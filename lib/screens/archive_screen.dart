@@ -4,7 +4,6 @@ import '../services/api_service.dart';
 import '../models/models.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
-import '../widgets/auto_slider.dart';
 
 class ArchiveScreen extends StatefulWidget {
   const ArchiveScreen({super.key});

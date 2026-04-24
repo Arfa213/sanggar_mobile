@@ -161,4 +161,11 @@ static Future<Map<String, String>> authHeader() async {
   if (token != null) return {'Authorization': 'Bearer $token'};
   return {};
 }
+
+// ── GET DETAIL TARIAN ─────────────────────────────────────────
+  static Future<Tarian> getTarianDetail(int id) async {
+    final d = await _get('/tarian/$id');
+    // Kita ambil dari d['data'] karena biasanya Laravel membungkus object dalam key 'data'
+    return Tarian.fromJson(d['data'] as Map<String, dynamic>);
+  }
 }

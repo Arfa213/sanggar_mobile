@@ -6,6 +6,7 @@ import '../services/auth_provider.dart';
 import '../models/models.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
+import '../models/jadwal_pendaftaran.dart';
 
 class PenjadwalanScreen extends StatefulWidget {
   final Tarian? initialTarian;

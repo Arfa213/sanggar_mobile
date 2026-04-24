@@ -8,7 +8,6 @@ import 'event_screen.dart';
 import 'archive_screen.dart';
 import 'profile_screen.dart';
 import 'chatbot_screen.dart';
-import 'penjadwalan_screen.dart';
 
 class MainNav extends StatefulWidget {
   const MainNav({super.key});

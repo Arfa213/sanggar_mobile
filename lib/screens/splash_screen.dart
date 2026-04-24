@@ -1,7 +1,5 @@
 // lib/screens/splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/auth_provider.dart';
 import '../utils/app_theme.dart';
 import 'main_nav.dart';
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../utils/app_theme.dart';
-import '../widgets/shared_widgets.dart';
 import '../services/api_service.dart';
 
 class ChatbotScreen extends StatefulWidget {
