@@ -48,19 +48,22 @@ jobs:
           chmod +x gradlew || true
           ./gradlew assembleRelease --no-daemon
           cd ..
+          ACTUAL_PATH=$(find build -name "app-release.apk" | head -n 1)
+          echo "APK_FOUND_AT=$ACTUAL_PATH" >> $GITHUB_ENV
+          echo "File ditemukan di: $ACTUAL_PATH"
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/apk/release/app-release.apk
+          path: ${{ env.APK_FOUND_AT }}
       
       - name: 🚀 Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           name: "Release ${{ github.ref_name }}"
-          files: build/app/outputs/apk/release/app-release.apk
+          files: ${{ env.APK_FOUND_AT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -83,5 +86,5 @@ jobs:
         run: |
           curl -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument \
           -F chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -F document=@build/app/outputs/apk/release/app-release.apk \
+          -F document=@${{ env.APK_FOUND_AT }} \
           -F caption="📦 APK terbaru berhasil di-build 🚀"
