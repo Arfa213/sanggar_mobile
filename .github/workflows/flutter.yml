@@ -30,7 +30,9 @@ jobs:
         continue-on-error: true # <--- Untuk mengabaikan apabila terjadi error pada saat testing otomatis
 
       - name: 🏗️ Build APK
-        run: flutter build apk --release
+        run: |
+          flutter clean
+          flutter build apk --release --no-tree-shake-icons
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
