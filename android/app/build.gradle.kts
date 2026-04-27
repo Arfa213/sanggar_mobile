@@ -9,6 +9,7 @@ android {
     namespace = "com.example.sanggar_mobile"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    flavorDimensions.add("env")
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -35,6 +36,16 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            applicationIdSuffix = ".dev" // Agar bisa install versi dev & prod di 1 HP
+        }
+        create("prod") {
+            dimension = "env"
         }
     }
 }
