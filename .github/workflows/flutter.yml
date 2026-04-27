@@ -43,22 +43,24 @@ jobs:
 
       - name: 🏗️ Build APK
         run: |
-          flutter clean
-          flutter pub get
-          flutter build apk --release --no-tree-shake-icons
+          flutter build apk --release --no-tree-shake-icons || true
+          cd android
+          chmod +x gradlew || true
+          ./gradlew assembleRelease --no-daemon
+          cd ..
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
       
       - name: 🚀 Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           name: "Release ${{ github.ref_name }}"
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,5 +83,5 @@ jobs:
         run: |
           curl -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument \
           -F chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -F document=@build/app/outputs/flutter-apk/app-release.apk \
+          -F document=@build/app/outputs/apk/release/app-release.apk \
           -F caption="📦 APK terbaru berhasil di-build 🚀"
