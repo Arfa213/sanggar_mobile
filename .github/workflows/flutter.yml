@@ -1,11 +1,10 @@
-name: Flutter CI/CD
+name: Flutter CI
 
 on:
   push:
     branches: [ main ]
     tags: 
       - 'v*'
-  pull_request:
 
 permissions:
   contents: write
@@ -13,9 +12,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        flutter-version: [3.16.0, 3.19.0] 
 
     steps:
       - name: 🗄️ Checkout Repository
@@ -31,22 +27,21 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-flutter-${{ matrix.flutter-version }}-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
 
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ matrix.flutter-version }}
+          flutter-version: '3.41.7' 
 
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      # Step test ini dibiarkan, tapi 'continue-on-error' agar build tidak berhenti jika test gagal
       - name: 🧪 Run Tests
         run: flutter test
         continue-on-error: true 
 
-      # Kita pakai build lewat Gradle langsung agar TIDAK error "Already watching path"
+      # MENGGUNAKAN GRADLE UNTUK MENGHINDARI ERROR "WATCHING PATH"
       - name: 🏗️ Build APK
         run: |
           cd android
@@ -57,10 +52,11 @@ jobs:
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: apk-flutter-${{ matrix.flutter-version }}
+          name: app-release
+          # Lokasi file APK sedikit berubah jika menggunakan Gradle langsung
           path: build/app/outputs/apk/release/app-release.apk
       
-      - name: 🚀 Create GitHub Release
+      - name: 🚀 Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
@@ -69,17 +65,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📢 Send APK to Telegram
+      - name: 📢 Notify Telegram (Success)
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ Build APK berhasil untuk commit ${{ github.sha }}"
+
+      - name: 📤 Send APK to Telegram
         if: success()
         run: |
           curl -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument \
           -F chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -F document=@build/app/outputs/apk/release/app-release.apk \
-          -F caption="✅ APK Berhasil di-build (Flutter ${{ matrix.flutter-version }})"
+          -F caption="📦 APK terbaru berhasil di-build 🚀"
 
-      - name: ❌ Notify Failed
+      - name: ❌ Notify Telegram (Failed)
         if: failure()
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="❌ Build gagal pada versi Flutter ${{ matrix.flutter-version }}"
+          -d text="❌ Build gagal di workflow GitHub Actions"
