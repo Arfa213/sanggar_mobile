@@ -43,27 +43,38 @@ jobs:
 
       - name: 🏗️ Build APK
         run: |
+          # 1. Jalankan pancingan build & Gradle
           flutter build apk --release --no-tree-shake-icons || true
           cd android
           chmod +x gradlew || true
           ./gradlew assembleRelease --no-daemon
           cd ..
-
-      - name: 🔍 Cek Lokasi File (Debug)
-        run: ls -R build/app/outputs
+          
+          # 2. Cari file APK secara dinamis
+          # Mencari file .apk di folder build/app/outputs yang ada kata 'release'
+          APK_PATH=$(find build/app/outputs -name "*release.apk" | head -n 1)
+          
+          # 3. Export ke environment agar bisa dibaca step lain
+          if [ -z "$APK_PATH" ]; then
+            echo "❌ ERROR: File APK tidak ditemukan!"
+            exit 1
+          fi
+          
+          echo "FINAL_APK_PATH=$APK_PATH" >> $GITHUB_ENV
+          echo "✅ APK ditemukan di: $APK_PATH"
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/apk/release/app-release.apk
+          path: ${{ env.FINAL_APK_PATH }}
       
       - name: 🚀 Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           name: "Release ${{ github.ref_name }}"
-          files: build/app/outputs/apk/release/app-release.apk
+          files: ${{ env.FINAL_APK_PATH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,19 +83,12 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="✅ Build APK berhasil untuk commit ${{ github.sha }}"
-
-      - name: ❌ Notify Telegram (Failed)
-        if: failure()
-        run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="❌ Build gagal di workflow GitHub Actions"
+          -d text="✅ Build Berhasil! Commit: ${{ github.sha }} | Path: ${{ env.FINAL_APK_PATH }}"
 
       - name: 📤 Send APK to Telegram
         if: success()
         run: |
           curl -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument \
           -F chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -F document=@build/app/outputs/apk/release/app-release.apk \
-          -F caption="📦 APK terbaru berhasil di-build 🚀"
+          -F document=@${{ env.FINAL_APK_PATH }} \
+          -F caption="📦 APK Sanggar Mobile terbaru 🚀"
