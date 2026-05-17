@@ -5,6 +5,10 @@ import '../services/auth_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import 'auth/login_screen.dart';
+import 'profil/edit_password_screen.dart';
+import 'profil/edit_profil_screen.dart';
+import 'profil/pusat_bantuan_scren.dart';
+import 'profil/riwayat_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -253,31 +257,45 @@ class _LoggedInView extends StatelessWidget {
           ),
           const SizedBox(height: kSpace),
 
-          // Menu Kelompok 1: Pengaturan Akun
+          // Pengaturan Akun
           _buildSectionTitle('PENGATURAN AKUN'),
-          _MenuItem(Icons.person_outline_rounded, 'Edit Profil', 
-              () => _showSnackbar(context, 'Halaman Edit Profil')),
-          _MenuItem(Icons.lock_outline_rounded, 'Ubah Password', 
-              () => _showSnackbar(context, 'Halaman Ubah Password')),
-          _MenuItem(Icons.history_rounded, 'Riwayat Aktivitas', 
-              () => _showSnackbar(context, 'Halaman Riwayat Aktivitas')),
-          
+          _MenuItem(
+            Icons.person_outline_rounded, 
+            'Edit Profil', 
+            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+          ),
+          _MenuItem(
+            Icons.lock_outline_rounded, 
+            'Ubah Password', 
+            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen())),
+          ),
+          _MenuItem(
+            Icons.history_rounded, 
+            'Riwayat Aktivitas', 
+            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen())),
+          ),
+
           const SizedBox(height: kSpace),
 
-          // Menu Kelompok 2: Informasi Umum
           _buildSectionTitle('INFORMASI LAINNYA'),
-          _MenuItem(Icons.info_outline_rounded, 'Tentang Aplikasi', 
-              () => _showInfoBottomSheet(context)),
-          _MenuItem(Icons.help_outline_rounded, 'Pusat Bantuan', 
-              () => _showSnackbar(context, 'Halaman Pusat Bantuan')),
-
+          _MenuItem(
+            Icons.info_outline_rounded, 
+            'Tentang Aplikasi', 
+            () => _showInfoBottomSheet(context), // Ini biarkan tetap bottom sheet bawaanmu
+          ),
+          _MenuItem(
+            Icons.help_outline_rounded, 
+            'Pusat Bantuan', 
+            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen())),
+          ),
+          
           // Tombol Keluar / Logout
           Padding(
             padding: const EdgeInsets.fromLTRB(kSpace, kSpaceLg, kSpace, 0),
             child: OutlinedButton.icon(
               onPressed: () => _handleLogout(context),
               icon:  const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
-              label: const Text('Keluar Aplikasi',
+              label: const Text('Keluar',
                   style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
               style: OutlinedButton.styleFrom(
                 minimumSize:  const Size.fromHeight(52),
