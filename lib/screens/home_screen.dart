@@ -5,7 +5,7 @@ import '../models/models.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import '../widgets/auto_slider.dart';
-import 'auth/login_screen.dart';
+import 'main_nav.dart'; // FIX: Pastikan import ini ada untuk membaca MainNav.of(context)
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,6 +75,56 @@ class _HomeScreenState extends State<HomeScreen> {
     )).toList();
   }
 
+  // ── POPUP DETAIL TENTANG SANGGAR ───────────────────────────
+  void _showSejarahDialog() {
+    if (_profil == null) return;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadius)),
+        backgroundColor: kBgCard,
+        title: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppBadge('SEJARAH LENGKAP'),
+                  const SizedBox(height: 6),
+                  Text(_profil!.namaSanggar, style: AppText.displayXs),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close_rounded, color: kMuted),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.85,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_profil!.tahunBerdiri != null) ...[
+                  Text('Berdiri sejak tahun ${_profil!.tahunBerdiri}',
+                      style: AppText.caption.copyWith(color: kPrimary, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                ],
+                Text(
+                  _profil!.sejarah,
+                  textAlign: TextAlign.justify, // FIX: Memperbaiki letak alignment text agar tidak crash
+                  style: AppText.bodyMd.copyWith(color: kDark, height: 1.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +162,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         title:       'Tarian Khas Indramayu',
                         subtitle:    'ARSIP DIGITAL',
                         actionLabel: 'Lihat semua',
-                        onAction:    () {},
+                        onAction: () {
+                          // FIX: Mengubah tab aktif MainNav ke indeks 1 (Menu Arsip)
+                          MainNav.of(context)?.setIndex = 1;
+                        },
                       ),
                     ),
                     SliverToBoxAdapter(child: _buildTarianList()),
@@ -124,7 +177,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           title:       'Event Unggulan',
                           subtitle:    'JEJAK PRESTASI',
                           actionLabel: 'Semua event',
-                          onAction:    () {},
+                          onAction: () {
+                            // FIX: Mengubah tab aktif MainNav ke indeks 2 (Menu Event)
+                            MainNav.of(context)?.setIndex = 2;
+                          },
                         ),
                       ),
                       SliverToBoxAdapter(child: _buildEventList()),
@@ -132,9 +188,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // ── DOKUMENTASI SLIDER ──
                     SliverToBoxAdapter(child: _buildDokumentasiSlider()),
-
-                    // ── CTA ──
-                    SliverToBoxAdapter(child: _buildCta()),
                     const SliverToBoxAdapter(child: SizedBox(height: 90)),
                   ]),
                 ),
@@ -152,7 +205,6 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: 12,
       ),
       child: Row(children: [
-        // Logo
         Container(
           width: 36, height: 36,
           decoration: BoxDecoration(
@@ -167,8 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(_profil?.namaSanggar ?? 'Sanggar Mulya Bhakti',
             style: AppText.displayXs.copyWith(fontSize: 15)),
-          Text('Indramayu, Jawa Barat',
-            style: AppText.caption),
+          Text('Indramayu, Jawa Barat', style: AppText.caption),
         ])),
         IconButton(
           icon: const Icon(Icons.notifications_none_rounded, color: kDark, size: 22),
@@ -231,10 +282,11 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 10),
         Text(
           sejarah.length > 220 ? '${sejarah.substring(0, 220)}...' : sejarah,
+          textAlign: TextAlign.justify, // FIX: Memperbaiki letak alignment text agar tidak crash
           style: AppText.bodyMd.copyWith(color: kMuted, height: 1.7),
         ),
         const SizedBox(height: 12),
-        _TextLink('Baca selengkapnya →', onTap: () {}),
+        _TextLink('Baca selengkapnya →', onTap: _showSejarahDialog), // FIX: Diarahkan ke popup dialog sejarah
       ]),
     );
   }
@@ -261,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── EVENT LIST ─────────────────────────────────────────────
   Widget _buildEventList() {
     return SizedBox(
-      height: 220,
+      height: 250,
       child: ListView.separated(
         scrollDirection:  Axis.horizontal,
         padding:          const EdgeInsets.symmetric(horizontal: kSpace),
@@ -283,54 +335,6 @@ class _HomeScreenState extends State<HomeScreen> {
       AutoSlider(items: slides, height: 220, interval: const Duration(seconds: 3)),
       const SizedBox(height: kSpace),
     ]);
-  }
-
-  // ── CTA ────────────────────────────────────────────────────
-  Widget _buildCta() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(kSpace, kSpaceLg, kSpace, 0),
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color:        kPrimary,
-        borderRadius: BorderRadius.circular(kRadiusXl),
-        image: const DecorationImage(
-          image:     AssetImage('assets/images/batik_pattern.png'),
-          fit:       BoxFit.cover,
-          opacity:   0.08,
-        ),
-      ),
-      child: Column(children: [
-        const Text('Bergabung dengan\nKomunitas Kami',
-          style: TextStyle(
-            color: Colors.white, fontSize: 22,
-            fontWeight: FontWeight.w900, height: 1.25,
-            fontFamily: 'PlayfairDisplay',
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Jadilah bagian dari gerakan pelestarian budaya Indramayu.',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const LoginScreen(showRegister: true))),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: kPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: const Text('Daftar Sekarang',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
-          ),
-        ),
-      ]),
-    );
   }
 }
 
@@ -418,7 +422,6 @@ class _EventCard extends StatelessWidget {
           blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Foto
         Stack(children: [
           AppImage(
             url:          event.foto,
@@ -438,8 +441,7 @@ class _EventCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Text(event.tahun,
-                style: AppText.caption.copyWith(color: kPrimary)),
+              Text(event.tahun, style: AppText.caption.copyWith(color: kPrimary)),
               const Spacer(),
               Text(event.level, style: AppText.caption),
             ]),

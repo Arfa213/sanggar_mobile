@@ -64,13 +64,13 @@ class _LoginScreenState extends State<LoginScreen>
       } else {
         await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
       }
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _loading = false);
-    }
+    } 
   }
 
   @override
@@ -91,12 +91,14 @@ class _LoginScreenState extends State<LoginScreen>
         SafeArea(
           child: Column(children: [
             // Back button
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_ios_rounded,
-                    color: Colors.white, size: 20))),
+           Align(
+            alignment: Alignment.centerLeft,
+            child: Navigator.canPop(context) // Hanya tampilkan tombol jika halaman ini bisa di-back
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 20),
+                  )
+                : const SizedBox(height: 48)),
 
             Expanded(child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: kSpace),

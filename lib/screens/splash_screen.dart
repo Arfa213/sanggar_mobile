@@ -1,7 +1,8 @@
 // lib/screens/splash_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_provider.dart';
 import '../utils/app_theme.dart';
-import 'main_nav.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,22 +24,27 @@ class _SplashScreenState extends State<SplashScreen>
     _slide = Tween(begin: 20.0, end: 0.0).animate(
       CurvedAnimation(parent: _ctrl, curve: const Interval(0.3, 1, curve: Curves.easeOut)));
     _ctrl.forward();
+    
+    // Menjalankan pengecekan rute setelah delay 3 detik
     Future.delayed(const Duration(seconds: 3), _navigate);
   }
 
   @override
   void dispose() { _ctrl.dispose(); super.dispose(); }
 
-  void _navigate() {
+void _navigate() {
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(PageRouteBuilder(
-      pageBuilder:       (_, __, ___) => const MainNav(),
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (_, a, __, child) =>
-          FadeTransition(opacity: a, child: child),
-    ));
-  }
+    
+    // Cek status login
+    final auth = Provider.of<AuthProvider>(context, listen: false);
 
+    // Tentukan rute tujuan
+    final String targetRoute = auth.isLoggedIn ? '/home' : '/register';
+
+    // Pindah halaman menggunakan nama rute secara aman
+    Navigator.pushReplacementNamed(context, targetRoute);
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

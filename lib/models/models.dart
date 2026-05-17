@@ -107,13 +107,32 @@ class Galeri {
 class UserModel {
   final int id;
   final String name, email, role, status;
-  final String? alamat, noHp;
+  final String? alamat, noHp, foto; // 👈 TAMBAHKAN properti foto di sini (bisa null)
   String? token;
-  UserModel({required this.id, required this.name, required this.email,
-    required this.role, required this.status, this.alamat, this.noHp, this.token});
+
+  UserModel({
+    required this.id, 
+    required this.name, 
+    required this.email,
+    required this.role, 
+    required this.status, 
+    this.alamat, 
+    this.noHp, 
+    this.foto, // 👈 TAMBAHKAN di constructor
+    this.token,
+  });
+
   factory UserModel.fromJson(Map<String, dynamic> j) => UserModel(
-    id: j['id'] as int, name: j['name'] ?? '', email: j['email'] ?? '',
-    role: j['role'] ?? 'anggota', status: j['status'] ?? 'aktif',
-    alamat: j['alamat'], noHp: j['no_hp'], token: j['token']);
-  bool get isAdmin => role == 'admin';
+    id: j['id'] as int, 
+    name: j['name'] ?? '', 
+    email: j['email'] ?? '',
+    role: j['role'] ?? 'anggota', 
+    status: j['status'] ?? 'aktif',
+    alamat: j['alamat'], 
+    noHp: j['no_hp'], 
+    foto: j['foto_profil'] ?? j['foto'], // 👈 Petakan dari key JSON API kamu (misal 'foto_profil' atau 'foto')
+    token: j['token'],
+  );
+
+  bool get isAdmin => role == 'admin' || role == 'administrator';
 }
