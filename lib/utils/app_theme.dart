@@ -27,11 +27,10 @@ Color get kBorder       => gIsDarkMode ? const Color(0xFF333333) : const Color(0
 Color get kBorder2      => gIsDarkMode ? const Color(0xFF2A2A2A) : const Color(0xFFF0EBE5);
 
 // ── BASE URL ─────────────────────────────────────────────────
-// Web/Windows : 127.0.0.1  (Laravel di mesin yang sama)
-// Android Emulator: 10.0.2.2 (alias localhost dari emulator)
-// Device fisik (WiFi): ganti ke IP WiFi PC kamu
-String get kBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
-String get kApiUrl  => kIsWeb ? 'http://127.0.0.1:8000/api/v1' : 'http://10.0.2.2:8000/api/v1';
+// Konfigurasi IP ini menggunakan IP WiFi Laptop kamu saat ini (192.168.100.223)
+// Agar HP asli (via USB) bisa nembak langsung ke server Laravel di laptop.
+String get kBaseUrl => 'http://192.168.100.223:8000';
+String get kApiUrl  => 'http://192.168.100.223:8000/api/v1';
 
 String getImageUrl(String? path) {
   if (path == null || path.isEmpty) return '';
