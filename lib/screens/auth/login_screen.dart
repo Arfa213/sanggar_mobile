@@ -169,12 +169,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   alignment: Alignment.centerLeft,
                   child: IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_ios_rounded,
+                    icon: Icon(Icons.arrow_back_ios_rounded,
                         color: Colors.white60, size: 20),
                   ),
                 )
               else
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
               // ── Brand Section ───────────────────────────────
               Expanded(
@@ -190,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         child: _buildLogo(),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     // Title & subtitle
                     SlideTransition(
@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               color: Colors.white.withOpacity(0.08),
               border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
             ),
-            child: const Center(
+            child: Center(
               child: Text('SMB', style: TextStyle(
                 color: Colors.white, fontSize: 22,
                 fontWeight: FontWeight.w900, letterSpacing: 1.5,
@@ -260,18 +260,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Widget _buildBrandText() {
     return Column(children: [
-      const Text('Sanggar Mulya Bhakti',
+      Text('Sanggar Mulya Bhakti',
         style: TextStyle(
           color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900,
           fontFamily: 'PlayfairDisplay', letterSpacing: 0.3)),
-      const SizedBox(height: 6),
+      SizedBox(height: 6),
       Row(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 24, height: 1, color: kPrimary.withOpacity(0.6)),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text('Melestarikan Budaya Melalui Seni',
           style: TextStyle(color: Colors.white.withOpacity(0.5),
               fontSize: 11, letterSpacing: 0.5)),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Container(width: 24, height: 1, color: kPrimary.withOpacity(0.6)),
       ]),
     ]);
@@ -305,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               _buildTab('Daftar', _isReg),
             ]),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Greeting ───────────────────────────────────────
           FadeTransition(
@@ -313,16 +313,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 _isReg ? 'Buat Akun Baru' : 'Selamat Datang!',
-                style: const TextStyle(color: Colors.white, fontSize: 20,
+                style: TextStyle(color: Colors.white, fontSize: 20,
                     fontWeight: FontWeight.w800, fontFamily: 'PlayfairDisplay')),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 _isReg ? 'Bergabung dengan komunitas seni kami'
                        : 'Masuk untuk mengakses semua fitur sanggar',
                 style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
             ]),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // ── Error Banner ───────────────────────────────────
           if (_error != null) ...[
@@ -334,13 +334,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 border: Border.all(color: Colors.red.withOpacity(0.3)),
               ),
               child: Row(children: [
-                const Icon(Icons.error_outline_rounded, color: Color(0xFFFF6B6B), size: 16),
-                const SizedBox(width: 8),
-                Expanded(child: Text(_error!, style: const TextStyle(
+                Icon(Icons.error_outline_rounded, color: Color(0xFFFF6B6B), size: 16),
+                SizedBox(width: 8),
+                Expanded(child: Text(_error!, style: TextStyle(
                     color: Color(0xFFFF6B6B), fontSize: 12))),
               ]),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
 
           // ── Form ───────────────────────────────────────────
@@ -354,7 +354,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       hint: 'Masukkan nama lengkap',
                       icon: Icons.person_outline_rounded,
                       validator: (v) => (v?.isEmpty ?? true) ? 'Wajib diisi' : null),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                 ],
                 _DarkField(ctrl: _emailCtrl, label: 'Email',
                     hint: 'nama@gmail.com',
@@ -365,13 +365,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       if (!v!.contains('@')) return 'Format email tidak valid';
                       return null;
                     }),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 if (_isReg) ...[
                   _DarkField(ctrl: _alamatCtrl, label: 'Alamat',
                       hint: 'Masukkan alamat (opsional)',
                       icon: Icons.location_on_outlined,
                       maxLines: 2),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                 ],
 
                 // Password field
@@ -389,7 +389,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
 
                 if (_isReg) ...[
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _DarkPasswordField(
                     ctrl: _passConfCtrl,
                     label: 'Konfirmasi Password',
@@ -409,7 +409,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                 ],
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Submit button
                 SizedBox(
@@ -424,16 +424,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     child: _loading
-                        ? const SizedBox(width: 22, height: 22,
+                        ? SizedBox(width: 22, height: 22,
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                         : Text(_isReg ? 'Buat Akun' : 'Masuk Sekarang',
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                   ),
                 ),
               ]),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Toggle link
           Center(
@@ -497,7 +497,7 @@ class _DarkField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TextFormField(
     controller: ctrl, keyboardType: type, maxLines: maxLines,
-    style: const TextStyle(color: Colors.white, fontSize: 14),
+    style: TextStyle(color: Colors.white, fontSize: 14),
     decoration: InputDecoration(
       labelText: label,
       hintText: hint,
@@ -514,11 +514,11 @@ class _DarkField extends StatelessWidget {
         borderSide: BorderSide(color: Colors.white.withOpacity(0.07))),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: kPrimary, width: 1.5)),
+        borderSide: BorderSide(color: kPrimary, width: 1.5)),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 1.2)),
-      errorStyle: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 11),
+        borderSide: BorderSide(color: Color(0xFFFF6B6B), width: 1.2)),
+      errorStyle: TextStyle(color: Color(0xFFFF6B6B), fontSize: 11),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
     validator: validator,
@@ -540,13 +540,13 @@ class _DarkPasswordField extends StatelessWidget {
   Widget build(BuildContext context) => TextFormField(
     controller: ctrl,
     obscureText: obscure,
-    style: const TextStyle(color: Colors.white, fontSize: 14),
+    style: TextStyle(color: Colors.white, fontSize: 14),
     decoration: InputDecoration(
       labelText: label,
       hintText: hint,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13),
       hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 13),
-      prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.white30, size: 18),
+      prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.white30, size: 18),
       suffixIcon: GestureDetector(
         onTap: onToggle,
         child: Icon(
@@ -562,11 +562,11 @@ class _DarkPasswordField extends StatelessWidget {
         borderSide: BorderSide(color: Colors.white.withOpacity(0.07))),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: kPrimary, width: 1.5)),
+        borderSide: BorderSide(color: kPrimary, width: 1.5)),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 1.2)),
-      errorStyle: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 11),
+        borderSide: BorderSide(color: Color(0xFFFF6B6B), width: 1.2)),
+      errorStyle: TextStyle(color: Color(0xFFFF6B6B), fontSize: 11),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
     validator: validator,

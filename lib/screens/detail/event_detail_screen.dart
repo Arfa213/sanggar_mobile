@@ -23,7 +23,7 @@ class EventDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
-              child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
+              child: Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
             ),
           ),
           flexibleSpace: FlexibleSpaceBar(
@@ -32,7 +32,7 @@ class EventDetailScreen extends StatelessWidget {
                 url: event.foto,
                 fit: BoxFit.cover,
                 placeholder: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [kPrimaryDark, kPrimary],
                       begin: Alignment.topLeft, end: Alignment.bottomRight))),
@@ -49,13 +49,13 @@ class EventDetailScreen extends StatelessWidget {
                 left: 0,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: kPrimary,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(kRadius),
                       bottomRight: Radius.circular(kRadius))),
                   child: Text(event.tahun,
-                    style: const TextStyle(color: Colors.white, fontSize: 13,
+                    style: TextStyle(color: Colors.white, fontSize: 13,
                         fontWeight: FontWeight.w900, letterSpacing: 1)),
                 ),
               ),
@@ -64,7 +64,7 @@ class EventDetailScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     CategoryChip(event.kategori),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -72,10 +72,10 @@ class EventDetailScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(kRadiusFull),
                         border: Border.all(color: Colors.white.withOpacity(0.3))),
                       child: Text(event.level,
-                        style: const TextStyle(color: Colors.white, fontSize: 10,
+                        style: TextStyle(color: Colors.white, fontSize: 10,
                             fontWeight: FontWeight.w700, letterSpacing: 0.5))),
                   ]),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(event.nama, style: AppText.displayMd.copyWith(color: Colors.white)),
                 ]),
               ),
@@ -99,7 +99,7 @@ class EventDetailScreen extends StatelessWidget {
               ],
             ]),
           ),
-          const SizedBox(height: kSpaceSm),
+          SizedBox(height: kSpaceSm),
 
           // Hasil
           if (event.hasil != null)
@@ -107,19 +107,19 @@ class EventDetailScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: kSpace),
             padding: const EdgeInsets.all(kSpace),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [Color(0xFFFFF8E1), Color(0xFFFFFDE7)],
                 begin: Alignment.topLeft, end: Alignment.bottomRight),
               borderRadius: BorderRadius.circular(kRadius),
               border: Border.all(color: kGold.withOpacity(0.4))),
             child: Row(children: [
-              const Text('🏆', style: TextStyle(fontSize: 28)),
-              const SizedBox(width: 14),
+              Text('🏆', style: TextStyle(fontSize: 28)),
+              SizedBox(width: 14),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Hasil Pencapaian',
+                Text('Hasil Pencapaian',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
                       color: kGold, letterSpacing: 0.8)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(event.hasil!,
                   style: AppText.displayXs.copyWith(color: const Color(0xFFE65100))),
               ])),
@@ -132,7 +132,7 @@ class EventDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.all(kSpace),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Tentang Event', style: AppText.displayXs),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Text(event.deskripsi!, style: AppText.bodyMd.copyWith(height: 1.75)),
             ]),
           ),
@@ -143,7 +143,7 @@ class EventDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(kSpace, 0, kSpace, kSpaceSm),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Penghargaan Diraih', style: AppText.displayXs),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Wrap(
                   spacing: 8, runSpacing: 8,
                   children: event.penghargaan.map((p) => Container(
@@ -160,7 +160,7 @@ class EventDetailScreen extends StatelessWidget {
             ),
           ],
 
-          const SizedBox(height: 80),
+          SizedBox(height: 80),
         ])),
       ]),
     );
@@ -176,12 +176,12 @@ class _MetaRow extends StatelessWidget {
     child: Row(children: [
       Container(
         width: 36, height: 36,
-        decoration: const BoxDecoration(color: kPrimaryPale, shape: BoxShape.circle),
+        decoration: BoxDecoration(color: kPrimaryPale, shape: BoxShape.circle),
         child: Icon(icon, color: kPrimary, size: 18)),
-      const SizedBox(width: 12),
+      SizedBox(width: 12),
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: AppText.caption.copyWith(letterSpacing: 0.8)),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(value, style: AppText.label),
       ]),
     ]),

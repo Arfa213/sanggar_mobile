@@ -15,7 +15,7 @@ class HelpCenterScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBgSoft,
       appBar: AppBar(
-        title: const Text('Pusat Bantuan', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Pusat Bantuan', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: kDark,
         elevation: 0.5,
@@ -26,7 +26,7 @@ class HelpCenterScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Pertanyaan Sering Diajukan (FAQ)', style: AppText.label.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             ...faqs.map((faq) => Container(
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
@@ -44,25 +44,25 @@ class HelpCenterScreen extends StatelessWidget {
                     ],
                   ),
                 )),
-            const SizedBox(height: kSpace),
+            SizedBox(height: kSpace),
             Container(
               padding: const EdgeInsets.all(kSpace),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [kPrimary, kPrimaryDark]),
+                gradient: LinearGradient(colors: [kPrimary, kPrimaryDark]),
                 borderRadius: BorderRadius.circular(kRadius),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Masih butuh bantuan lain?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 4),
+                  Text('Masih butuh bantuan lain?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  SizedBox(height: 4),
                   Text('Hubungi langsung kontak resmi Sanggar Mulya Bhakti.', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   ElevatedButton.icon(
                     onPressed: () {}, // Hubungkan ke API WhatsApp link jika perlu
                     style: ElevatedButton.styleFrom(backgroundColor: kGold, foregroundColor: Colors.white),
-                    icon: const Icon(Icons.support_agent_rounded, size: 18),
-                    label: const Text('Hubungi Pengurus Sanggar'),
+                    icon: Icon(Icons.support_agent_rounded, size: 18),
+                    label: Text('Hubungi Pengurus Sanggar'),
                   )
                 ],
               ),

@@ -102,19 +102,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       backgroundColor: kBgSoft,
       appBar: AppBar(
         backgroundColor: kPrimary,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white),
         titleSpacing: 0,
         title: Row(children: [
           Container(
             width: 38, height: 38,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
-            child: const Center(child: Text('AI',
+            child: Center(child: Text('AI',
               style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900))),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Asisten Sanggar', style: TextStyle(
+            Text('Asisten Sanggar', style: TextStyle(
                 color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
             Text('🟢 Online', style: TextStyle(
                 color: Colors.white.withOpacity(0.75), fontSize: 11)),
@@ -127,7 +127,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               _msgs.add(const _ChatMsg(role: 'bot',
                 content: 'Chat dihapus. Ada yang bisa saya bantu? 😊'));
             }),
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white70),
+            icon: Icon(Icons.delete_outline_rounded, color: Colors.white70),
           ),
         ],
       ),
@@ -163,7 +163,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     color: kPrimaryPale,
                     borderRadius: BorderRadius.circular(kRadiusFull),
                     border: Border.all(color: kPrimary.withOpacity(0.2))),
-                  child: Text(q, style: const TextStyle(
+                  child: Text(q, style: TextStyle(
                       color: kPrimary, fontSize: 12, fontWeight: FontWeight.w700)),
                 ),
               )).toList(),
@@ -178,7 +178,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             top: kSpaceSm,
             bottom: MediaQuery.of(context).viewInsets.bottom + kSpaceSm + MediaQuery.of(context).padding.bottom,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: kBgCard,
             border: Border(top: BorderSide(color: kBorder2)),
           ),
@@ -200,7 +200,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: kSpaceSm),
+            SizedBox(width: kSpaceSm),
             GestureDetector(
               onTap: () => _send(_ctrl.text),
               child: AnimatedContainer(
@@ -209,7 +209,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 decoration: BoxDecoration(
                   color: _loading ? kMuted2 : kPrimary,
                   shape: BoxShape.circle),
-                child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
               ),
             ),
           ]),
@@ -243,8 +243,8 @@ class _MessageBubble extends StatelessWidget {
             Container(
               width: 30, height: 30,
               margin: const EdgeInsets.only(right: 8),
-              decoration: const BoxDecoration(color: kPrimary, shape: BoxShape.circle),
-              child: const Center(child: Text('AI',
+              decoration: BoxDecoration(color: kPrimary, shape: BoxShape.circle),
+              child: Center(child: Text('AI',
                 style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900))),
             ),
           ],
@@ -299,8 +299,8 @@ class _TypingIndicatorState extends State<_TypingIndicator>
         Container(
           width: 30, height: 30,
           margin: const EdgeInsets.only(right: 8),
-          decoration: const BoxDecoration(color: kPrimary, shape: BoxShape.circle),
-          child: const Center(child: Text('AI',
+          decoration: BoxDecoration(color: kPrimary, shape: BoxShape.circle),
+          child: Center(child: Text('AI',
             style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900))),
         ),
         Container(

@@ -64,21 +64,21 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
     // Harus login
     if (!auth.isLoggedIn) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Penjadwalan')),
+        appBar: AppBar(title: Text('Penjadwalan')),
         body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
           Container(
             width: 80, height: 80,
             decoration: BoxDecoration(color: kPrimaryPale, shape: BoxShape.circle),
-            child: const Icon(Icons.lock_outline_rounded, color: kPrimary, size: 36)),
-          const SizedBox(height: kSpace),
+            child: Icon(Icons.lock_outline_rounded, color: kPrimary, size: 36)),
+          SizedBox(height: kSpace),
           Text('Login Diperlukan', style: AppText.displayXs),
-          const SizedBox(height: 8),
-          const Text('Masuk terlebih dahulu untuk mendaftar kelas tari.',
+          SizedBox(height: 8),
+          Text('Masuk terlebih dahulu untuk mendaftar kelas tari.',
             style: TextStyle(color: kMuted), textAlign: TextAlign.center),
-          const SizedBox(height: kSpaceLg),
+          SizedBox(height: kSpaceLg),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/login'),
-            child: const Text('Masuk Sekarang')),
+            child: Text('Masuk Sekarang')),
         ])),
       );
     }
@@ -93,7 +93,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kSpace),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const AppBadge('KELAS TARI'),
+                AppBadge('KELAS TARI'),
                 Text('Penjadwalan', style: AppText.displaySm),
               ]),
             ),
@@ -102,7 +102,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
               indicatorColor: kPrimary,
               labelColor: kPrimary,
               unselectedLabelColor: kMuted,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              labelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: [
                 Tab(text: 'Pilih Kelas (${_tarian.length})'),
                 Tab(text: 'Terdaftar (${_daftar.length})'),
@@ -140,7 +140,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(children: [
+          content: Row(children: [
             Icon(Icons.check_circle_rounded, color: Colors.white),
             SizedBox(width: 10),
             Text('Berhasil mendaftar kelas!'),
@@ -169,14 +169,14 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusLg)),
-        title: const Text('Batalkan Pendaftaran?'),
-        content: const Text('Kamu akan keluar dari kelas ini.'),
+        title: Text('Batalkan Pendaftaran?'),
+        content: Text('Kamu akan keluar dari kelas ini.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Tidak')),
+              child: Text('Tidak')),
           ElevatedButton(onPressed: () => Navigator.pop(context, true),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Ya, Batalkan')),
+              child: Text('Ya, Batalkan')),
         ],
       ),
     );
@@ -214,7 +214,7 @@ class _PilihKelasTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(kSpace),
       itemCount: tarian.length,
-      separatorBuilder: (_, __) => const SizedBox(height: kSpaceSm),
+      separatorBuilder: (_, __) => SizedBox(height: kSpaceSm),
       itemBuilder: (_, i) {
         final t        = tarian[i];
         final sudah    = sudahDaftarIds.contains(t.id);
@@ -281,14 +281,14 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                 borderRadius: BorderRadius.circular(kRadiusSm),
                 placeholder: Container(
                   color: kPrimaryPale,
-                  child: const Icon(Icons.music_note_rounded, color: kPrimary, size: 24)),
+                  child: Icon(Icons.music_note_rounded, color: kPrimary, size: 24)),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t.nama, style: AppText.label),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 CategoryChip(t.kategori, small: true),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text('📍 ${t.asal}', style: AppText.bodyXs),
               ])),
               if (widget.sudahDaftar)
@@ -297,7 +297,7 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(kRadiusFull)),
-                  child: const Text('✓ Terdaftar',
+                  child: Text('✓ Terdaftar',
                     style: TextStyle(color: Color(0xFF2E7D32),
                         fontSize: 11, fontWeight: FontWeight.w800)))
               else
@@ -314,7 +314,7 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const AppDivider(padding: EdgeInsets.only(bottom: kSpace)),
             Text('Pilih Jadwal Latihan', style: AppText.labelSm),
-            const SizedBox(height: kSpaceSm),
+            SizedBox(height: kSpaceSm),
             // Jadwal options
             ...widget.jadwal.map((j) => GestureDetector(
               onTap: () => setState(() => _selectedJadwal = j.id),
@@ -342,7 +342,7 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                 ]),
               ),
             )).toList(),
-            const SizedBox(height: kSpaceSm),
+            SizedBox(height: kSpaceSm),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -352,9 +352,9 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                   if (mounted) setState(() { _loading = false; _expanded = false; });
                 },
                 child: _loading
-                    ? const SizedBox(width: 18, height: 18,
+                    ? SizedBox(width: 18, height: 18,
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Daftar Kelas Ini'),
+                    : Text('Daftar Kelas Ini'),
               )),
           ]),
         ),
@@ -376,11 +376,11 @@ class _TerdaftarTab extends StatelessWidget {
         Container(
           width: 72, height: 72,
           decoration: BoxDecoration(color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadius)),
-          child: const Icon(Icons.event_note_rounded, color: kPrimary, size: 32)),
-        const SizedBox(height: kSpace),
+          child: Icon(Icons.event_note_rounded, color: kPrimary, size: 32)),
+        SizedBox(height: kSpace),
         Text('Belum ada kelas terdaftar', style: AppText.displayXs.copyWith(fontSize: 16)),
-        const SizedBox(height: 6),
-        const Text('Pilih kelas tari dari tab "Pilih Kelas"',
+        SizedBox(height: 6),
+        Text('Pilih kelas tari dari tab "Pilih Kelas"',
             style: TextStyle(color: kMuted)),
       ]));
     }
@@ -388,7 +388,7 @@ class _TerdaftarTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(kSpace),
       itemCount: daftar.length,
-      separatorBuilder: (_, __) => const SizedBox(height: kSpaceSm),
+      separatorBuilder: (_, __) => SizedBox(height: kSpaceSm),
       itemBuilder: (_, i) {
         final d = daftar[i];
         return Container(
@@ -401,19 +401,19 @@ class _TerdaftarTab extends StatelessWidget {
             Container(
               width: 56, height: 60,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   colors: [kPrimary, kPrimaryDark],
                   begin: Alignment.topCenter, end: Alignment.bottomCenter),
                 borderRadius: BorderRadius.circular(kRadiusSm)),
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(d.hariSingkat, style: const TextStyle(
+                Text(d.hariSingkat, style: TextStyle(
                     color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
               ]),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(d.tarianNama, style: AppText.label),
-              const SizedBox(height: 3),
+              SizedBox(height: 3),
               Text('⏰ ${d.jamMulai} – ${d.jamSelesai}',
                   style: AppText.bodyXs),
               Text('📍 ${d.tempat}', style: AppText.bodyXs),
@@ -426,7 +426,7 @@ class _TerdaftarTab extends StatelessWidget {
                   color: const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(kRadiusSm),
                   border: Border.all(color: const Color(0xFFFECACA))),
-                child: const Text('Batalkan',
+                child: Text('Batalkan',
                     style: TextStyle(color: Color(0xFFDC2626), fontSize: 11, fontWeight: FontWeight.w700))),
             ),
           ]),

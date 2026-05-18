@@ -49,7 +49,7 @@ void _navigate() {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [kPrimaryDark, kPrimary, Color(0xFFD4754A)],
             begin:  Alignment.topLeft,
@@ -89,20 +89,20 @@ void _navigate() {
                       color: Colors.white.withOpacity(0.3), width: 2),
                   ),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    const Text('SMB', style: TextStyle(
+                    Text('SMB', style: TextStyle(
                       color: Colors.white, fontSize: 22,
                       fontWeight: FontWeight.w900, letterSpacing: 1.5,
                       fontFamily: 'PlayfairDisplay',
                     )),
                     Container(width: 30, height: 1.5, color: Colors.white.withOpacity(0.5)),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text('SANGGAR', style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 7, letterSpacing: 2, fontWeight: FontWeight.w700,
                     )),
                   ]),
                 )),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
 
               // Title
               AnimatedBuilder(
@@ -112,27 +112,27 @@ void _navigate() {
                   child: child,
                 ),
                 child: Column(children: [
-                  const Text('Sanggar Mulya Bhakti',
+                  Text('Sanggar Mulya Bhakti',
                     style: TextStyle(
                       color: Colors.white, fontSize: 26,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'PlayfairDisplay',
                       letterSpacing: 0.5,
                     )),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     Container(width: 20, height: 1, color: Colors.white.withOpacity(0.4)),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text('Melestarikan Budaya Melalui Seni',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8), fontSize: 12,
                         letterSpacing: 0.5)),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Container(width: 20, height: 1, color: Colors.white.withOpacity(0.4)),
                   ]),
                 ]),
               ),
-              const SizedBox(height: 52),
+              SizedBox(height: 52),
 
               // Loader
               SizedBox(

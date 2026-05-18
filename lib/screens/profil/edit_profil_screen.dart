@@ -58,7 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: kBgSoft,
       appBar: AppBar(
-        title: const Text('Edit Profil', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text('Edit Profil', style: TextStyle(fontWeight: FontWeight.w800)),
         backgroundColor: kBgCard, foregroundColor: kDark, elevation: 0,
         bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(color: kBorder)),
       ),
@@ -70,34 +70,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(kRadius),
                   border: Border.all(color: const Color(0xFF2E7D32))),
               child: Row(children: [
-                const Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 16),
-                const SizedBox(width: 8),
-                Text(_success!, style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 13)),
+                Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 16),
+                SizedBox(width: 8),
+                Text(_success!, style: TextStyle(color: Color(0xFF2E7D32), fontSize: 13)),
               ])),
           if (_error != null)
             Container(margin: const EdgeInsets.only(bottom: kSpace), padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: const Color(0xFFFEF2F2), borderRadius: BorderRadius.circular(kRadius),
                   border: Border.all(color: const Color(0xFFDC2626))),
-              child: Text(_error!, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13))),
+              child: Text(_error!, style: TextStyle(color: Color(0xFFDC2626), fontSize: 13))),
           Container(padding: const EdgeInsets.all(kSpace), decoration: BoxDecoration(
             color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
             child: Column(children: [
               _Field(_nameCtrl, 'Nama Lengkap', Icons.person_outline_rounded,
                   validator: (v) => v!.isEmpty ? 'Nama wajib diisi' : null),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _Field(_emailCtrl, 'Email', Icons.email_outlined,
                   type: TextInputType.emailAddress,
                   validator: (v) { if (v!.isEmpty) return 'Email wajib diisi'; if (!v.contains('@')) return 'Format email tidak valid'; return null; }),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _Field(_hpCtrl, 'No. HP / WhatsApp', Icons.phone_outlined, type: TextInputType.phone),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _Field(_alamatCtrl, 'Alamat Lengkap', Icons.location_on_outlined, maxLines: 3),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(width: double.infinity, child: ElevatedButton(
                 onPressed: _loading ? null : _save,
-                child: _loading ? const SizedBox(width: 20, height: 20,
+                child: _loading ? SizedBox(width: 20, height: 20,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                    : const Text('Simpan Perubahan'))),
+                    : Text('Simpan Perubahan'))),
             ]),
           ),
         ]),
@@ -120,10 +120,10 @@ class _Field extends StatelessWidget {
     controller: ctrl, keyboardType: type, maxLines: maxLines, validator: validator,
     decoration: InputDecoration(
       labelText: label, prefixIcon: Icon(icon, color: kPrimary, size: 18),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: const BorderSide(color: kBorder2)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: const BorderSide(color: kBorder2)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: const BorderSide(color: kPrimary, width: 1.5)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kBorder2)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kBorder2)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kPrimary, width: 1.5)),
       filled: true, fillColor: kBgSoft,
-      errorStyle: const TextStyle(color: Color(0xFFDC2626), fontSize: 11),
+      errorStyle: TextStyle(color: Color(0xFFDC2626), fontSize: 11),
     ));
 }

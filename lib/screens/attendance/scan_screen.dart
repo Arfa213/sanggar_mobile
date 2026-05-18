@@ -86,7 +86,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         if (_processing)
           Container(
             color: Colors.black87,
-            child: const Center(
+            child: Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 CircularProgressIndicator(color: kPrimary, strokeWidth: 3),
                 SizedBox(height: 16),
@@ -113,11 +113,11 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white12),
                   ),
-                  child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
+                  child: Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
                 ),
               ),
-              const SizedBox(width: 14),
-              const Expanded(
+              SizedBox(width: 14),
+              Expanded(
                 child: Text('Scan Absensi', style: TextStyle(
                     color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
               ),
@@ -131,7 +131,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.white12),
                     ),
-                    child: const Icon(Icons.flash_on_rounded, color: Colors.white, size: 20),
+                    child: Icon(Icons.flash_on_rounded, color: Colors.white, size: 20),
                   ),
                 ),
             ]),
@@ -154,7 +154,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         ColorFiltered(
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.72), BlendMode.srcOut),
           child: Stack(children: [
-            Container(decoration: const BoxDecoration(
+            Container(decoration: BoxDecoration(
                 color: Colors.transparent, backgroundBlendMode: BlendMode.dstOut)),
             Positioned(
               left: left, top: top, width: boxSize, height: boxSize,
@@ -202,7 +202,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         Positioned(
           left: 0, right: 0,
           top: top + boxSize + 24,
-          child: const Column(children: [
+          child: Column(children: [
             Text('Arahkan kamera ke QR Code kelas',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
@@ -245,19 +245,19 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                   size: 52),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             Text(ok ? 'Berhasil! 🎉' : 'Gagal',
               style: TextStyle(
                 color: ok ? const Color(0xFF4CAF50) : const Color(0xFFEF5350),
                 fontSize: 26, fontWeight: FontWeight.w900,
                 fontFamily: 'PlayfairDisplay')),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             Text(_result!.message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5)),
-            const SizedBox(height: 36),
+              style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5)),
+            SizedBox(height: 36),
 
             // Buttons
             SizedBox(
@@ -271,11 +271,11 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: Text(ok ? 'Kembali ke Dashboard' : 'Kembali',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
               ),
             ),
             if (!ok) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextButton(
                 onPressed: _retry,
                 child: Text('Coba Scan Lagi',

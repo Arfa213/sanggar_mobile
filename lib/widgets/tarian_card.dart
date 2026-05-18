@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../utils/constants.dart';
+import '../models/models.dart';
 import '../utils/app_theme.dart';
 
 class TarianMiniCard extends StatelessWidget {
@@ -46,7 +46,7 @@ class TarianMiniCard extends StatelessWidget {
                 ? CachedNetworkImage(imageUrl: getImageUrl(tarian.foto!),
                     height: 100, width: double.infinity, fit: BoxFit.cover)
                 : Container(height: 100, color: kPrimaryPale,
-                    child: const Icon(Icons.music_note_rounded, color: kPrimary, size: 32)),
+                    child: Icon(Icons.music_note_rounded, color: kPrimary, size: 32)),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
@@ -58,13 +58,13 @@ class TarianMiniCard extends StatelessWidget {
                 child: Text(tarian.kategori,
                   style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w700)),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(tarian.nama,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kDark),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kDark),
                 maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text('📍 ${tarian.asal}',
-                style: const TextStyle(fontSize: 10, color: kMuted),
+                style: TextStyle(fontSize: 10, color: kMuted),
                 maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),

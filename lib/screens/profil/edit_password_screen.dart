@@ -27,7 +27,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: kBgSoft,
       appBar: AppBar(
-        title: const Text('Ubah Password', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Ubah Password', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: kDark,
         elevation: 0.5,
@@ -47,7 +47,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Password Lama', style: AppText.label),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 TextFormField(
                   controller: _oldPassCtrl,
                   obscureText: true,
@@ -57,9 +57,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   validator: (v) => v!.length < 6 ? 'Password minimal 6 karakter' : null,
                 ),
-                const SizedBox(height: kSpace),
+                SizedBox(height: kSpace),
                 Text('Password Baru', style: AppText.label),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 TextFormField(
                   controller: _newPassCtrl,
                   obscureText: true,
@@ -69,9 +69,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   validator: (v) => v!.length < 6 ? 'Password baru minimal 6 karakter' : null,
                 ),
-                const SizedBox(height: kSpace),
+                SizedBox(height: kSpace),
                 Text('Konfirmasi Password Baru', style: AppText.label),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 TextFormField(
                   controller: _confirmPassCtrl,
                   obscureText: true,
@@ -81,7 +81,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   validator: (v) => v != _newPassCtrl.text ? 'Konfirmasi password tidak cocok' : null,
                 ),
-                const SizedBox(height: kSpaceLg),
+                SizedBox(height: kSpaceLg),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -94,7 +94,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         Navigator.pop(context);
                       }
                     },
-                    child: const Text('Update Password'),
+                    child: Text('Update Password'),
                   ),
                 ),
               ],

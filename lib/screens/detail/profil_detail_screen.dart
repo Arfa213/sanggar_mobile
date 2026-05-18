@@ -26,7 +26,7 @@ class ProfilDetailScreen extends StatelessWidget {
                 color: Colors.white.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
+              child: Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
             ),
           ),
           flexibleSpace: FlexibleSpaceBar(
@@ -34,7 +34,7 @@ class ProfilDetailScreen extends StatelessWidget {
               profil.fotoProfil != null
                   ? AppImage(url: profil.fotoProfil, fit: BoxFit.cover)
                   : Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [kPrimaryDark, kPrimary],
                           begin: Alignment.topLeft, end: Alignment.bottomRight)),
@@ -48,8 +48,8 @@ class ProfilDetailScreen extends StatelessWidget {
               Positioned(
                 bottom: 20, left: 20, right: 20,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const AppBadge('TENTANG SANGGAR'),
-                  const SizedBox(height: 8),
+                  AppBadge('TENTANG SANGGAR'),
+                  SizedBox(height: 8),
                   Text(profil.namaSanggar, style: AppText.displayMd.copyWith(color: Colors.white)),
                   if (profil.tahunBerdiri != null)
                     Text('Berdiri sejak ${profil.tahunBerdiri}',
@@ -111,11 +111,11 @@ class ProfilDetailScreen extends StatelessWidget {
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Container(
                       width: 28, height: 28,
-                      decoration: const BoxDecoration(color: kPrimary, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: kPrimary, shape: BoxShape.circle),
                       child: Center(child: Text('${e.key + 1}',
-                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
+                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(child: Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(e.value, style: AppText.bodyMd.copyWith(height: 1.6)),
@@ -139,7 +139,7 @@ class ProfilDetailScreen extends StatelessWidget {
             ]),
           ),
 
-          const SizedBox(height: 80),
+          SizedBox(height: 80),
         ])),
       ]),
     );
@@ -168,12 +168,12 @@ class _Section extends StatelessWidget {
       Row(children: [
         Container(
           width: 32, height: 32,
-          decoration: const BoxDecoration(color: kPrimaryPale, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: kPrimaryPale, shape: BoxShape.circle),
           child: Icon(icon, color: kPrimary, size: 16)),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Text(title, style: AppText.displayXs),
       ]),
-      const SizedBox(height: 14),
+      SizedBox(height: 14),
       child,
     ]),
   );
@@ -188,7 +188,7 @@ class _ContactRow extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(children: [
       Icon(icon, color: kPrimary, size: 18),
-      const SizedBox(width: 12),
+      SizedBox(width: 12),
       Expanded(child: Text(text, style: AppText.bodyMd)),
     ]),
   );

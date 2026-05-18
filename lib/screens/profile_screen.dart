@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
+import '../services/theme_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import 'auth/login_screen.dart';
@@ -32,38 +33,38 @@ class _GuestView extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(kSpaceLg),
           child: Column(children: [
-            const SizedBox(height: kSpaceXl),
+            SizedBox(height: kSpaceXl),
             Container(
               width: 120, height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [kPrimary, kPrimaryDark],
+                gradient: LinearGradient(colors: [kPrimary, kPrimaryDark],
                     begin: Alignment.topLeft, end: Alignment.bottomRight),
                 shape: BoxShape.circle,
                 boxShadow: [BoxShadow(color: kPrimary.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 10))],
               ),
-              child: const Icon(Icons.person_rounded, color: Colors.white, size: 58),
+              child: Icon(Icons.person_rounded, color: Colors.white, size: 58),
             ),
-            const SizedBox(height: kSpaceLg),
-            const AppBadge('AKUN ANGGOTA'),
-            const SizedBox(height: 12),
+            SizedBox(height: kSpaceLg),
+            AppBadge('AKUN ANGGOTA'),
+            SizedBox(height: 12),
             Text('Masuk ke Akun Anda', style: AppText.displayMd),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text('Masuk atau daftar untuk mengakses fitur lengkap dan mengikuti kegiatan sanggar.',
                 style: AppText.bodySm, textAlign: TextAlign.center),
-            const SizedBox(height: kSpaceXl),
+            SizedBox(height: kSpaceXl),
             SizedBox(width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-                child: const Text('Masuk Sekarang'))),
-            const SizedBox(height: 12),
+                child: Text('Masuk Sekarang'))),
+            SizedBox(height: 12),
             SizedBox(width: double.infinity,
               child: OutlinedButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen(showRegister: true))),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: kPrimary, side: const BorderSide(color: kPrimary),
+                  foregroundColor: kPrimary, side: BorderSide(color: kPrimary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusFull)),
                   padding: const EdgeInsets.symmetric(vertical: 16)),
-                child: const Text('Daftar Anggota', style: TextStyle(fontWeight: FontWeight.w700)))),
+                child: Text('Daftar Anggota', style: TextStyle(fontWeight: FontWeight.w700)))),
           ]),
         ),
       ),
@@ -79,12 +80,12 @@ class _LoggedInView extends StatelessWidget {
   Future<void> _logout(BuildContext ctx) async {
     final ok = await showDialog<bool>(context: ctx, builder: (_) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusLg)),
-      title: const Text('Keluar dari Akun?'),
-      content: const Text('Kamu akan keluar dari akun sanggar saat ini.'),
+      title: Text('Keluar dari Akun?'),
+      content: Text('Kamu akan keluar dari akun sanggar saat ini.'),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal', style: TextStyle(color: kMuted))),
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Batal', style: TextStyle(color: kMuted))),
         TextButton(onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
+            child: Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
       ],
     ));
     if (ok == true) {
@@ -98,6 +99,7 @@ class _LoggedInView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = auth.user!;
+    final themeProvider = context.watch<ThemeProvider>();
     return Scaffold(
       backgroundColor: kBgSoft,
       body: CustomScrollView(slivers: [
@@ -109,7 +111,7 @@ class _LoggedInView extends StatelessWidget {
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [kPrimaryDark, kPrimary],
                       begin: Alignment.topLeft, end: Alignment.bottomRight)),
               child: Stack(children: [
@@ -128,19 +130,19 @@ class _LoggedInView extends StatelessWidget {
                         backgroundImage: (user.foto != null && user.foto!.isNotEmpty)
                             ? NetworkImage(getImageUrl(user.foto!)) as ImageProvider : null,
                         child: (user.foto == null || user.foto!.isEmpty)
-                            ? Text(user.initial, style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
+                            ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
                             : null,
                       ),
                     ),
                     Positioned(bottom: 0, right: 0,
                       child: Container(
                         padding: const EdgeInsets.all(5),
-                        decoration: const BoxDecoration(color: kGold, shape: BoxShape.circle),
-                        child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
+                        decoration: BoxDecoration(color: kGold, shape: BoxShape.circle),
+                        child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
                   ]),
-                  const SizedBox(height: 10),
-                  Text(user.name, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 10),
+                  Text(user.name, style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+                  SizedBox(height: 2),
                   Text(user.email, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
                 ]))),
               ]),
@@ -149,7 +151,7 @@ class _LoggedInView extends StatelessWidget {
         ),
 
         SliverList(delegate: SliverChildListDelegate([
-          const SizedBox(height: kSpace),
+          SizedBox(height: kSpace),
 
           // Role badge
           Padding(padding: const EdgeInsets.symmetric(horizontal: kSpace),
@@ -167,7 +169,7 @@ class _LoggedInView extends StatelessWidget {
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle,
                         color: user.status == 'aktif' ? const Color(0xFF2E7D32) : kMuted)),
-                    const SizedBox(width: 5),
+                    SizedBox(width: 5),
                     Text(user.status == 'aktif' ? 'Aktif' : 'Non-aktif',
                         style: TextStyle(color: user.status == 'aktif' ? const Color(0xFF2E7D32) : kMuted,
                             fontSize: 11, fontWeight: FontWeight.w800)),
@@ -175,7 +177,7 @@ class _LoggedInView extends StatelessWidget {
                 ),
               ]),
             )),
-          const SizedBox(height: kSpaceMd),
+          SizedBox(height: kSpaceMd),
 
           _sectionTitle('PENGATURAN AKUN'),
           _MenuItem(Icons.person_outline_rounded, 'Edit Profil',
@@ -185,7 +187,7 @@ class _LoggedInView extends StatelessWidget {
           _MenuItem(Icons.history_rounded, 'Riwayat Aktivitas',
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen()))),
 
-          const SizedBox(height: kSpace),
+          SizedBox(height: kSpace),
           _sectionTitle('INFORMASI'),
           _MenuItem(Icons.info_outline_rounded, 'Tentang Aplikasi', () => _showAbout(context)),
           _MenuItem(Icons.help_outline_rounded, 'Pusat Bantuan',
@@ -196,17 +198,17 @@ class _LoggedInView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(kSpace, kSpaceLg, kSpace, 0),
             child: OutlinedButton.icon(
               onPressed: () => _logout(context),
-              icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
-              label: const Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
+              icon: Icon(Icons.logout_rounded, color: Colors.red, size: 18),
+              label: Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                side: const BorderSide(color: Color(0xFFFFCDD2), width: 1.5),
+                side: BorderSide(color: Color(0xFFFFCDD2), width: 1.5),
                 backgroundColor: const Color(0xFFFFEBEE),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadius)),
               ),
             ),
           ),
-          const SizedBox(height: 100),
+          SizedBox(height: 100),
         ])),
       ]),
     );
@@ -223,19 +225,19 @@ class _LoggedInView extends StatelessWidget {
     builder: (_) => Padding(padding: const EdgeInsets.all(kSpaceLg),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: kBorder2, borderRadius: BorderRadius.circular(2)))),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Text('Tentang Aplikasi', style: AppText.displayXs),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Text('Aplikasi Sanggar Mulya Bhakti — platform digitalisasi arsip kebudayaan seni tari khas Indramayu dan manajemen keanggotaan sanggar.',
             style: AppText.bodyMd.copyWith(color: kMuted, height: 1.6)),
-        const SizedBox(height: 16),
-        const Divider(color: kBorder),
-        const SizedBox(height: 8),
+        SizedBox(height: 16),
+        Divider(color: kBorder),
+        SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('Versi Aplikasi', style: AppText.bodySm),
           Text('v1.1.0', style: AppText.label.copyWith(color: kPrimary)),
         ]),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
       ])));
 }
 
@@ -254,10 +256,10 @@ class _MenuItem extends StatelessWidget {
             Container(width: 36, height: 36,
               decoration: BoxDecoration(color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadiusSm)),
               child: Icon(icon, color: kPrimary, size: 18)),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Text(label, style: AppText.label.copyWith(fontWeight: FontWeight.w600)),
             const Spacer(),
-            const Icon(Icons.chevron_right_rounded, color: kMuted2, size: 20),
+            Icon(Icons.chevron_right_rounded, color: kMuted2, size: 20),
           ]),
         ),
       ),

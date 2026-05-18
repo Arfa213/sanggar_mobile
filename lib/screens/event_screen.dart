@@ -62,7 +62,7 @@ class _EventScreenState extends State<EventScreen>
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kSpace),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const AppBadge('JEJAK PRESTASI'),
+                AppBadge('JEJAK PRESTASI'),
                 Text('Event & Pentas', style: AppText.displaySm),
               ]),
             ),
@@ -72,7 +72,7 @@ class _EventScreenState extends State<EventScreen>
               indicatorWeight:      2,
               labelColor:           kPrimary,
               unselectedLabelColor: kMuted,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              labelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: const [Tab(text: 'Semua Event'), Tab(text: 'Akan Datang')],
             ),
           ),
@@ -113,29 +113,29 @@ class _AllTab extends StatelessWidget {
       children: [
         // Stats
         _StatsRow(stats: stats),
-        const SizedBox(height: kSpaceLg),
+        SizedBox(height: kSpaceLg),
 
         // Unggulan
         if (featured.isNotEmpty) ...[
           Row(children: [
-            const AppBadge('HIGHLIGHT'),
-            const SizedBox(width: 10),
+            AppBadge('HIGHLIGHT'),
+            SizedBox(width: 10),
             Text('Event Unggulan', style: AppText.displayXs),
           ]),
-          const SizedBox(height: kSpace),
+          SizedBox(height: kSpace),
           ...featured.map((e) => _FeaturedCard(event: e)),
-          const SizedBox(height: kSpaceLg),
+          SizedBox(height: kSpaceLg),
         ],
 
         // Timeline
         Row(children: [
-          const AppBadge('REKAM JEJAK'),
-          const SizedBox(width: 10),
+          AppBadge('REKAM JEJAK'),
+          SizedBox(width: 10),
           Text('Semua Event', style: AppText.displayXs),
         ]),
-        const SizedBox(height: kSpace),
+        SizedBox(height: kSpace),
         if (selesai.isEmpty)
-          const Text('Belum ada data event.', style: TextStyle(color: kMuted))
+          Text('Belum ada data event.', style: TextStyle(color: kMuted))
         else
           ...selesai.map((e) => _TimelineTile(event: e)),
       ],
@@ -156,12 +156,12 @@ class _MendatangTab extends StatelessWidget {
           width: 72, height: 72,
           decoration: BoxDecoration(
             color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadius)),
-          child: const Icon(Icons.event_available_rounded, color: kPrimary, size: 32),
+          child: Icon(Icons.event_available_rounded, color: kPrimary, size: 32),
         ),
-        const SizedBox(height: kSpace),
+        SizedBox(height: kSpace),
         Text('Belum ada event mendatang', style: AppText.displayXs.copyWith(fontSize: 16)),
-        const SizedBox(height: 4),
-        const Text('Pantau terus untuk info terbaru!',
+        SizedBox(height: 4),
+        Text('Pantau terus untuk info terbaru!',
             style: TextStyle(color: kMuted)),
       ]));
     }
@@ -188,9 +188,9 @@ class _StatsRow extends StatelessWidget {
       ),
       child: Row(children: [
         StatItem(number: '${stats['total'] ?? 0}',          label: 'Total'),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         StatItem(number: '${stats['internasional'] ?? 0}',  label: 'Internasional'),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         StatItem(number: '${stats['penghargaan'] ?? 0}',    label: 'Penghargaan'),
       ]),
     );
@@ -227,7 +227,7 @@ class _FeaturedCard extends StatelessWidget {
                 top: Radius.circular(kRadiusLg - 1)),
             placeholder: Container(
               height: 180, color: kPrimaryPale,
-              child: const Center(
+              child: Center(
                 child: Icon(Icons.event_rounded, color: kPrimary, size: 44))),
           ),
           Positioned(top: 12, right: 12,
@@ -236,7 +236,7 @@ class _FeaturedCard extends StatelessWidget {
           Positioned(bottom: 0, left: 0,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: kPrimary,
                 borderRadius: BorderRadius.only(
                   topRight:     Radius.circular(kRadius),
@@ -244,7 +244,7 @@ class _FeaturedCard extends StatelessWidget {
                 ),
               ),
               child: Text(event.tahun,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white, fontSize: 13,
                   fontWeight: FontWeight.w900, letterSpacing: 1)),
             )),
@@ -260,24 +260,24 @@ class _FeaturedCard extends StatelessWidget {
               const Spacer(),
               if (event.jumlahPenonton != null)
                 Row(children: [
-                  const Icon(Icons.people_rounded, size: 12, color: kMuted),
-                  const SizedBox(width: 3),
+                  Icon(Icons.people_rounded, size: 12, color: kMuted),
+                  SizedBox(width: 3),
                   Text('${event.jumlahPenonton}+',
                       style: AppText.caption),
                 ]),
             ]),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(event.nama, style: AppText.displayXs),
-            const SizedBox(height: 5),
+            SizedBox(height: 5),
             Row(children: [
-              const Icon(Icons.location_on_rounded, size: 13, color: kMuted),
-              const SizedBox(width: 3),
+              Icon(Icons.location_on_rounded, size: 13, color: kMuted),
+              SizedBox(width: 3),
               Expanded(child: Text(event.lokasi,
                 style: AppText.bodySm,
                 overflow: TextOverflow.ellipsis)),
             ]),
             if (event.hasil != null) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -286,13 +286,13 @@ class _FeaturedCard extends StatelessWidget {
                   border:       Border.all(color: const Color(0xFFFFD54F)),
                 ),
                 child: Text(event.hasil!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFE65100), fontSize: 13,
                     fontWeight: FontWeight.w800)),
               ),
             ],
             if (event.penghargaan.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Wrap(spacing: 6, runSpacing: 6, children: event.penghargaan
                 .take(3)
                 .map((p) => Container(
@@ -334,7 +334,7 @@ class _TimelineTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(kRadiusSm),
               ),
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(event.tgl, style: const TextStyle(
+                Text(event.tgl, style: TextStyle(
                   color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
                 Text(event.bulanSingkat, style: TextStyle(
                   color: Colors.white.withOpacity(0.8), fontSize: 9,
@@ -345,7 +345,7 @@ class _TimelineTile extends StatelessWidget {
             Container(width: 1.5, height: 24, color: kBorder2),
           ]),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
 
         // Info
         Expanded(
@@ -363,18 +363,18 @@ class _TimelineTile extends StatelessWidget {
                 const Spacer(),
                 Text(event.tahun, style: AppText.caption),
               ]),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(event.nama, style: AppText.label,
                   maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Row(children: [
-                const Icon(Icons.location_on_rounded, size: 11, color: kMuted),
-                const SizedBox(width: 2),
+                Icon(Icons.location_on_rounded, size: 11, color: kMuted),
+                SizedBox(width: 2),
                 Expanded(child: Text(event.lokasi,
                   style: AppText.bodyXs, maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
               if (event.hasil != null) ...[
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(event.hasil!,
                   style: AppText.bodySm.copyWith(
                     color: kPrimary, fontWeight: FontWeight.w800)),
@@ -409,7 +409,7 @@ class _MendatangCard extends StatelessWidget {
         Container(
           width: 56, height: 64,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               colors: [kPrimary, kPrimaryDark],
               begin:  Alignment.topCenter,
               end:    Alignment.bottomCenter,
@@ -417,36 +417,36 @@ class _MendatangCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(kRadiusSm),
           ),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(event.tgl, style: const TextStyle(
+            Text(event.tgl, style: TextStyle(
                 color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
             Text(event.bulanSingkat, style: TextStyle(
                 color: Colors.white.withOpacity(0.8), fontSize: 10,
                 fontWeight: FontWeight.w700)),
           ]),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(event.nama, style: AppText.label,
               maxLines: 2, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Row(children: [
-            const Icon(Icons.location_on_rounded, size: 11, color: kMuted),
-            const SizedBox(width: 2),
+            Icon(Icons.location_on_rounded, size: 11, color: kMuted),
+            SizedBox(width: 2),
             Expanded(child: Text(event.lokasi,
               style: AppText.bodyXs,
               maxLines: 1, overflow: TextOverflow.ellipsis)),
           ]),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           CategoryChip(event.kategori, small: true),
         ])),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color:        const Color(0xFFE8F5E9),
             borderRadius: BorderRadius.circular(kRadiusFull),
           ),
-          child: const Text('Upcoming',
+          child: Text('Upcoming',
             style: TextStyle(color: Color(0xFF2E7D32),
                 fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
         ),

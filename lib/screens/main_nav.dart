@@ -26,8 +26,8 @@ class _MainNavState extends State<MainNav> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: kBgCard,
-          border: const Border(top: BorderSide(color: Color(0xFFF0EBE5), width: 1)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -4))],
+          border: Border(top: BorderSide(color: kBorder2, width: 1)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(gIsDarkMode ? 0.3 : 0.06), blurRadius: 16, offset: const Offset(0, -4))],
         ),
         child: SafeArea(
           top: false,
@@ -57,27 +57,33 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final active = idx == cur;
     return Expanded(
-      child: GestureDetector(
-        onTap: () => onTap(idx),
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: active ? kPrimaryPale : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              child: Icon(icon, color: active ? kPrimary : kMuted2, size: active ? 24 : 22),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onTap(idx),
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: kPrimary.withOpacity(0.08),
+          splashColor: kPrimary.withOpacity(0.15),
+          highlightColor: kPrimary.withOpacity(0.05),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: active ? kPrimaryPale : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 3),
-            Text(label, style: TextStyle(
-              color: active ? kPrimary : kMuted2,
-              fontSize: 10, fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-            )),
-          ]),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(icon, color: active ? kPrimary : kMuted2, size: active ? 24 : 22),
+              ),
+              const SizedBox(height: 3),
+              Text(label, style: TextStyle(
+                color: active ? kPrimary : kMuted2,
+                fontSize: 10, fontWeight: active ? FontWeight.w800 : FontWeight.w500,
+              )),
+            ]),
+          ),
         ),
       ),
     );

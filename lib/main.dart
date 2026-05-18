@@ -6,6 +6,7 @@ import 'package:sanggar_mulya_bhakti/screens/archive_screen.dart';
 import 'package:sanggar_mulya_bhakti/screens/event_screen.dart';
 
 import 'services/auth_provider.dart';
+import 'services/theme_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart'; 
 import 'screens/main_nav.dart';   
@@ -16,16 +17,12 @@ import 'utils/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-  ));
-
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
         ChangeNotifierProvider(create: (_) => NotificationService()..init()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const SanggarApp(),
     ),
@@ -37,6 +34,14 @@ class SanggarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    gIsDarkMode = themeProvider.isDarkMode;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: gIsDarkMode ? Brightness.light : Brightness.dark,
+    ));
+
     return MaterialApp(
       title: 'Sanggar Mulya Bhakti',
       debugShowCheckedModeBanner: false,

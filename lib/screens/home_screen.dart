@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           MaterialPageRoute(builder: (_) => const ChatbotScreen()),
         ),
         backgroundColor: kPrimary,
-        child: const Icon(Icons.forum_rounded, color: Colors.white),
+        child: Icon(Icons.forum_rounded, color: Colors.white),
       ),
     );
   }
@@ -171,14 +171,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           color: kPrimaryPale,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.calendar_today_rounded,
                           color: kPrimary,
                           size: 20,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
+                      SizedBox(height: 12),
+                      Text(
                         'Booking Kelas',
                         style: TextStyle(
                           color: kText,
@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         'Daftar / atur sesi latihan',
                         style: TextStyle(
@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             // Action 2: Tanya AI Asisten
             Expanded(
               child: GestureDetector(
@@ -229,14 +229,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           color: const Color(0xFFE8F5E9),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.support_agent_rounded,
                           color: Color(0xFF2E7D32),
                           size: 20,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
+                      SizedBox(height: 12),
+                      Text(
                         'Tanya AI Asisten',
                         style: TextStyle(
                           color: kText,
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         'Chatbot info sanggar',
                         style: TextStyle(
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return FadeTransition(
       opacity: _stagger(0),
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(colors: [kPrimaryDark, kPrimary],
               begin: Alignment.topLeft, end: Alignment.bottomRight)),
         child: SafeArea(
@@ -278,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               Row(children: [
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Selamat datang,', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13)),
-                  Text(user.firstName, style: const TextStyle(color: Colors.white, fontSize: 24,
+                  Text(user.firstName, style: TextStyle(color: Colors.white, fontSize: 24,
                       fontWeight: FontWeight.w900, fontFamily: 'PlayfairDisplay')),
                 ])),
                 
@@ -288,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     return Stack(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 26),
+                          icon: Icon(Icons.notifications_active_outlined, color: Colors.white, size: 26),
                           onPressed: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const NotificationScreen()),
@@ -300,12 +300,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             top: 4,
                             child: Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                              decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
                               constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                               child: Center(
                                 child: Text(
                                   '${ns.unreadCount}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
+                                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
                                 ),
                               ),
                             ),
@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     );
                   },
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
 
                 GestureDetector(
                   onTap: () => MainNav.of(context)?.setIndex = 3, // Ke Halaman Profil
@@ -329,13 +329,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           : null,
                     ),
                     child: (user.foto == null || user.foto!.isEmpty)
-                        ? Center(child: Text(user.initial, style: const TextStyle(
+                        ? Center(child: Text(user.initial, style: TextStyle(
                             color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)))
                         : null,
                   ),
                 ),
               ]),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
@@ -344,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
                 child: Text(
                   user.isAdmin ? '👑 Administrator' : (user.isPengunjung ? '🎭 Anggota Sementara' : '🎭 Anggota Tetap'),
-                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
               ),
             ]),
           ),
@@ -378,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Icon(item.$3, color: item.$4, size: 18),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(item.$1, style: TextStyle(color: item.$4, fontSize: 20,
                     fontWeight: FontWeight.w900, fontFamily: 'PlayfairDisplay')),
                 Text(item.$2, style: AppText.bodyXs, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -412,15 +412,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               Container(
                 width: 48, height: 48,
                 decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(14)),
-                child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 26),
+                child: Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 26),
               ),
-              const SizedBox(width: 14),
-              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Scan Kehadiran', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
                 SizedBox(height: 2),
                 Text('Arahkan kamera ke QR Code kelas', style: TextStyle(color: Colors.white38, fontSize: 12)),
               ])),
-              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16),
+              Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16),
             ]),
           ),
         ),
@@ -435,13 +435,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const AppBadge('KELAS SAYA'),
+            AppBadge('KELAS SAYA'),
             GestureDetector(
               onTap: () => MainNav.of(context)?.setIndex = 1,
               child: Text('Kelola', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
             ),
           ]),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           if (_jadwalAktif.isEmpty)
             Container(
               width: double.infinity,
@@ -449,9 +449,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
               child: Column(children: [
                 Icon(Icons.school_outlined, color: kMuted2, size: 32),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text('Belum ada kelas aktif', style: AppText.label.copyWith(color: kMuted)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 GestureDetector(
                   onTap: () => MainNav.of(context)?.setIndex = 1,
                   child: Text('Daftar kelas →', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
@@ -468,21 +468,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   width: 52, height: 52,
                   decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(12)),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(p.hariSingkat, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                    Text(p.hariSingkat, style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                     Text(p.jadwal.jamMulai, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w700)),
                   ]),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(p.tarianNama, style: AppText.label),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3),
                   Text('📍 ${p.jadwal.tempat}  ⏰ ${p.jadwal.jamMulai}–${p.jadwal.jamSelesai}',
                       style: AppText.bodyXs),
                 ])),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(kRadiusFull)),
-                  child: const Text('Aktif', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.w800)),
+                  child: Text('Aktif', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.w800)),
                 ),
               ]),
             )),
@@ -499,10 +499,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const AppBadge('KEHADIRAN TERAKHIR'),
+            AppBadge('KEHADIRAN TERAKHIR'),
             Text('Lihat semua', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
           ]),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
             child: Column(children: _kehadiran.asMap().entries.map((e) {
@@ -515,13 +515,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                 decoration: BoxDecoration(border: e.key < _kehadiran.length - 1
-                    ? const Border(bottom: BorderSide(color: Color(0xFFF5F5F5))) : null),
+                    ? Border(bottom: BorderSide(color: Color(0xFFF5F5F5))) : null),
                 child: Row(children: [
                   Container(width: 32, height: 32,
                     decoration: BoxDecoration(color: c[0], borderRadius: BorderRadius.circular(8)),
                     child: Center(child: Text(icons[k.status] ?? '?',
                         style: TextStyle(color: c[1], fontWeight: FontWeight.w900)))),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(k.tarianNama, style: AppText.label.copyWith(fontWeight: FontWeight.w600)),
                     Text(k.tanggalFormatted, style: AppText.bodyXs),
@@ -544,8 +544,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const AppBadge('EVENT MENDATANG'),
-          const SizedBox(height: 10),
+          AppBadge('EVENT MENDATANG'),
+          SizedBox(height: 10),
           ..._events.map((ev) => Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(14),
@@ -555,14 +555,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 width: 46, height: 52,
                 decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(10)),
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(ev.tgl, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                  Text(ev.tgl, style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                   Text(ev.bulanSingkat, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w700)),
                 ]),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(ev.nama, style: AppText.label, maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text('📍 ${ev.lokasi}', style: AppText.bodyXs, maxLines: 1, overflow: TextOverflow.ellipsis),
               ])),
             ]),
@@ -601,8 +601,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       child: Row(children: [
         Container(width: 36, height: 36,
           decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(10)),
-          child: const Center(child: Text('SMB', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)))),
-        const SizedBox(width: 10),
+          child: Center(child: Text('SMB', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)))),
+        SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(_profil?.namaSanggar ?? 'Sanggar Mulya Bhakti', style: AppText.displayXs.copyWith(fontSize: 15)),
           Text('Indramayu, Jawa Barat', style: AppText.caption),
@@ -620,9 +620,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 4))]),
       child: Row(children: [
         StatItem(number: '${_profil!.jumlahAnggota}+', label: 'Anggota Aktif', icon: Icons.people_rounded),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         StatItem(number: '${_profil!.jumlahPenghargaan}+', label: 'Penghargaan', icon: Icons.emoji_events_rounded),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         StatItem(number: '${_profil!.jumlahEvent}+', label: 'Event Diikuti', icon: Icons.event_rounded),
       ]),
     );
@@ -636,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: kSpace),
         itemCount: _tarian.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => SizedBox(width: 12),
         itemBuilder: (_, i) {
           final t = _tarian[i];
           return Container(
@@ -648,10 +648,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               AppImage(url: t.foto, height: 110, width: 155,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(kRadius - 1)),
                   placeholder: Container(height: 110, color: kPrimaryPale,
-                      child: const Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 28)))),
+                      child: Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 28)))),
               Padding(padding: const EdgeInsets.fromLTRB(10, 8, 10, 10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t.nama, style: AppText.label, maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text(t.asal, style: AppText.bodyXs, maxLines: 1, overflow: TextOverflow.ellipsis),
               ])),
             ]),

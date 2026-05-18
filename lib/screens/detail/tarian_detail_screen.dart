@@ -52,7 +52,7 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
 
   Widget _buildError() => Scaffold(
     appBar: AppBar(),
-    body: const Center(child: Text('Gagal memuat data tarian.')),
+    body: Center(child: Text('Gagal memuat data tarian.')),
   );
 
   Widget _buildContent() {
@@ -69,7 +69,7 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
-            child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
+            child: Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16),
           ),
         ),
         flexibleSpace: FlexibleSpaceBar(
@@ -78,7 +78,7 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
               url: t.foto,
               fit: BoxFit.cover,
               placeholder: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [kPrimaryDark, kPrimary],
                     begin: Alignment.topLeft, end: Alignment.bottomRight))),
@@ -95,22 +95,22 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
                 Row(children: [
                   CategoryChip(t.kategori),
                   if (t.unggulan) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: kGold.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(kRadiusFull)),
-                      child: const Text('★ Unggulan',
+                      child: Text('★ Unggulan',
                         style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ]),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(t.nama, style: AppText.displayLg.copyWith(color: Colors.white)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(children: [
-                  const Icon(Icons.location_on_rounded, size: 14, color: Colors.white70),
-                  const SizedBox(width: 4),
+                  Icon(Icons.location_on_rounded, size: 14, color: Colors.white70),
+                  SizedBox(width: 4),
                   Text(t.asal, style: AppText.bodySm.copyWith(color: Colors.white70)),
                 ]),
               ]),
@@ -127,7 +127,7 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
           child: Row(children: [
             if (t.durasi != null) ...[
               _InfoChip(Icons.schedule_rounded, t.durasi!),
-              const SizedBox(width: kSpace),
+              SizedBox(width: kSpace),
             ],
             _InfoChip(Icons.category_rounded, t.kategori),
             const Spacer(),
@@ -138,7 +138,7 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: kPrimary, borderRadius: BorderRadius.circular(kRadiusFull)),
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.play_circle_rounded, color: Colors.white, size: 16),
                     SizedBox(width: 6),
                     Text('Video', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
@@ -156,12 +156,12 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
             // Ornamental divider
             Row(children: [
               Container(width: 32, height: 2.5, color: kPrimary),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Container(width: 10, height: 2.5, color: kPrimaryLight),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Container(width: 4, height: 2.5, color: kPrimaryPale2),
             ]),
-            const SizedBox(height: kSpace),
+            SizedBox(height: kSpace),
             Text(t.deskripsi, style: AppText.bodyMd.copyWith(height: 1.8)),
           ]),
         ),
@@ -192,14 +192,14 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
             color: kPrimary,
             borderRadius: BorderRadius.circular(kRadius)),
           child: Column(children: [
-            const Text('Tertarik mempelajari tarian ini?',
+            Text('Tertarik mempelajari tarian ini?',
               style: TextStyle(color: Colors.white, fontSize: 15,
                   fontWeight: FontWeight.w800, fontFamily: 'PlayfairDisplay')),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text('Daftar kelas dan dapatkan jadwal latihan otomatis',
               style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
               textAlign: TextAlign.center),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             SizedBox(width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/penjadwalan',
@@ -208,13 +208,13 @@ class _TarianDetailScreenState extends State<TarianDetailScreen> {
                   backgroundColor: Colors.white,
                   foregroundColor: kPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: const Text('Daftar Kelas Ini',
+                child: Text('Daftar Kelas Ini',
                     style: TextStyle(fontWeight: FontWeight.w800)),
               )),
           ]),
         ),
 
-        const SizedBox(height: 80),
+        SizedBox(height: 80),
       ])),
     ]);
   }
@@ -226,7 +226,7 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
     Icon(icon, size: 14, color: kMuted),
-    const SizedBox(width: 4),
+    SizedBox(width: 4),
     Text(text, style: AppText.bodySm),
   ]);
 }
@@ -238,11 +238,11 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(emoji, style: const TextStyle(fontSize: 20)),
-      const SizedBox(width: 12),
+      Text(emoji, style: TextStyle(fontSize: 20)),
+      SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: AppText.caption.copyWith(letterSpacing: 0.8)),
-        const SizedBox(height: 3),
+        SizedBox(height: 3),
         Text(value, style: AppText.label),
       ])),
     ]),

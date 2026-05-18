@@ -19,8 +19,8 @@ class NotificationScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: kBgCard,
         elevation: 0,
-        iconTheme: const IconThemeData(color: kText),
-        title: const Text(
+        iconTheme: IconThemeData(color: kText),
+        title: Text(
           'Notifikasi & Pengingat',
           style: TextStyle(
             color: kText,
@@ -41,8 +41,8 @@ class NotificationScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.done_all_rounded, color: kPrimary, size: 16),
-              label: const Text(
+              icon: Icon(Icons.done_all_rounded, color: kPrimary, size: 16),
+              label: Text(
                 'Baca Semua',
                 style: TextStyle(
                   color: kPrimary,
@@ -53,12 +53,12 @@ class NotificationScreen extends StatelessWidget {
             ),
             IconButton(
               onPressed: () => _confirmClear(context, notifService),
-              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
+              icon: Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
               tooltip: 'Hapus Semua',
             ),
           ],
         ],
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, color: kBorder2),
         ),
@@ -86,18 +86,18 @@ class NotificationScreen extends StatelessWidget {
             Container(
               width: 100,
               height: 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: kPrimaryPale,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.notifications_none_rounded,
                 color: kPrimary,
                 size: 48,
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: 24),
+            Text(
               'Belum Ada Notifikasi',
               style: TextStyle(
                 color: kText,
@@ -105,8 +105,8 @@ class NotificationScreen extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Pengingat latihan otomatis 24 jam & 1 jam sebelum sesi dimulai akan muncul di sini!',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -125,12 +125,12 @@ class NotificationScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Notifikasi', style: TextStyle(fontWeight: FontWeight.w800)),
-        content: const Text('Apakah Anda yakin ingin menghapus semua riwayat notifikasi?'),
+        title: Text('Hapus Notifikasi', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: Text('Apakah Anda yakin ingin menghapus semua riwayat notifikasi?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: kMuted)),
+            child: Text('Batal', style: TextStyle(color: kMuted)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -138,7 +138,7 @@ class NotificationScreen extends StatelessWidget {
               Navigator.pop(ctx);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
-            child: const Text('Hapus Semua'),
+            child: Text('Hapus Semua'),
           ),
         ],
       ),
@@ -216,7 +216,7 @@ class _NotificationCard extends StatelessWidget {
               ),
               child: Icon(style[2] as IconData, color: style[1] as Color, size: 22),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
 
             // Content
             Expanded(
@@ -240,14 +240,14 @@ class _NotificationCard extends StatelessWidget {
                         Container(
                           width: 8,
                           height: 8,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: kPrimary,
                             shape: BoxShape.circle,
                           ),
                         ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     notif.message,
                     maxLines: 2,
@@ -258,7 +258,7 @@ class _NotificationCard extends StatelessWidget {
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Text(
                     timeStr,
                     style: TextStyle(
@@ -312,15 +312,15 @@ class _NotificationCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: kPrimary, size: 24),
-                const SizedBox(width: 10),
+                Icon(Icons.info_outline_rounded, color: kPrimary, size: 24),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     notif.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: kText,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -330,18 +330,18 @@ class _NotificationCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Divider(color: kBorder2),
-            const SizedBox(height: 12),
+            SizedBox(height: 16),
+            Divider(color: kBorder2),
+            SizedBox(height: 12),
             Text(
               notif.message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: kText,
                 fontSize: 14,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(
               'Diterima: ${DateFormat('dd MMMM yyyy, HH:mm').format(notif.timestamp)} WIB',
               style: TextStyle(
@@ -350,7 +350,7 @@ class _NotificationCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -361,10 +361,10 @@ class _NotificationCard extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.w800)),
+                child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
           ],
         ),
       ),

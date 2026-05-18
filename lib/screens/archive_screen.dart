@@ -62,7 +62,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kSpace),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const AppBadge('WARISAN BUDAYA'),
+                AppBadge('WARISAN BUDAYA'),
                 Text('Arsip Digital', style: AppText.displaySm),
               ]),
             ),
@@ -78,10 +78,10 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                     padding: const EdgeInsets.fromLTRB(kSpace, 10, kSpace, 8),
                     child: TextField(
                       controller: _searchCtrl,
-                      style:      const TextStyle(fontSize: 14),
+                      style:      TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'Cari nama tarian...',
-                        prefixIcon: const Icon(Icons.search_rounded,
+                        prefixIcon: Icon(Icons.search_rounded,
                             color: kMuted, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
@@ -102,7 +102,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       scrollDirection: Axis.horizontal,
                       padding:         const EdgeInsets.symmetric(horizontal: kSpace),
                       itemCount:       _filters.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      separatorBuilder: (_, __) => SizedBox(width: 8),
                       itemBuilder: (_, i) {
                         final f      = _filters[i];
                         final active = f == _filter;
@@ -130,7 +130,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                 ]),
               ),
             ),
@@ -139,7 +139,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
         body: _loading ? const AppLoading()
             : _error != null ? AppError(message: _error!, onRetry: _load)
             : _filtered.isEmpty
-                ? const Center(child: Text('Tarian tidak ditemukan.',
+                ? Center(child: Text('Tarian tidak ditemukan.',
                     style: TextStyle(color: kMuted)))
                 : RefreshIndicator(
                     color:     kPrimary,
@@ -183,72 +183,102 @@ class _TarianGridCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color:        kBgCard,
           borderRadius: BorderRadius.circular(kRadius),
-          border: Border.all(
-            color: tarian.unggulan ? kPrimary : kBorder2,
-            width: tarian.unggulan ? 1.5 : 1,
-          ),
-          boxShadow: [BoxShadow(
-            color:      Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset:     const Offset(0, 3),
-          )],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(gIsDarkMode ? 0.3 : 0.08), blurRadius: 12, offset: const Offset(0, 4))],
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Stack(children: [
-            AppImage(
-              url:          tarian.foto,
-              height:       125,
-              width:        double.infinity,
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(kRadius - 1)),
-              placeholder: Container(
-                height: 125, color: kPrimaryPale,
-                child: const Center(child: Icon(Icons.music_note_rounded,
-                    color: kPrimary, size: 32))),
-            ),
-            if (tarian.unggulan)
-              Positioned(
-                top: 8, left: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: kGold,
-                    borderRadius: BorderRadius.circular(kRadiusFull),
-                  ),
-                  child: const Text('★', style: TextStyle(
-                    color: Colors.white, fontSize: 10)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(kRadius),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 1. Gambar Full
+              AppImage(
+                url:   tarian.foto,
+                fit:   BoxFit.cover,
+                placeholder: Container(
+                  color: kPrimaryPale,
+                  child: Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 32)),
                 ),
               ),
-            Positioned(
-              top: 8, right: 8,
-              child: CategoryChip(tarian.kategori, small: true)),
-          ]),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tarian.nama, style: AppText.label,
-                  maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 3),
-              Row(children: [
-                const Icon(Icons.location_on_rounded, size: 9, color: kMuted),
-                const SizedBox(width: 2),
-                Expanded(child: Text(tarian.asal,
-                  style: AppText.bodyXs,
-                  maxLines: 1, overflow: TextOverflow.ellipsis)),
-              ]),
-              if (tarian.durasi != null) ...[
-                const SizedBox(height: 2),
-                Row(children: [
-                  const Icon(Icons.schedule_rounded, size: 9, color: kMuted),
-                  const SizedBox(width: 2),
-                  Text(tarian.durasi!, style: AppText.bodyXs),
-                ]),
-              ],
-            ]),
+
+              // 2. Gradient Gelap dari Bawah
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.1),
+                      Colors.black.withOpacity(0.85),
+                    ],
+                    stops: const [0.4, 0.7, 1.0],
+                  ),
+                ),
+              ),
+
+              // 3. Kategori (Kanan Atas)
+              Positioned(
+                top: 8, right: 8,
+                child: CategoryChip(tarian.kategori, small: true),
+              ),
+
+              // 4. Bintang Unggulan (Kiri Atas)
+              if (tarian.unggulan)
+                Positioned(
+                  top: 8, left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: kGold,
+                      borderRadius: BorderRadius.circular(kRadiusFull),
+                      boxShadow: [BoxShadow(color: kGold.withOpacity(0.4), blurRadius: 4)],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                        SizedBox(width: 2),
+                        Text('Unggulan', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // 5. Teks Judul & Asal di Bawah
+              Positioned(
+                bottom: 12, left: 12, right: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      tarian.nama,
+                      style: AppText.displayXs.copyWith(color: Colors.white, fontSize: 15, height: 1.1),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on_rounded, size: 10, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            tarian.asal,
+                            style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ]),
+        ),
       ),
     );
   }
@@ -266,7 +296,7 @@ class _TarianDetailSheet extends StatelessWidget {
       maxChildSize:     0.95,
       minChildSize:     0.45,
       builder: (_, ctrl) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color:        kBgCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(kRadiusXl)),
         ),
@@ -289,7 +319,7 @@ class _TarianDetailSheet extends StatelessWidget {
                   width:  double.infinity,
                   placeholder: Container(
                     height: 200, color: kPrimaryPale,
-                    child: const Center(child: Icon(Icons.music_note_rounded,
+                    child: Center(child: Icon(Icons.music_note_rounded,
                         color: kPrimary, size: 48))),
                 ),
                 // Gradient overlay on image
@@ -297,7 +327,7 @@ class _TarianDetailSheet extends StatelessWidget {
                   bottom: 0, left: 0, right: 0,
                   child: Container(
                     height: 80,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin:  Alignment.bottomCenter,
                         end:    Alignment.topCenter,
@@ -314,7 +344,7 @@ class _TarianDetailSheet extends StatelessWidget {
                   Row(children: [
                     CategoryChip(tarian.kategori),
                     if (tarian.unggulan) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
@@ -322,34 +352,34 @@ class _TarianDetailSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(kRadiusFull),
                           border: Border.all(color: kGold.withOpacity(0.5)),
                         ),
-                        child: const Text('★ Unggulan', style: TextStyle(
+                        child: Text('★ Unggulan', style: TextStyle(
                             color: kGold, fontSize: 11, fontWeight: FontWeight.w800)),
                       ),
                     ],
                   ]),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(tarian.nama, style: AppText.displayLg),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(children: [
-                    const Icon(Icons.location_on_rounded, size: 14, color: kMuted),
-                    const SizedBox(width: 4),
+                    Icon(Icons.location_on_rounded, size: 14, color: kMuted),
+                    SizedBox(width: 4),
                     Text(tarian.asal, style: AppText.bodySm),
                   ]),
-                  const SizedBox(height: kSpace),
+                  SizedBox(height: kSpace),
 
                   // Divider ornamental
                   Row(children: [
                     Container(width: 32, height: 2, color: kPrimary),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Container(width: 8, height: 2, color: kPrimaryLight),
                   ]),
-                  const SizedBox(height: kSpace),
+                  SizedBox(height: kSpace),
 
                   Text(tarian.deskripsi,
                     style: AppText.bodyMd.copyWith(height: 1.75)),
 
                   // Info cards
-                  const SizedBox(height: kSpaceMd),
+                  SizedBox(height: kSpaceMd),
                   if (tarian.fungsi != null || tarian.kostum != null || tarian.durasi != null)
                     Container(
                       padding: const EdgeInsets.all(kSpace),
@@ -373,17 +403,17 @@ class _TarianDetailSheet extends StatelessWidget {
                     ),
 
                   if (tarian.videoUrl != null) ...[
-                    const SizedBox(height: kSpace),
+                    SizedBox(height: kSpace),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {},
-                        icon:  const Icon(Icons.play_circle_rounded, size: 20),
-                        label: const Text('Tonton Video Tarian'),
+                        icon:  Icon(Icons.play_circle_rounded, size: 20),
+                        label: Text('Tonton Video Tarian'),
                       ),
                     ),
                   ],
-                  const SizedBox(height: kSpaceXl),
+                  SizedBox(height: kSpaceXl),
                 ]),
               ),
             ]),
@@ -402,11 +432,11 @@ class _InfoTile extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Row(children: [
-      Text(emoji, style: const TextStyle(fontSize: 18)),
-      const SizedBox(width: 12),
+      Text(emoji, style: TextStyle(fontSize: 18)),
+      SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: AppText.caption.copyWith(letterSpacing: 0.8)),
-        const SizedBox(height: 2),
+        SizedBox(height: 2),
         Text(value, style: AppText.label),
       ])),
     ]),

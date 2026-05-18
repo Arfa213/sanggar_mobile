@@ -9,7 +9,7 @@ class AppBadge extends StatelessWidget {
   final String text;
   final Color? bg;
   final Color? color;
-  const AppBadge(this.text, {super.key, this.bg, this.color});
+  AppBadge(this.text, {super.key, this.bg, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class SectionTitle extends StatelessWidget {
               if (subtitle != null)
                 Text(subtitle!, style: AppText.caption.copyWith(
                   color: kPrimary, letterSpacing: 1.5)),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(title, style: AppText.displayXs),
             ]),
           ),
@@ -67,8 +67,8 @@ class SectionTitle extends StatelessWidget {
                 Text(actionLabel!,
                   style: AppText.bodySm.copyWith(
                     color: kPrimary, fontWeight: FontWeight.w700)),
-                const SizedBox(width: 2),
-                const Icon(Icons.arrow_forward_ios_rounded,
+                SizedBox(width: 2),
+                Icon(Icons.arrow_forward_ios_rounded,
                     size: 10, color: kPrimary),
               ]),
             ),
@@ -84,7 +84,7 @@ class StatItem extends StatelessWidget {
   final String label;
   final IconData? icon;
 
-  const StatItem({
+  StatItem({
     super.key,
     required this.number,
     required this.label,
@@ -116,12 +116,12 @@ class StatItem extends StatelessWidget {
                 color: kPrimaryPale, shape: BoxShape.circle),
               child: Icon(icon, color: kPrimary, size: 18),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
           ],
           Text(number,
             style: AppText.displaySm.copyWith(
               color: kPrimary, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           Text(label,
             style: AppText.caption,
             textAlign: TextAlign.center),
@@ -185,7 +185,7 @@ class AppImage extends StatelessWidget {
   Widget _defaultPlaceholder() => Container(
     width: width, height: height,
     color: kPrimaryPale,
-    child: const Center(
+    child: Center(
       child: Icon(Icons.image_outlined, color: kPrimary, size: 32)),
   );
 }
@@ -264,7 +264,7 @@ class AppDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: padding,
-    child: const Divider(color: kBorder2, height: 1, thickness: 1),
+    child: Divider(color: kBorder2, height: 1, thickness: 1),
   );
 }
 
@@ -279,7 +279,7 @@ class AppLoading extends StatelessWidget {
     children: [
       const CircularProgressIndicator(color: kPrimary, strokeWidth: 2.5),
       if (message != null) ...[
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(message!, style: AppText.bodySm),
       ],
     ],
@@ -301,22 +301,22 @@ class AppError extends StatelessWidget {
           width: 72, height: 72,
           decoration: BoxDecoration(
             color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadius)),
-          child: const Icon(Icons.wifi_off_rounded, color: kPrimary, size: 32),
+          child: Icon(Icons.wifi_off_rounded, color: kPrimary, size: 32),
         ),
-        const SizedBox(height: kSpace),
+        SizedBox(height: kSpace),
         Text('Koneksi Bermasalah',
           style: AppText.displayXs.copyWith(fontSize: 18)),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
-          'Pastikan Laravel berjalan dan URL sudah benar di constants.dart',
+          'Pastikan Laravel berjalan dan URL sudah benar di app_theme.dart',
           style: AppText.bodySm,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: kSpaceLg),
+        SizedBox(height: kSpaceLg),
         ElevatedButton.icon(
           onPressed: onRetry,
-          icon:  const Icon(Icons.refresh_rounded, size: 18),
-          label: const Text('Coba Lagi'),
+          icon:  Icon(Icons.refresh_rounded, size: 18),
+          label: Text('Coba Lagi'),
         ),
       ]),
     ),

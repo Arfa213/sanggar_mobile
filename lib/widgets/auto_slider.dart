@@ -92,13 +92,13 @@ class _AutoSliderState extends State<AutoSlider> {
 
   Widget _placeholderSlide() => Container(
     height: widget.height,
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       color: kPrimary,
     ),
     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text('Sanggar Mulya Bhakti',
         style: AppText.displayMd.copyWith(color: Colors.white)),
-      const SizedBox(height: 8),
+      SizedBox(height: 8),
       Text('Melestarikan Budaya Melalui Seni',
         style: AppText.bodyMd.copyWith(color: Colors.white70)),
     ]),
@@ -155,7 +155,7 @@ class _SlideCard extends StatelessWidget {
                   border:       Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 child: Text(item.badge!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color:       Colors.white,
                     fontSize:    10,
                     fontWeight:  FontWeight.w700,
@@ -172,7 +172,7 @@ class _SlideCard extends StatelessWidget {
                   ],
                 )),
             if (item.subtitle != null) ...[
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(item.subtitle!,
                 style: AppText.bodySm.copyWith(color: Colors.white70)),
             ],
@@ -183,7 +183,7 @@ class _SlideCard extends StatelessWidget {
   }
 
   Widget _colorBg() => Container(
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [kPrimaryDark, kPrimary],
         begin:  Alignment.topLeft,

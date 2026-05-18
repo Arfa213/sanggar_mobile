@@ -33,7 +33,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     return Scaffold(
       backgroundColor: kBgSoft,
       appBar: AppBar(
-        title: const Text('Riwayat Kehadiran', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text('Riwayat Kehadiran', style: TextStyle(fontWeight: FontWeight.w800)),
         backgroundColor: kBgCard, foregroundColor: kDark, elevation: 0,
         bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(color: kBorder)),
       ),
@@ -42,12 +42,12 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
           : _error != null
               ? AppError(message: _error!, onRetry: _load)
               : _data.isEmpty
-                  ? const Center(child: Text('Belum ada riwayat kehadiran.'))
+                  ? Center(child: Text('Belum ada riwayat kehadiran.'))
                   : RefreshIndicator(color: kPrimary, onRefresh: _load,
                       child: ListView.separated(
                         padding: const EdgeInsets.all(kSpace),
                         itemCount: _data.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        separatorBuilder: (_, __) => SizedBox(height: 8),
                         itemBuilder: (_, i) => _KehadiranCard(_data[i]),
                       )),
     );
@@ -75,10 +75,10 @@ class _KehadiranCard extends StatelessWidget {
           decoration: BoxDecoration(color: c[0], borderRadius: BorderRadius.circular(10)),
           child: Center(child: Text(icons[k.status] ?? '?',
               style: TextStyle(color: c[1], fontWeight: FontWeight.w900, fontSize: 16)))),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(k.tarianNama, style: AppText.label),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           Text(k.tanggalFormatted, style: AppText.bodyXs),
           if (k.jadwal != null)
             Text('${k.jadwal!.hari} · ${k.jadwal!.jamMulai}–${k.jadwal!.jamSelesai}', style: AppText.bodyXs),
