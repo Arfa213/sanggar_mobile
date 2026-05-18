@@ -9,6 +9,7 @@ import 'services/auth_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart'; 
 import 'screens/main_nav.dart';   
+import 'services/notification_service.dart';
 
 import 'utils/app_theme.dart';
 
@@ -21,8 +22,11 @@ void main() async {
   ));
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider()..init(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
+        ChangeNotifierProvider(create: (_) => NotificationService()..init()),
+      ],
       child: const SanggarApp(),
     ),
   );

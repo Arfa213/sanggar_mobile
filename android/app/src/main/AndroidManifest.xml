@@ -11,6 +11,9 @@
 
     <!-- WAJIB: permission internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Untuk fitur scan QR kehadiran -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
         android:label="Sanggar Mulya Bhakti"

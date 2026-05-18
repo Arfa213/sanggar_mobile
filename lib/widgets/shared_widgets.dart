@@ -158,7 +158,7 @@ class AppImage extends StatelessWidget {
       child = placeholder ?? _defaultPlaceholder();
     } else {
       child = CachedNetworkImage(
-        imageUrl:    url!,
+        imageUrl:    getImageUrl(url!),
         width:       width,
         height:      height,
         fit:         fit,

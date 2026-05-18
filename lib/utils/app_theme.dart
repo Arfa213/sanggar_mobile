@@ -1,6 +1,7 @@
 // lib/utils/app_theme.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 // ── WARNA ────────────────────────────────────────────────────
 const kPrimary      = Color(0xFFC65D2E);
@@ -20,10 +21,17 @@ const kBgCard       = Color(0xFFFFFFFF);
 const kGold         = Color(0xFFD4AF37);
 
 // ── BASE URL ─────────────────────────────────────────────────
-// Emulator Android: http://10.0.2.2:8000
-// Device fisik    : http://IP-WIFI-PC:8000
-const kBaseUrl = 'http://10.0.2.2:8000';
-const kApiUrl  = "http://127.0.0.1:8000/api/v1";
+// Web/Windows : 127.0.0.1  (Laravel di mesin yang sama)
+// Android Emulator: 10.0.2.2 (alias localhost dari emulator)
+// Device fisik (WiFi): ganti ke IP WiFi PC kamu
+String get kBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+String get kApiUrl  => kIsWeb ? 'http://127.0.0.1:8000/api/v1' : 'http://10.0.2.2:8000/api/v1';
+
+String getImageUrl(String? path) {
+  if (path == null || path.isEmpty) return '';
+  if (path.startsWith('http')) return path;
+  return '$kBaseUrl/storage/$path';
+}
 
 // ── RADIUS ───────────────────────────────────────────────────
 const kRadiusXs = 8.0;

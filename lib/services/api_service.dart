@@ -44,6 +44,15 @@ class ApiService {
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
+  static Future<Map<String, dynamic>> _put(String path, Map<String, dynamic> body,
+      {bool auth = false}) async {
+    final res = await http.put(Uri.parse('$kApiUrl$path'),
+        headers: await _headers(auth: auth), body: jsonEncode(body))
+        .timeout(const Duration(seconds: 15));
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
+  // ── PUBLIK ────────────────────────────────────────────────────
   static Future<SanggarProfile> getProfil() async {
     final d = await _get('/profil');
     return SanggarProfile.fromJson(d['data'] as Map<String, dynamic>);
@@ -76,6 +85,12 @@ class ApiService {
     return (d['data'] as List).map((e) => Galeri.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  static Future<Tarian> getTarianDetail(int id) async {
+    final d = await _get('/tarian/$id');
+    return Tarian.fromJson(d['data'] as Map<String, dynamic>);
+  }
+
+  // ── AUTH ──────────────────────────────────────────────────────
   static Future<UserModel> login(String email, String password) async {
     final d = await _post('/auth/login', {'email': email, 'password': password});
     if (d['success'] == true) {
@@ -111,61 +126,116 @@ class ApiService {
       return UserModel.fromJson(d['data'] as Map<String, dynamic>);
     } catch (_) { return null; }
   }
-  static Future<List<JadwalLatihan>> getJadwal() async {
-  final d = await _get('/jadwal');
-  return (d['data'] as List)
-      .map((e) => JadwalLatihan.fromJson(e as Map<String, dynamic>))
-      .toList();
-}
- 
-// ── PENDAFTARAN SAYA ─────────────────────────────────────────
-static Future<List<Pendaftaran>> getPendaftaranSaya() async {
-  try {
-    final d = await _get('/pendaftaran', auth: true);
-    return (d['data'] as List)
-        .map((e) => Pendaftaran.fromJson(e as Map<String, dynamic>))
-        .toList();
-  } catch (_) {
-    return [];
-  }
-}
- 
-// ── DAFTAR KELAS ─────────────────────────────────────────────
-static Future<void> daftarKelas({
-  required int tarianId,
-  required int jadwalId,
-  String? catatan,
-}) async {
-  final d = await _post('/pendaftaran', {
-    'tarian_id': tarianId,
-    'jadwal_id': jadwalId,
-    if (catatan != null) 'catatan': catatan,
-  }, auth: true);
-  if (d['success'] != true) {
-    throw Exception(d['message'] ?? 'Gagal mendaftar kelas');
-  }
-}
- 
-// ── BATALKAN PENDAFTARAN ──────────────────────────────────────
-static Future<void> batalkanPendaftaran(int id) async {
-  final d = await _post('/pendaftaran/$id/batalkan', {}, auth: true);
-  if (d['success'] != true) {
-    throw Exception(d['message'] ?? 'Gagal membatalkan pendaftaran');
-  }
-}
- 
-// ── AUTH HEADER HELPER ────────────────────────────────────────
-// untuk dipakai ChatbotScreen
-static Future<Map<String, String>> authHeader() async {
-  final token = await getToken();
-  if (token != null) return {'Authorization': 'Bearer $token'};
-  return {};
-}
 
-// ── GET DETAIL TARIAN ─────────────────────────────────────────
-  static Future<Tarian> getTarianDetail(int id) async {
-    final d = await _get('/tarian/$id');
-    // Kita ambil dari d['data'] karena biasanya Laravel membungkus object dalam key 'data'
-    return Tarian.fromJson(d['data'] as Map<String, dynamic>);
+  static Future<void> updateProfile(Map<String, dynamic> data) async {
+    final d = await _put('/auth/profile', data, auth: true);
+    if (d['success'] != true) throw Exception(d['message'] ?? 'Gagal update profil');
+  }
+
+  static Future<void> updatePassword({
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    final d = await _put('/auth/password', {
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    }, auth: true);
+    if (d['success'] != true) throw Exception(d['message'] ?? 'Gagal ganti password');
+  }
+
+  // ── JADWAL & PENDAFTARAN ──────────────────────────────────────
+  static Future<List<JadwalLatihan>> getJadwal() async {
+    final d = await _get('/jadwal');
+    return (d['data'] as List)
+        .map((e) => JadwalLatihan.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<List<PendaftaranMember>> getPendaftaranSaya() async {
+    try {
+      final d = await _get('/pendaftaran', auth: true);
+      return (d['data'] as List)
+          .map((e) => PendaftaranMember.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<void> daftarKelas({
+    required int tarianId,
+    required int jadwalId,
+    String? catatan,
+  }) async {
+    final d = await _post('/pendaftaran', {
+      'tarian_id': tarianId,
+      'jadwal_id': jadwalId,
+      if (catatan != null) 'catatan': catatan,
+    }, auth: true);
+    if (d['success'] != true) {
+      throw Exception(d['message'] ?? 'Gagal mendaftar kelas');
+    }
+  }
+
+  static Future<void> batalkanPendaftaran(int id) async {
+    final d = await _post('/pendaftaran/$id/batalkan', {}, auth: true);
+    if (d['success'] != true) {
+      throw Exception(d['message'] ?? 'Gagal membatalkan pendaftaran');
+    }
+  }
+
+  // ── KEHADIRAN ─────────────────────────────────────────────────
+  static Future<List<Kehadiran>> getKehadiranSaya({int page = 1}) async {
+    try {
+      final d = await _get('/kehadiran-saya?page=$page', auth: true);
+      final list = (d['data'] as List?) ?? [];
+      return list.map((e) => Kehadiran.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<StatistikKehadiran> getStatistikKehadiran({String? bulan}) async {
+    final b = bulan ?? DateTime.now().toString().substring(0, 7);
+    try {
+      final d = await _get('/kehadiran-saya/statistik?bulan=$b', auth: true);
+      return StatistikKehadiran.fromJson(d);
+    } catch (_) {
+      return StatistikKehadiran(bulan: b, hadir: 0, izin: 0, alpa: 0, total: 0, persenHadir: 0);
+    }
+  }
+
+  static Future<Map<String, dynamic>> scanAbsensi(String barcodeToken) async {
+    final d = await _post('/attendance/scan', {'barcode_token': barcodeToken}, auth: true);
+    return d;
+  }
+
+  // ── HELPER ────────────────────────────────────────────────────
+  static Future<Map<String, String>> authHeader() async {
+    final token = await getToken();
+    if (token != null) return {'Authorization': 'Bearer $token'};
+    return {};
+  }
+
+  // ── OLD COMPAT (untuk Pendaftaran lama) ──────────────────────
+  static Future<List<Pendaftaran>> getPendaftaranSayaLegacy() async {
+    try {
+      final d = await _get('/pendaftaran', auth: true);
+      return (d['data'] as List)
+          .map((e) => Pendaftaran.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getPengumuman() async {
+    try {
+      final d = await _get('/pengumuman', auth: true);
+      final list = (d['data'] as List?) ?? [];
+      return list.map((e) => e as Map<String, dynamic>).toList();
+    } catch (_) {
+      return [];
+    }
   }
 }

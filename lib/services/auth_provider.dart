@@ -22,4 +22,6 @@ class AuthProvider extends ChangeNotifier {
     _user = await ApiService.register(data); notifyListeners(); }
   Future<void> logout() async {
     await ApiService.logout(); _user = null; notifyListeners(); }
+
+  void updateUser(UserModel u) { _user = u; notifyListeners(); }
 }

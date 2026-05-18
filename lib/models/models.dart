@@ -107,32 +107,133 @@ class Galeri {
 class UserModel {
   final int id;
   final String name, email, role, status;
-  final String? alamat, noHp, foto; // 👈 TAMBAHKAN properti foto di sini (bisa null)
+  final String? alamat, noHp, foto, tipeAnggota;
   String? token;
 
   UserModel({
-    required this.id, 
-    required this.name, 
+    required this.id,
+    required this.name,
     required this.email,
-    required this.role, 
-    required this.status, 
-    this.alamat, 
-    this.noHp, 
-    this.foto, // 👈 TAMBAHKAN di constructor
+    required this.role,
+    required this.status,
+    this.alamat,
+    this.noHp,
+    this.foto,
+    this.tipeAnggota,
     this.token,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> j) => UserModel(
-    id: j['id'] as int, 
-    name: j['name'] ?? '', 
-    email: j['email'] ?? '',
-    role: j['role'] ?? 'anggota', 
-    status: j['status'] ?? 'aktif',
-    alamat: j['alamat'], 
-    noHp: j['no_hp'], 
-    foto: j['foto_profil'] ?? j['foto'], // 👈 Petakan dari key JSON API kamu (misal 'foto_profil' atau 'foto')
-    token: j['token'],
+    id:          j['id'] as int,
+    name:        j['name'] ?? '',
+    email:       j['email'] ?? '',
+    role:        j['role'] ?? 'anggota',
+    status:      j['status'] ?? 'aktif',
+    alamat:      j['alamat'],
+    noHp:        j['no_hp'],
+    foto:        j['foto_profil'] ?? j['foto'],
+    tipeAnggota: j['tipe_anggota'] ?? 'anggota_tetap',
+    token:       j['token'],
   );
 
-  bool get isAdmin => role == 'admin' || role == 'administrator';
+  bool get isAdmin     => role == 'admin' || role == 'administrator';
+  bool get isPengunjung => tipeAnggota == 'pengunjung';
+  String get firstName => name.split(' ').first;
+  String get initial   => name.isNotEmpty ? name[0].toUpperCase() : 'U';
+}
+
+// ── KEHADIRAN ─────────────────────────────────────────────────
+class JadwalSingkat {
+  final String hari, jamMulai, jamSelesai, tempat;
+  JadwalSingkat({required this.hari, required this.jamMulai,
+    required this.jamSelesai, required this.tempat});
+  factory JadwalSingkat.fromJson(Map<String, dynamic> j) => JadwalSingkat(
+    hari:       j['hari'] ?? '',
+    jamMulai:   j['jam_mulai'] ?? '',
+    jamSelesai: j['jam_selesai'] ?? '',
+    tempat:     j['tempat'] ?? '',
+  );
+}
+
+class Kehadiran {
+  final int id;
+  final String tanggal, status;
+  final String? keterangan;
+  final String tarianNama;
+  final JadwalSingkat? jadwal;
+
+  Kehadiran({required this.id, required this.tanggal, required this.status,
+    this.keterangan, required this.tarianNama, this.jadwal});
+
+  factory Kehadiran.fromJson(Map<String, dynamic> j) => Kehadiran(
+    id:         j['id'] as int,
+    tanggal:    j['tanggal'] ?? '',
+    status:     j['status'] ?? 'alpa',
+    keterangan: j['keterangan'],
+    tarianNama: (j['tarian'] as Map<String, dynamic>?)?['nama'] ?? '',
+    jadwal:     j['jadwal'] != null
+        ? JadwalSingkat.fromJson(j['jadwal'] as Map<String, dynamic>)
+        : null,
+  );
+
+  String get tanggalFormatted {
+    if (tanggal.length < 10) return tanggal;
+    const bulan = ['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+    final parts = tanggal.substring(0, 10).split('-');
+    if (parts.length < 3) return tanggal;
+    final bln = int.tryParse(parts[1]) ?? 0;
+    return '${parts[2]} ${bulan[bln]} ${parts[0]}';
+  }
+}
+
+class StatistikKehadiran {
+  final String bulan;
+  final int hadir, izin, alpa, total;
+  final int persenHadir;
+
+  StatistikKehadiran({required this.bulan, required this.hadir,
+    required this.izin, required this.alpa, required this.total,
+    required this.persenHadir});
+
+  factory StatistikKehadiran.fromJson(Map<String, dynamic> j) {
+    final d = j['data'] as Map<String, dynamic>? ?? j;
+    return StatistikKehadiran(
+      bulan:       d['bulan'] ?? '',
+      hadir:       (d['hadir'] ?? 0) as int,
+      izin:        (d['izin']  ?? 0) as int,
+      alpa:        (d['alpa']  ?? 0) as int,
+      total:       (d['total'] ?? 0) as int,
+      persenHadir: (d['persen_hadir'] ?? 0) as int,
+    );
+  }
+}
+
+// ── PENDAFTARAN MEMBER ────────────────────────────────────────
+class PendaftaranMember {
+  final int id;
+  final String tarianNama, tarianKategori;
+  final String? tarianFoto;
+  final JadwalSingkat jadwal;
+  final String status, tanggalDaftar;
+
+  PendaftaranMember({required this.id, required this.tarianNama,
+    required this.tarianKategori, this.tarianFoto,
+    required this.jadwal, required this.status, required this.tanggalDaftar});
+
+  factory PendaftaranMember.fromJson(Map<String, dynamic> j) {
+    final t = j['tarian'] as Map<String, dynamic>? ?? {};
+    final jd = j['jadwal'] as Map<String, dynamic>? ?? {};
+    return PendaftaranMember(
+      id:             j['id'] as int,
+      tarianNama:     t['nama'] ?? '',
+      tarianKategori: t['kategori'] ?? '',
+      tarianFoto:     t['foto'],
+      jadwal:         JadwalSingkat.fromJson(jd),
+      status:         j['status'] ?? 'aktif',
+      tanggalDaftar:  j['tanggal_daftar'] ?? '',
+    );
+  }
+
+  String get hariSingkat =>
+      jadwal.hari.length >= 3 ? jadwal.hari.substring(0, 3).toUpperCase() : jadwal.hari.toUpperCase();
 }

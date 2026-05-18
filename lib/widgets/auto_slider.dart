@@ -115,7 +115,7 @@ class _SlideCard extends StatelessWidget {
       // Gambar
       item.imageUrl != null
           ? CachedNetworkImage(
-              imageUrl: item.imageUrl!,
+              imageUrl: getImageUrl(item.imageUrl!),
               fit:      BoxFit.cover,
               placeholder: (_, __) => Container(color: kPrimaryDark),
               errorWidget: (_, __, ___) => _colorBg(),

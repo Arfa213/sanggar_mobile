@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../utils/constants.dart';
+import '../utils/app_theme.dart';
 
 class TarianMiniCard extends StatelessWidget {
   final Tarian tarian;
@@ -42,7 +43,7 @@ class TarianMiniCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             child: tarian.foto != null
-                ? CachedNetworkImage(imageUrl: tarian.foto!,
+                ? CachedNetworkImage(imageUrl: getImageUrl(tarian.foto!),
                     height: 100, width: double.infinity, fit: BoxFit.cover)
                 : Container(height: 100, color: kPrimaryPale,
                     child: const Icon(Icons.music_note_rounded, color: kPrimary, size: 32)),
