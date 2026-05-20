@@ -27,15 +27,14 @@ Color get kBorder       => gIsDarkMode ? const Color(0xFF333333) : const Color(0
 Color get kBorder2      => gIsDarkMode ? const Color(0xFF2A2A2A) : const Color(0xFFF0EBE5);
 
 // ── BASE URL ─────────────────────────────────────────────────
-// Konfigurasi IP ini menggunakan IP WiFi Laptop kamu saat ini (192.168.100.223)
-// Agar HP asli (via USB) bisa nembak langsung ke server Laravel di laptop.
-String get kBaseUrl => 'http://192.168.100.223:8000';
-String get kApiUrl  => 'http://192.168.100.223:8000/api/v1';
+// Konfigurasi menggunakan URL server Laravel yang sudah di-deploy.
+String get kBaseUrl => 'http://senindrai.my.id';
+String get kApiUrl  => 'http://senindrai.my.id/api/v1';
 
 String getImageUrl(String? path) {
   if (path == null || path.isEmpty) return '';
   if (path.startsWith('http')) return path;
-  return '$kBaseUrl/storage/$path';
+  return '$kApiUrl/file/$path';
 }
 
 // ── RADIUS ───────────────────────────────────────────────────

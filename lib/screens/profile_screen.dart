@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
+import '../services/api_service.dart';
 import '../services/theme_service.dart';
+import 'package:image_picker/image_picker.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import 'auth/login_screen.dart';
@@ -96,6 +98,28 @@ class _LoggedInView extends StatelessWidget {
     }
   }
 
+  Future<void> _pickAndUploadPhoto(BuildContext context, AuthProvider auth) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+      if (picked == null) return;
+      
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengunggah foto...')));
+      
+      await ApiService.updateProfilePhoto(picked.path);
+      
+      final fresh = await ApiService.getMe();
+      if (fresh != null) auth.updateUser(fresh);
+      
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto profil berhasil diperbarui!')));
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: ${e.toString()}'), backgroundColor: Colors.red));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = auth.user!;
@@ -120,26 +144,37 @@ class _LoggedInView extends StatelessWidget {
                     decoration: BoxDecoration(shape: BoxShape.circle,
                       border: Border.all(color: Colors.white.withOpacity(0.06), width: 30)))),
                 SafeArea(child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Stack(children: [
-                    Container(
-                      decoration: BoxDecoration(shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
-                      child: CircleAvatar(
-                        radius: 44,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        backgroundImage: (user.foto != null && user.foto!.isNotEmpty)
-                            ? NetworkImage(getImageUrl(user.foto!)) as ImageProvider : null,
-                        child: (user.foto == null || user.foto!.isEmpty)
-                            ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
-                            : null,
+                  GestureDetector(
+                    onTap: () => _pickAndUploadPhoto(context, auth),
+                    child: Stack(children: [
+                      Container(
+                        decoration: BoxDecoration(shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
+                        child: ClipOval(
+                          child: (user.foto != null && user.foto!.isNotEmpty)
+                              ? AppImage(
+                                  url: user.foto!,
+                                  width: 88,
+                                  height: 88,
+                                  fit: BoxFit.cover,
+                                  placeholder: Container(
+                                    width: 88, height: 88, color: Colors.white.withOpacity(0.2),
+                                    child: Center(child: Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)))
+                                  ),
+                                )
+                              : Container(
+                                  width: 88, height: 88, color: Colors.white.withOpacity(0.2),
+                                  child: Center(child: Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)))
+                                ),
+                        ),
                       ),
-                    ),
-                    Positioned(bottom: 0, right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(color: kGold, shape: BoxShape.circle),
-                        child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
-                  ]),
+                      Positioned(bottom: 0, right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(color: kGold, shape: BoxShape.circle),
+                          child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
+                    ]),
+                  ),
                   SizedBox(height: 10),
                   Text(user.name, style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
                   SizedBox(height: 2),
@@ -177,6 +212,29 @@ class _LoggedInView extends StatelessWidget {
                 ),
               ]),
             )),
+          SizedBox(height: kSpaceMd),
+
+          _sectionTitle('PENGATURAN TEMA'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 3),
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: kBorder2), borderRadius: BorderRadius.circular(kRadius), color: kBgCard),
+              child: SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                title: Text('Mode Gelap', style: AppText.label.copyWith(fontWeight: FontWeight.w600)),
+                subtitle: Text('Ubah tampilan menjadi gelap.', style: AppText.bodyXs.copyWith(color: kMuted2)),
+                secondary: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(color: themeProvider.isDarkMode ? kDark2 : kPrimaryPale, borderRadius: BorderRadius.circular(kRadiusSm)),
+                  child: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                      color: themeProvider.isDarkMode ? Colors.white : kPrimary, size: 18),
+                ),
+                value: themeProvider.isDarkMode,
+                activeColor: kPrimary,
+                onChanged: (val) => themeProvider.toggleTheme(),
+              ),
+            ),
+          ),
           SizedBox(height: kSpaceMd),
 
           _sectionTitle('PENGATURAN AKUN'),

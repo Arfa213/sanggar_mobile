@@ -1,6 +1,7 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../services/api_service.dart';
 import '../services/auth_provider.dart';
 import '../models/models.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   List<Event> _events = [];
   List<PendaftaranMember> _jadwalAktif = [];
   List<Kehadiran> _kehadiran = [];
+  List<Map<String, dynamic>> _pengumuman = [];
   StatistikKehadiran? _statistik;
   bool _loading = true;
   String? _error;
@@ -52,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ApiService.getKehadiranSaya(),
           ApiService.getStatistikKehadiran(),
           ApiService.getEvents(),
+          ApiService.getPengumuman(),
         ]);
         if (!mounted) return;
         final ev = results[4] as Map<String, dynamic>;
@@ -61,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           _kehadiran = (results[2] as List<Kehadiran>).take(5).toList();
           _statistik = results[3] as StatistikKehadiran;
           _events = ((ev['mendatang'] as List<Event>?) ?? []).take(3).toList();
+          _pengumuman = results[5] as List<Map<String, dynamic>>;
           _loading = false;
         });
 
@@ -115,10 +119,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         onRefresh: _load,
         child: CustomScrollView(slivers: [
           SliverToBoxAdapter(child: _buildDashHeader(user)),
-          SliverToBoxAdapter(child: _buildBentoQuickActions()),
-          SliverToBoxAdapter(child: _buildScanButton()),
+          SliverToBoxAdapter(child: _buildAnnouncementCarousel()),
+          SliverToBoxAdapter(child: _buildUpcomingClassWidget()),
+          SliverToBoxAdapter(child: _buildModernQuickGrid()),
           SliverToBoxAdapter(child: _buildStatsRow()),
-          SliverToBoxAdapter(child: _buildJadwalSection()),
           SliverToBoxAdapter(child: _buildKehadiranSection()),
           SliverToBoxAdapter(child: _buildEventSection()),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
@@ -135,127 +139,412 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildBentoQuickActions() {
+  Widget _buildAnnouncementCarousel() {
+    if (_pengumuman.isEmpty) return const SizedBox.shrink();
     return FadeTransition(
       opacity: _stagger(1),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-        child: Row(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Action 1: Booking Kelas / Penjadwalan
-            Expanded(
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const PenjadwalanScreen()),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: kBgCard,
-                    borderRadius: BorderRadius.circular(kRadius),
-                    border: Border.all(color: kBorder2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: kPrimaryPale,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.calendar_today_rounded,
-                          color: kPrimary,
-                          size: 20,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        'Booking Kelas',
-                        style: TextStyle(
-                          color: kText,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Daftar / atur sesi latihan',
-                        style: TextStyle(
-                          color: kMuted,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
+            Row(
+              children: [
+                Icon(Icons.campaign_rounded, color: kPrimary, size: 20),
+                const SizedBox(width: 6),
+                const Text(
+                  'Pengumuman & Event',
+                  style: TextStyle(
+                    color: Color(0xFF1A1A1A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 120,
+              child: PageView.builder(
+                itemCount: _pengumuman.length,
+                itemBuilder: (context, index) {
+                  final item = _pengumuman[index];
+                  final isEvent = item['tipe'] == 'event';
+                  return Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isEvent
+                            ? [const Color(0xFFC65D2E), const Color(0xFFE28743)]
+                            : [Colors.white, const Color(0xFFFAF9F6)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isEvent ? Colors.transparent : const Color(0xFFE5E2DE),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: isEvent
+                                    ? Colors.white.withOpacity(0.2)
+                                    : kPrimary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                isEvent ? '🏆 EVENT' : '📢 PENGUMUMAN',
+                                style: TextStyle(
+                                  color: isEvent ? Colors.white : kPrimary,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              item['created_at'] != null
+                                  ? DateFormat('dd MMM yyyy').format(DateTime.parse(item['created_at'] as String).toLocal())
+                                  : '',
+                              style: TextStyle(
+                                color: isEvent ? Colors.white70 : Colors.grey,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item['judul'] ?? '-',
+                          style: TextStyle(
+                            color: isEvent ? Colors.white : const Color(0xFF1A1A1A),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item['konten'] ?? '-',
+                          style: TextStyle(
+                            color: isEvent ? Colors.white.withOpacity(0.85) : const Color(0xFF666666),
+                            fontSize: 11,
+                            height: 1.3,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
-            SizedBox(width: 12),
-            // Action 2: Tanya AI Asisten
-            Expanded(
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ChatbotScreen()),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: kBgCard,
-                    borderRadius: BorderRadius.circular(kRadius),
-                    border: Border.all(color: kBorder2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F5E9),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.support_agent_rounded,
-                          color: Color(0xFF2E7D32),
-                          size: 20,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        'Tanya AI Asisten',
-                        style: TextStyle(
-                          color: kText,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Chatbot info sanggar',
-                        style: TextStyle(
-                          color: kMuted,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingClassWidget() {
+    if (_jadwalAktif.isEmpty) return const SizedBox.shrink();
+    // Cari kelas terdekat (untuk demonstrasi, kita ambil index pertama saja)
+    final p = _jadwalAktif.first;
+    return FadeTransition(
+      opacity: _stagger(2),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1A1A1A), Color(0xFF2C2C2C)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
               ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: kPrimary.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.flash_on_rounded, color: kPrimary, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'LATIHAN TERDEKAT KAMU',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Ready',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          p.tarianNama,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'PlayfairDisplay',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined, color: Colors.white38, size: 13),
+                            const SizedBox(width: 4),
+                            Text(
+                              p.jadwal.tempat,
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.schedule_outlined, color: Colors.white38, size: 13),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${p.jadwal.hari}, ${p.jadwal.jamMulai}',
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(color: Colors.white10, height: 24, thickness: 1),
+              Row(
+                children: [
+                  const Icon(Icons.info_outline_rounded, color: Colors.white38, size: 14),
+                  const SizedBox(width: 6),
+                  const Expanded(
+                    child: Text(
+                      'Harap hadir 10 menit sebelum kelas dimulai.',
+                      style: TextStyle(color: Colors.white38, fontSize: 11),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      final ok = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScanScreen()),
+                      );
+                      if (ok == true && mounted) { _load(); }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: kPrimary,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 14),
+                          SizedBox(width: 6),
+                          Text(
+                            'Scan Absen',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernQuickGrid() {
+    final items = [
+      (
+        'Scan QR',
+        'Absensi kehadiran kelas',
+        Icons.qr_code_scanner_rounded,
+        const Color(0xFF1565C0),
+        const Color(0xFFE3F2FD),
+        () async {
+          final ok = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(builder: (_) => const ScanScreen()),
+          );
+          if (ok == true && mounted) { _load(); }
+        }
+      ),
+      (
+        'Booking Kelas',
+        'Daftar sesi latihan tari',
+        Icons.add_task_rounded,
+        const Color(0xFFC65D2E),
+        const Color(0xFFFBEBE3),
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PenjadwalanScreen()),
+        )
+      ),
+      (
+        'Tanya AI',
+        'Asisten info budaya',
+        Icons.support_agent_rounded,
+        const Color(0xFF2E7D32),
+        const Color(0xFFE8F5E9),
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+        )
+      ),
+      (
+        'Arsip Digital',
+        'Kamus tarian & topeng',
+        Icons.auto_stories_rounded,
+        const Color(0xFF6A1B9A),
+        const Color(0xFFF3E5F5),
+        () => MainNav.of(context)?.setIndex = 1 // Pindah ke tab Arsip
+      ),
+    ];
+
+    return FadeTransition(
+      opacity: _stagger(3),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Akses Cepat',
+              style: TextStyle(
+                color: Color(0xFF1A1A1A),
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: items.length,
+              itemBuilder: (context, idx) {
+                final item = items[idx];
+                return GestureDetector(
+                  onTap: item.$6 as VoidCallback,
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE5E2DE), width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.02),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: item.$5,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(item.$3, color: item.$4, size: 18),
+                        ),
+                        const Spacer(),
+                        Text(
+                          item.$1,
+                          style: const TextStyle(
+                            color: Color(0xFF1A1A1A),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.$2,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -390,106 +679,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildScanButton() {
-    return FadeTransition(
-      opacity: _stagger(2),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-        child: GestureDetector(
-          onTap: () async {
-            final ok = await Navigator.push<bool>(context,
-                MaterialPageRoute(builder: (_) => const ScanScreen()));
-            if (ok == true && mounted) { _load(); }
-          },
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(kRadiusLg),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 16, offset: const Offset(0, 4))],
-            ),
-            child: Row(children: [
-              Container(
-                width: 48, height: 48,
-                decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(14)),
-                child: Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 26),
-              ),
-              SizedBox(width: 14),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Scan Kehadiran', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-                SizedBox(height: 2),
-                Text('Arahkan kamera ke QR Code kelas', style: TextStyle(color: Colors.white38, fontSize: 12)),
-              ])),
-              Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildJadwalSection() {
-    return FadeTransition(
-      opacity: _stagger(4),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            AppBadge('KELAS SAYA'),
-            GestureDetector(
-              onTap: () => MainNav.of(context)?.setIndex = 1,
-              child: Text('Kelola', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
-            ),
-          ]),
-          SizedBox(height: 10),
-          if (_jadwalAktif.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
-              child: Column(children: [
-                Icon(Icons.school_outlined, color: kMuted2, size: 32),
-                SizedBox(height: 8),
-                Text('Belum ada kelas aktif', style: AppText.label.copyWith(color: kMuted)),
-                SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () => MainNav.of(context)?.setIndex = 1,
-                  child: Text('Daftar kelas →', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
-                ),
-              ]),
-            )
-          else
-            ..._jadwalAktif.map((p) => Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
-              child: Row(children: [
-                Container(
-                  width: 52, height: 52,
-                  decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(12)),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(p.hariSingkat, style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                    Text(p.jadwal.jamMulai, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w700)),
-                  ]),
-                ),
-                SizedBox(width: 12),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(p.tarianNama, style: AppText.label),
-                  SizedBox(height: 3),
-                  Text('📍 ${p.jadwal.tempat}  ⏰ ${p.jadwal.jamMulai}–${p.jadwal.jamSelesai}',
-                      style: AppText.bodyXs),
-                ])),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(kRadiusFull)),
-                  child: Text('Aktif', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.w800)),
-                ),
-              ]),
-            )),
-        ]),
-      ),
-    );
-  }
 
   Widget _buildKehadiranSection() {
     if (_kehadiran.isEmpty) return const SizedBox.shrink();

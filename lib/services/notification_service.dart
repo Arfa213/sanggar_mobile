@@ -130,7 +130,7 @@ class NotificationService extends ChangeNotifier {
             id: id,
             title: item['judul'] ?? 'Pengumuman Baru',
             message: item['konten'] ?? '',
-            timestamp: DateTime.parse(dtStr),
+            timestamp: DateTime.parse(dtStr).toLocal(),
             type: item['tipe'] ?? 'announcement',
           ));
           updated = true;

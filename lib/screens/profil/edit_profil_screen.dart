@@ -83,9 +83,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
             child: Column(children: [
               _Field(_nameCtrl, 'Nama Lengkap', Icons.person_outline_rounded,
+                  readOnly: true,
                   validator: (v) => v!.isEmpty ? 'Nama wajib diisi' : null),
               SizedBox(height: 14),
               _Field(_emailCtrl, 'Email', Icons.email_outlined,
+                  readOnly: true,
                   type: TextInputType.emailAddress,
                   validator: (v) { if (v!.isEmpty) return 'Email wajib diisi'; if (!v.contains('@')) return 'Format email tidak valid'; return null; }),
               SizedBox(height: 14),
@@ -112,18 +114,21 @@ class _Field extends StatelessWidget {
   final IconData icon;
   final TextInputType type;
   final int maxLines;
+  final bool readOnly;
   final String? Function(String?)? validator;
   const _Field(this.ctrl, this.label, this.icon,
-      {this.type = TextInputType.text, this.maxLines = 1, this.validator});
+      {this.type = TextInputType.text, this.maxLines = 1, this.readOnly = false, this.validator});
   @override
   Widget build(BuildContext context) => TextFormField(
     controller: ctrl, keyboardType: type, maxLines: maxLines, validator: validator,
+    readOnly: readOnly,
+    style: TextStyle(color: readOnly ? kMuted : kText),
     decoration: InputDecoration(
-      labelText: label, prefixIcon: Icon(icon, color: kPrimary, size: 18),
+      labelText: label, prefixIcon: Icon(icon, color: readOnly ? kMuted : kPrimary, size: 18),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kBorder2)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kBorder2)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: kPrimary, width: 1.5)),
-      filled: true, fillColor: kBgSoft,
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(kRadius), borderSide: BorderSide(color: readOnly ? kBorder2 : kPrimary, width: 1.5)),
+      filled: true, fillColor: readOnly ? (gIsDarkMode ? kBgSoft : const Color(0xFFF3F4F6)) : kBgSoft,
       errorStyle: TextStyle(color: Color(0xFFDC2626), fontSize: 11),
     ));
 }

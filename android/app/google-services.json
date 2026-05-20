@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "611713677810",
+    "project_id": "sanggar-mulya-bhakti",
+    "storage_bucket": "sanggar-mulya-bhakti.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:611713677810:android:53d7ebb23cda7dcf85936b",
+        "android_client_info": {
+          "package_name": "com.example.sanggar_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhwOBl3BgZunSPkOMXcImkVFKt4ltom8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:611713677810:android:53d7ebb23cda7dcf85936b",
+        "android_client_info": {
+          "package_name": "com.example.sanggar_mobile.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhwOBl3BgZunSPkOMXcImkVFKt4ltom8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

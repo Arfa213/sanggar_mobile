@@ -38,7 +38,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
       final results = await Future.wait([
         ApiService.getTarian(),
         ApiService.getJadwal(),
-        ApiService.getPendaftaranSaya(),
+        ApiService.getPendaftaranSayaRaw(),
       ]);
       if (!mounted) return;
       setState(() {
@@ -83,6 +83,8 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
       );
     }
 
+    final isPengunjung = auth.user?.isPengunjung == true;
+
     return Scaffold(
       backgroundColor: kBgSoft,
       body: NestedScrollView(
@@ -93,20 +95,45 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kSpace),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppBadge('KELAS TARI'),
-                Text('Penjadwalan', style: AppText.displaySm),
+                AppBadge(isPengunjung ? 'BOOKING SESI' : 'KELAS TARI'),
+                Text(isPengunjung ? 'Sesi Latihan' : 'Penjadwalan', style: AppText.displaySm),
               ]),
             ),
-            bottom: TabBar(
-              controller: _tab,
-              indicatorColor: kPrimary,
-              labelColor: kPrimary,
-              unselectedLabelColor: kMuted,
-              labelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-              tabs: [
-                Tab(text: 'Pilih Kelas (${_tarian.length})'),
-                Tab(text: 'Terdaftar (${_daftar.length})'),
-              ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(60),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 8),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: kBgSoft,
+                  borderRadius: BorderRadius.circular(kRadiusFull),
+                  border: Border.all(color: kBorder2),
+                ),
+                child: TabBar(
+                  controller: _tab,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  indicator: BoxDecoration(
+                    color: kPrimary,
+                    borderRadius: BorderRadius.circular(kRadiusFull),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kPrimary.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: kMuted,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                  tabs: [
+                    Tab(text: isPengunjung ? 'Pilih Tarian (${_tarian.length})' : 'Pilih Kelas (${_tarian.length})'),
+                    Tab(text: isPengunjung ? 'Booking Saya (${_daftar.length})' : 'Terdaftar (${_daftar.length})'),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -133,17 +160,32 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
     );
   }
 
-  Future<void> _daftarKelas(int tarianId, int jadwalId) async {
+  Future<void> _daftarKelas({
+    required int tarianId,
+    int? jadwalId,
+    String? tanggal,
+    String? jam,
+    String? catatan,
+  }) async {
     try {
-      await ApiService.daftarKelas(tarianId: tarianId, jadwalId: jadwalId);
+      if (jadwalId != null) {
+        await ApiService.daftarKelas(tarianId: tarianId, jadwalId: jadwalId, catatan: catatan);
+      } else {
+        await ApiService.daftarKelas(
+          tarianId: tarianId,
+          tanggalLatihan: tanggal,
+          jamLatihan: jam,
+          catatan: catatan,
+        );
+      }
       await _load();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white),
-            SizedBox(width: 10),
-            Text('Berhasil mendaftar kelas!'),
+            const Icon(Icons.check_circle_rounded, color: Colors.white),
+            const SizedBox(width: 10),
+            Text(jadwalId != null ? 'Berhasil mendaftar kelas!' : 'Booking berhasil dikirim!'),
           ]),
           backgroundColor: const Color(0xFF2E7D32),
           behavior: SnackBarBehavior.floating,
@@ -198,7 +240,13 @@ class _PilihKelasTab extends StatelessWidget {
   final List<Tarian>       tarian;
   final List<JadwalLatihan> jadwal;
   final List<Pendaftaran>  daftarSaya;
-  final Future<void> Function(int, int) onDaftar;
+  final Future<void> Function({
+    required int tarianId,
+    int? jadwalId,
+    String? tanggal,
+    String? jam,
+    String? catatan,
+  }) onDaftar;
   final Tarian? initialTarian;
 
   const _PilihKelasTab({
@@ -209,7 +257,9 @@ class _PilihKelasTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sudahDaftarIds = daftarSaya.map((d) => d.tarianId).toSet();
+    final auth = context.watch<AuthProvider>();
+    final isPengunjung = auth.user?.isPengunjung == true;
+    final sudahDaftarIds = isPengunjung ? <int>{} : daftarSaya.map((d) => d.tarianId).toSet();
 
     return ListView.separated(
       padding: const EdgeInsets.all(kSpace),
@@ -237,7 +287,13 @@ class _TarianKelasCard extends StatefulWidget {
   final List<JadwalLatihan> jadwal;
   final bool             sudahDaftar;
   final bool             highlighted;
-  final Future<void> Function(int, int) onDaftar;
+  final Future<void> Function({
+    required int tarianId,
+    int? jadwalId,
+    String? tanggal,
+    String? jam,
+    String? catatan,
+  }) onDaftar;
   const _TarianKelasCard({required this.tarian, required this.jadwal,
     required this.sudahDaftar, required this.highlighted, required this.onDaftar});
   @override State<_TarianKelasCard> createState() => _TarianKelasCardState();
@@ -246,6 +302,9 @@ class _TarianKelasCard extends StatefulWidget {
 class _TarianKelasCardState extends State<_TarianKelasCard> {
   bool _expanded = false;
   int? _selectedJadwal;
+  DateTime? _selectedDate;
+  String? _selectedTimeSlot;
+  final _catatanController = TextEditingController();
   bool _loading = false;
 
   @override
@@ -255,110 +314,407 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
   }
 
   @override
+  void dispose() {
+    _catatanController.dispose();
+    super.dispose();
+  }
+
+  String _formatDate(DateTime date) {
+    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    const months = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    final dayName = days[date.weekday - 1];
+    final monthName = months[date.month];
+    return '$dayName, ${date.day} $monthName ${date.year}';
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = widget.tarian;
+    final auth = context.watch<AuthProvider>();
+    final isPengunjung = auth.user?.isPengunjung == true;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: kBgCard,
         borderRadius: BorderRadius.circular(kRadius),
         border: Border.all(
           color: widget.sudahDaftar ? const Color(0xFF2E7D32)
                : widget.highlighted ? kPrimary
-               : kBorder2,
-          width: (widget.sudahDaftar || widget.highlighted) ? 1.5 : 1,
+               : kBorder,
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: widget.highlighted 
+                ? kPrimary.withOpacity(0.06)
+                : Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(kRadius - 1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // CLEAN SOOTHING COVER IMAGE (NO HARSH GRADIENTS)
+            Hero(
+              tag: 'tarian_cover_${t.id}',
+              child: AppImage(
+                url: t.foto,
+                width: double.infinity,
+                height: 120,
+                borderRadius: BorderRadius.zero,
+                placeholder: Container(
+                  width: double.infinity,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [kPrimaryPale, kPrimaryPale2],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.music_note_rounded, color: kPrimary.withOpacity(0.4), size: 32),
+                  ),
+                ),
+              ),
+            ),
+            
+            // CARD BODY (EASY TO READ & BREATHABLE)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // CATEGORY & LOCATION (SOFT & TASTEFUL)
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: kPrimaryPale,
+                          borderRadius: BorderRadius.circular(kRadiusXs),
+                        ),
+                        child: Text(
+                          t.kategori.toUpperCase(),
+                          style: TextStyle(
+                            color: kPrimary, 
+                            fontSize: 9, 
+                            fontWeight: FontWeight.w900, 
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '📍 ${t.asal}',
+                        style: TextStyle(color: kMuted, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                      const Spacer(),
+                      if (widget.sudahDaftar)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(kRadiusXs),
+                          ),
+                          child: const Text(
+                            '✓ Terdaftar',
+                            style: TextStyle(color: Color(0xFF2E7D32), fontSize: 9, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // TITLE & ACTION ROW
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          t.nama,
+                          style: AppText.displaySm.copyWith(fontSize: 18, color: kDark),
+                        ),
+                      ),
+                      if (!widget.sudahDaftar)
+                        GestureDetector(
+                          onTap: () => setState(() => _expanded = !_expanded),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _expanded ? kPrimary : kPrimaryPale,
+                              borderRadius: BorderRadius.circular(kRadiusFull),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _expanded ? 'Tutup' : (isPengunjung ? 'Booking' : 'Daftar'),
+                                  style: TextStyle(
+                                    color: _expanded ? Colors.white : kPrimary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                                  color: _expanded ? Colors.white : kPrimary,
+                                  size: 14,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  
+                  // EXPANDED FORM (CLEAN & MINIMALIST)
+                  if (_expanded && !widget.sudahDaftar) ...[
+                    const SizedBox(height: 16),
+                    const AppDivider(),
+                    const SizedBox(height: 16),
+                    
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: kBgSoft,
+                        borderRadius: BorderRadius.circular(kRadiusSm),
+                        border: Border.all(color: kBorder2),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isPengunjung) ...[
+                            // ── Visitor Dynamic Booking Form ──
+                            Text('Tanggal Booking', style: AppText.label),
+                            const SizedBox(height: 6),
+                            GestureDetector(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(const Duration(days: 30)),
+                                  builder: (context, child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: ColorScheme.light(
+                                          primary: kPrimary,
+                                          onPrimary: Colors.white,
+                                          onSurface: kDark,
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
+                                );
+                                if (picked != null) {
+                                  setState(() => _selectedDate = picked);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(kRadiusXs),
+                                  border: Border.all(color: kBorder),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today_rounded, color: kPrimary, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      _selectedDate == null
+                                          ? 'Ketuk untuk pilih tanggal...'
+                                          : _formatDate(_selectedDate!),
+                                      style: TextStyle(
+                                        color: _selectedDate == null ? kMuted : kDark,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            Text('Pilih Jam Booking', style: AppText.label),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: [
+                                '08:00', '09:00', '10:00', '11:00', 
+                                '13:00', '14:00', '15:00', '16:00', 
+                                '17:00', '18:00', '19:00', '20:00'
+                              ].map((slot) {
+                                final isSelected = _selectedTimeSlot == slot;
+                                return GestureDetector(
+                                  onTap: () => setState(() => _selectedTimeSlot = slot),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? kPrimary : Colors.white,
+                                      borderRadius: BorderRadius.circular(kRadiusXs),
+                                      border: Border.all(
+                                        color: isSelected ? kPrimary : kBorder,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      slot,
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white : kDark,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            Text('Catatan (Opsional)', style: AppText.label),
+                            const SizedBox(height: 6),
+                            TextField(
+                              controller: _catatanController,
+                              decoration: const InputDecoration(
+                                hintText: 'Masukkan catatan tambahan...',
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                              maxLines: 2,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _selectedDate == null || _selectedTimeSlot == null || _loading
+                                    ? null
+                                    : () async {
+                                        setState(() => _loading = true);
+                                        final dateStr = '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+                                        await widget.onDaftar(
+                                          tarianId: widget.tarian.id,
+                                          tanggal: dateStr,
+                                          jam: _selectedTimeSlot,
+                                          catatan: _catatanController.text.trim().isEmpty ? null : _catatanController.text.trim(),
+                                        );
+                                        if (mounted) {
+                                          setState(() {
+                                            _loading = false;
+                                            _expanded = false;
+                                          });
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kPrimary,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusFull)),
+                                ),
+                                child: _loading
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                    : const Text('Kirim Booking', style: TextStyle(fontWeight: FontWeight.w800)),
+                              ),
+                            ),
+                          ] else ...[
+                            // ── Regular Member Class Schedules ──
+                            Text('Pilih Jadwal Latihan Rutin', style: AppText.label),
+                            const SizedBox(height: 6),
+                            ...widget.jadwal.map((j) {
+                              final isSelected = _selectedJadwal == j.id;
+                              return GestureDetector(
+                                onTap: () => setState(() => _selectedJadwal = j.id),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? kPrimaryPale : Colors.white,
+                                    borderRadius: BorderRadius.circular(kRadiusXs),
+                                    border: Border.all(
+                                      color: isSelected ? kPrimary : kBorder,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        isSelected ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
+                                        color: isSelected ? kPrimary : kMuted,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              j.hari,
+                                              style: TextStyle(
+                                                color: isSelected ? kPrimary : kDark,
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              '⏰ ${j.jamMulai} – ${j.jamSelesai}  ·  📍 ${j.tempat}',
+                                              style: AppText.bodyXs,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            const SizedBox(height: 12),
+                            
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _selectedJadwal == null || _loading ? null : () async {
+                                  setState(() => _loading = true);
+                                  await widget.onDaftar(
+                                    tarianId: widget.tarian.id,
+                                    jadwalId: _selectedJadwal!,
+                                  );
+                                  if (mounted) setState(() { _loading = false; _expanded = false; });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kPrimary,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusFull)),
+                                ),
+                                child: _loading
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                    : const Text('Daftar Kelas Ini', style: TextStyle(fontWeight: FontWeight.w800)),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+          ],
         ),
       ),
-      child: Column(children: [
-        // Header tap
-        GestureDetector(
-          onTap: widget.sudahDaftar ? null : () => setState(() => _expanded = !_expanded),
-          child: Padding(
-            padding: const EdgeInsets.all(kSpace),
-            child: Row(children: [
-              AppImage(
-                url: t.foto, width: 60, height: 60,
-                borderRadius: BorderRadius.circular(kRadiusSm),
-                placeholder: Container(
-                  color: kPrimaryPale,
-                  child: Icon(Icons.music_note_rounded, color: kPrimary, size: 24)),
-              ),
-              SizedBox(width: 12),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(t.nama, style: AppText.label),
-                SizedBox(height: 3),
-                CategoryChip(t.kategori, small: true),
-                SizedBox(height: 3),
-                Text('📍 ${t.asal}', style: AppText.bodyXs),
-              ])),
-              if (widget.sudahDaftar)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(kRadiusFull)),
-                  child: Text('✓ Terdaftar',
-                    style: TextStyle(color: Color(0xFF2E7D32),
-                        fontSize: 11, fontWeight: FontWeight.w800)))
-              else
-                Icon(_expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                    color: kMuted),
-            ]),
-          ),
-        ),
-
-        // Form pilih jadwal
-        if (_expanded && !widget.sudahDaftar)
-        Container(
-          padding: const EdgeInsets.fromLTRB(kSpace, 0, kSpace, kSpace),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const AppDivider(padding: EdgeInsets.only(bottom: kSpace)),
-            Text('Pilih Jadwal Latihan', style: AppText.labelSm),
-            SizedBox(height: kSpaceSm),
-            // Jadwal options
-            ...widget.jadwal.map((j) => GestureDetector(
-              onTap: () => setState(() => _selectedJadwal = j.id),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: _selectedJadwal == j.id ? kPrimaryPale : kBgSoft,
-                  borderRadius: BorderRadius.circular(kRadiusSm),
-                  border: Border.all(
-                    color: _selectedJadwal == j.id ? kPrimary : kBorder2,
-                    width: _selectedJadwal == j.id ? 1.5 : 1)),
-                child: Row(children: [
-                  Radio<int>(
-                    value: j.id, groupValue: _selectedJadwal,
-                    onChanged: (v) => setState(() => _selectedJadwal = v),
-                    activeColor: kPrimary),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(j.hari, style: AppText.label.copyWith(
-                        color: _selectedJadwal == j.id ? kPrimary : kDark)),
-                    Text('${j.jamMulai} – ${j.jamSelesai}  ·  ${j.tempat}',
-                      style: AppText.bodyXs),
-                  ])),
-                ]),
-              ),
-            )).toList(),
-            SizedBox(height: kSpaceSm),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _selectedJadwal == null || _loading ? null : () async {
-                  setState(() => _loading = true);
-                  await widget.onDaftar(widget.tarian.id, _selectedJadwal!);
-                  if (mounted) setState(() { _loading = false; _expanded = false; });
-                },
-                child: _loading
-                    ? SizedBox(width: 18, height: 18,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : Text('Daftar Kelas Ini'),
-              )),
-          ]),
-        ),
-      ]),
+    ],
+  ),
+),
     );
   }
 }
@@ -371,16 +727,26 @@ class _TerdaftarTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final isPengunjung = auth.user?.isPengunjung == true;
+
     if (daftar.isEmpty) {
       return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
           width: 72, height: 72,
-          decoration: BoxDecoration(color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadius)),
+          decoration: BoxDecoration(
+            color: kPrimaryPale, 
+            borderRadius: BorderRadius.circular(kRadiusLg),
+            boxShadow: [
+              BoxShadow(color: kPrimary.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4)),
+            ],
+          ),
           child: Icon(Icons.event_note_rounded, color: kPrimary, size: 32)),
         SizedBox(height: kSpace),
-        Text('Belum ada kelas terdaftar', style: AppText.displayXs.copyWith(fontSize: 16)),
-        SizedBox(height: 6),
-        Text('Pilih kelas tari dari tab "Pilih Kelas"',
+        Text(isPengunjung ? 'Belum ada booking sesi' : 'Belum ada kelas terdaftar', 
+            style: AppText.displayXs.copyWith(fontSize: 16)),
+        const SizedBox(height: 6),
+        Text(isPengunjung ? 'Pilih tarian dari tab pertama untuk membooking' : 'Pilih kelas tari dari tab "Pilih Kelas"',
             style: TextStyle(color: kMuted)),
       ]));
     }
@@ -388,50 +754,115 @@ class _TerdaftarTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(kSpace),
       itemCount: daftar.length,
-      separatorBuilder: (_, __) => SizedBox(height: kSpaceSm),
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, i) {
         final d = daftar[i];
+        
+        // Parse dynamic ticket calendar blocks
+        final isRoutine = !d.hariSingkat.contains('\n');
+        final String topText;
+        final String bottomText;
+        if (isRoutine) {
+          topText = d.hariSingkat; // e.g. "SEN", "MIN"
+          bottomText = 'RUTIN';
+        } else {
+          final dateParts = d.hariSingkat.split('\n');
+          topText = dateParts.first; // e.g. "18"
+          bottomText = dateParts.length > 1 ? dateParts[1] : 'TGL';
+        }
+
         return Container(
           padding: const EdgeInsets.all(kSpace),
           decoration: BoxDecoration(
             color: kBgCard,
-            borderRadius: BorderRadius.circular(kRadius),
-            border: Border.all(color: kBorder2)),
+            borderRadius: BorderRadius.circular(kRadiusLg),
+            border: Border.all(color: kBorder2),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+            ],
+          ),
           child: Row(children: [
+            // SLICK TICKET-STYLE DATE BADGE
             Container(
-              width: 56, height: 60,
+              width: 58, height: 58,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [kPrimary, kPrimaryDark],
-                  begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                borderRadius: BorderRadius.circular(kRadiusSm)),
+                  begin: Alignment.topLeft, end: Alignment.bottomRight),
+                borderRadius: BorderRadius.circular(kRadiusSm),
+                boxShadow: [
+                  BoxShadow(color: kPrimary.withOpacity(0.25), blurRadius: 6, offset: const Offset(0, 2)),
+                ],
+              ),
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(d.hariSingkat, style: TextStyle(
-                    color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                Text(topText, 
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontSize: isRoutine ? 15 : 20, 
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                  )),
+                const SizedBox(height: 2),
+                Text(bottomText, 
+                  style: const TextStyle(
+                    color: Colors.white70, 
+                    fontSize: 8, 
+                    fontWeight: FontWeight.w800, 
+                    letterSpacing: 1.0,
+                  )),
               ]),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(d.tarianNama, style: AppText.label),
-              SizedBox(height: 3),
-              Text('⏰ ${d.jamMulai} – ${d.jamSelesai}',
-                  style: AppText.bodyXs),
+              Row(children: [
+                Expanded(child: Text(d.tarianNama, style: AppText.label, overflow: TextOverflow.ellipsis)),
+                const SizedBox(width: 6),
+                _buildStatusBadge(d.status),
+              ]),
+              const SizedBox(height: 4),
+              Text(d.jamSelesai.isNotEmpty ? '⏰ ${d.jamMulai} – ${d.jamSelesai}' : '⏰ ${d.jamMulai} WIB',
+                  style: AppText.bodyXs.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
               Text('📍 ${d.tempat}', style: AppText.bodyXs),
             ])),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: () => onBatalkan(d.id),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(kRadiusSm),
                   border: Border.all(color: const Color(0xFFFECACA))),
-                child: Text('Batalkan',
-                    style: TextStyle(color: Color(0xFFDC2626), fontSize: 11, fontWeight: FontWeight.w700))),
+                child: const Text('Batal',
+                    style: TextStyle(color: Color(0xFFDC2626), fontSize: 11, fontWeight: FontWeight.w800))),
             ),
           ]),
         );
       },
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    final isPending = status == 'nonaktif';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: isPending ? const Color(0xFFFFF3E0) : const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isPending ? const Color(0xFFFFB74D) : const Color(0xFF81C784),
+          width: 0.8,
+        ),
+      ),
+      child: Text(
+        isPending ? 'Pending' : 'Aktif',
+        style: TextStyle(
+          color: isPending ? const Color(0xFFE65100) : const Color(0xFF2E7D32),
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
     );
   }
 }

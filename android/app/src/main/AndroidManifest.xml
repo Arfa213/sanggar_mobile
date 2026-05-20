@@ -18,7 +18,7 @@
     <application
         android:label="Sanggar Mulya Bhakti"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <!-- usesCleartextTraffic="true" diperlukan untuk HTTP (bukan HTTPS) -->
         <!-- Saat production dengan domain HTTPS, bisa dihapus -->

@@ -222,11 +222,21 @@ class PendaftaranMember {
 
   factory PendaftaranMember.fromJson(Map<String, dynamic> j) {
     final t = j['tarian'] as Map<String, dynamic>? ?? {};
-    final jd = j['jadwal'] as Map<String, dynamic>? ?? {};
+    var jd = j['jadwal'] as Map<String, dynamic>? ?? {};
+    
+    if (j['jadwal_id'] == null) {
+      jd = {
+        'hari': j['tanggal_latihan'] ?? '',
+        'jam_mulai': j['jam_latihan'] ?? '',
+        'jam_selesai': '',
+        'tempat': 'Aula Sanggar',
+      };
+    }
+    
     return PendaftaranMember(
       id:             j['id'] as int,
-      tarianNama:     t['nama'] ?? '',
-      tarianKategori: t['kategori'] ?? '',
+      tarianNama:     t['nama'] ?? j['catatan'] ?? 'Latihan Mandiri',
+      tarianKategori: t['kategori'] ?? 'Tradisional',
       tarianFoto:     t['foto'],
       jadwal:         JadwalSingkat.fromJson(jd),
       status:         j['status'] ?? 'aktif',

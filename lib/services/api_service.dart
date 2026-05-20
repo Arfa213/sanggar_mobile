@@ -103,6 +103,20 @@ class ApiService {
     throw Exception(d['message'] ?? 'Login gagal');
   }
 
+  /// Login menggunakan Firebase ID Token dari Google Sign-In.
+  /// Backend Laravel harus punya endpoint POST /api/v1/auth/google
+  static Future<UserModel> loginWithGoogleToken(String firebaseIdToken) async {
+    final d = await _post('/auth/google', {'firebase_token': firebaseIdToken});
+    if (d['success'] == true) {
+      final token = d['token'] as String;
+      await saveToken(token);
+      final u = UserModel.fromJson(d['user'] as Map<String, dynamic>);
+      u.token = token;
+      return u;
+    }
+    throw Exception(d['message'] ?? 'Login Google gagal');
+  }
+
   static Future<UserModel> register(Map<String, String> body) async {
     final d = await _post('/auth/register', body);
     if (d['success'] == true) {
@@ -130,6 +144,22 @@ class ApiService {
   static Future<void> updateProfile(Map<String, dynamic> data) async {
     final d = await _put('/auth/profile', data, auth: true);
     if (d['success'] != true) throw Exception(d['message'] ?? 'Gagal update profil');
+  }
+
+  static Future<void> updateProfilePhoto(String imagePath) async {
+    final token = await getToken();
+    final req = http.MultipartRequest('POST', Uri.parse('$kApiUrl/auth/foto'));
+    req.headers['Authorization'] = 'Bearer $token';
+    req.headers['Accept'] = 'application/json';
+    req.files.add(await http.MultipartFile.fromPath('foto', imagePath));
+    
+    final res = await req.send();
+    final body = await res.stream.bytesToString();
+    final data = jsonDecode(body);
+    
+    if (res.statusCode >= 400 || data['success'] != true) {
+      throw Exception(data['message'] ?? 'Gagal update foto');
+    }
   }
 
   static Future<void> updatePassword({
@@ -162,14 +192,29 @@ class ApiService {
     }
   }
 
+  static Future<List<Pendaftaran>> getPendaftaranSayaRaw() async {
+    try {
+      final d = await _get('/pendaftaran', auth: true);
+      return (d['data'] as List)
+          .map((e) => Pendaftaran.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   static Future<void> daftarKelas({
     required int tarianId,
-    required int jadwalId,
+    int? jadwalId,
+    String? tanggalLatihan,
+    String? jamLatihan,
     String? catatan,
   }) async {
     final d = await _post('/pendaftaran', {
       'tarian_id': tarianId,
-      'jadwal_id': jadwalId,
+      if (jadwalId != null) 'jadwal_id': jadwalId,
+      if (tanggalLatihan != null) 'tanggal_latihan': tanggalLatihan,
+      if (jamLatihan != null) 'jam_latihan': jamLatihan,
       if (catatan != null) 'catatan': catatan,
     }, auth: true);
     if (d['success'] != true) {

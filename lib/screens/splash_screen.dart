@@ -81,26 +81,25 @@ void _navigate() {
               // Logo
               ScaleTransition(scale: _scale,
                 child: Container(
-                  width: 100, height: 100,
+                  width: 110, height: 110,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color:        Colors.white.withOpacity(0.15),
-                    shape:        BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3), width: 2),
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text('SMB', style: TextStyle(
-                      color: Colors.white, fontSize: 22,
-                      fontWeight: FontWeight.w900, letterSpacing: 1.5,
-                      fontFamily: 'PlayfairDisplay',
-                    )),
-                    Container(width: 30, height: 1.5, color: Colors.white.withOpacity(0.5)),
-                    SizedBox(height: 2),
-                    Text('SANGGAR', style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 7, letterSpacing: 2, fontWeight: FontWeight.w700,
-                    )),
-                  ]),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/images/logosanggar.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 )),
               SizedBox(height: 28),
 

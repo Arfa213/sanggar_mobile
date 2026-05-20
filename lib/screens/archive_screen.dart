@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/models.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 
@@ -53,112 +54,178 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBgSoft,
-      body: NestedScrollView(
-        headerSliverBuilder: (_, __) => [
-          SliverAppBar(
-            pinned:     true,
-            backgroundColor: kBgCard,
-            titleSpacing: 0,
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kSpace),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppBadge('WARISAN BUDAYA'),
-                Text('Arsip Digital', style: AppText.displaySm),
-              ]),
-            ),
-            toolbarHeight: 72,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(108),
-              child: Container(
-                color: kBgCard,
-                child: Column(children: [
-                  const AppDivider(),
-                  // Search
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(kSpace, 10, kSpace, 8),
-                    child: TextField(
-                      controller: _searchCtrl,
-                      style:      TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        hintText: 'Cari nama tarian...',
-                        prefixIcon: Icon(Icons.search_rounded,
-                            color: kMuted, size: 20),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        filled:    true,
-                        fillColor: kBgSoft,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(kRadiusFull),
-                          borderSide:   BorderSide.none,
-                        ),
+      body: RefreshIndicator(
+        color: kPrimary,
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // 1. Sleek Pinned AppBar
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 130,
+              backgroundColor: kBgCard,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: false,
+                titlePadding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 12),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppBadge('WARISAN BUDAYA'),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Arsip Digital',
+                      style: AppText.displaySm.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: kDark,
                       ),
-                      onChanged: (v) { _search = v; _apply(); },
                     ),
-                  ),
-                  // Filter
-                  SizedBox(
-                    height: 46,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding:         const EdgeInsets.symmetric(horizontal: kSpace),
-                      itemCount:       _filters.length,
-                      separatorBuilder: (_, __) => SizedBox(width: 8),
-                      itemBuilder: (_, i) {
-                        final f      = _filters[i];
-                        final active = f == _filter;
-                        return GestureDetector(
-                          onTap: () { _filter = f; _apply(); },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: active ? kPrimary : kBgCard,
-                              borderRadius: BorderRadius.circular(kRadiusFull),
-                              border: Border.all(
-                                color: active ? kPrimary : kBorder,
-                              ),
-                            ),
-                            child: Text(_labels[f]!,
-                              style: TextStyle(
-                                color:      active ? Colors.white : kMuted,
-                                fontSize:   12,
-                                fontWeight: FontWeight.w700,
-                              )),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                ]),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-        body: _loading ? const AppLoading()
-            : _error != null ? AppError(message: _error!, onRetry: _load)
-            : _filtered.isEmpty
-                ? Center(child: Text('Tarian tidak ditemukan.',
-                    style: TextStyle(color: kMuted)))
-                : RefreshIndicator(
-                    color:     kPrimary,
-                    onRefresh: _load,
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(kSpace),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:   2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing:  12,
-                        childAspectRatio: 0.68,
-                      ),
-                      itemCount: _filtered.length,
-                      itemBuilder: (_, i) => _TarianGridCard(
-                        tarian: _filtered[i],
-                        onTap:  () => _detail(_filtered[i]),
+
+            // 2. Search & Filter Section
+            SliverToBoxAdapter(
+              child: Container(
+                color: kBgCard,
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    const AppDivider(),
+                    // Search Bar
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(kSpace, 14, kSpace, 12),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        style: TextStyle(fontSize: 14, color: kDark),
+                        decoration: InputDecoration(
+                          hintText: 'Cari nama tarian...',
+                          hintStyle: TextStyle(color: kMuted),
+                          prefixIcon: Icon(Icons.search_rounded, color: kMuted, size: 20),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                          filled: true,
+                          fillColor: kBgSoft,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(kRadius),
+                            borderSide: BorderSide(color: kBorder2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(kRadius),
+                            borderSide: BorderSide(color: kBorder2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(kRadius),
+                            borderSide: BorderSide(color: kPrimary, width: 1.5),
+                          ),
+                        ),
+                        onChanged: (v) { _search = v; _apply(); },
                       ),
                     ),
+                    // Categories ListView
+                    SizedBox(
+                      height: 38,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: kSpace),
+                        itemCount: _filters.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (_, i) {
+                          final f = _filters[i];
+                          final active = f == _filter;
+                          return GestureDetector(
+                            onTap: () { _filter = f; _apply(); },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: active ? kPrimary : kBgSoft,
+                                borderRadius: BorderRadius.circular(kRadius),
+                                border: Border.all(
+                                  color: active ? kPrimary : kBorder2,
+                                  width: 1.2,
+                                ),
+                                boxShadow: active ? [
+                                  BoxShadow(
+                                    color: kPrimary.withOpacity(0.25),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ] : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  _labels[f]!,
+                                  style: TextStyle(
+                                    color: active ? Colors.white : kMuted,
+                                    fontSize: 12,
+                                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 3. Grid / Loading / Error Body
+            if (_loading)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: AppLoading()),
+              )
+            else if (_error != null)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: AppError(message: _error!, onRetry: _load)),
+              )
+            else if (_filtered.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.folder_open_rounded, size: 48, color: kMuted.withOpacity(0.5)),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tarian tidak ditemukan.',
+                        style: TextStyle(color: kMuted, fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                    ],
                   ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(kSpace, 16, kSpace, 32),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.68,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) => _TarianGridCard(
+                      tarian: _filtered[i],
+                      onTap: () => _detail(_filtered[i]),
+                    ),
+                    childCount: _filtered.length,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -402,12 +469,23 @@ class _TarianDetailSheet extends StatelessWidget {
                       ]),
                     ),
 
-                  if (tarian.videoUrl != null) ...[
+                  if (tarian.videoUrl != null && tarian.videoUrl!.isNotEmpty) ...[
                     SizedBox(height: kSpace),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final uri = Uri.parse(tarian.videoUrl!);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Tidak dapat membuka video.')),
+                              );
+                            }
+                          }
+                        },
                         icon:  Icon(Icons.play_circle_rounded, size: 20),
                         label: Text('Tonton Video Tarian'),
                       ),
