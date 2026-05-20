@@ -58,13 +58,19 @@ class _EventScreenState extends State<EventScreen>
             pinned:      true,
             backgroundColor: kBgCard,
             titleSpacing: 0,
-            toolbarHeight: 72,
+            toolbarHeight: 75,
+            centerTitle: false,
             title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kSpace),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppBadge('JEJAK PRESTASI'),
-                Text('Event & Pentas', style: AppText.displaySm),
-              ]),
+              padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start, 
+                children: [
+                  AppBadge('JEJAK PRESTASI'),
+                  const SizedBox(height: 5),
+                  Text('Event & Pentas', style: AppText.displaySm),
+                ]
+              ),
             ),
             bottom: TabBar(
               controller:           _tab,
@@ -131,7 +137,6 @@ class _AllTab extends StatelessWidget {
         Row(children: [
           AppBadge('REKAM JEJAK'),
           SizedBox(width: 10),
-          Text('Semua Event', style: AppText.displayXs),
         ]),
         SizedBox(height: kSpace),
         if (selesai.isEmpty)
@@ -177,21 +182,28 @@ class _StatsRow extends StatelessWidget {
   final Map<String, dynamic> stats;
   const _StatsRow({required this.stats});
 
-  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(kSpace),
+      padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 20),
       decoration: BoxDecoration(
         color:        kBgCard,
-        borderRadius: BorderRadius.circular(kRadius),
-        border:       Border.all(color: kBorder2),
+        borderRadius: BorderRadius.circular(kRadiusLg),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(gIsDarkMode ? 0.2 : 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Row(children: [
-        StatItem(number: '${stats['total'] ?? 0}',          label: 'Total'),
-        SizedBox(width: 8),
-        StatItem(number: '${stats['internasional'] ?? 0}',  label: 'Internasional'),
-        SizedBox(width: 8),
-        StatItem(number: '${stats['penghargaan'] ?? 0}',    label: 'Penghargaan'),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          StatItem(number: '${stats['total'] ?? 0}',          label: 'Total'),
+          Container(width: 1, height: 40, color: kBorder2),
+          StatItem(number: '${stats['internasional'] ?? 0}',  label: 'Internasional'),
+          Container(width: 1, height: 40, color: kBorder2),
+          StatItem(number: '${stats['penghargaan'] ?? 0}',    label: 'Penghargaan'),
       ]),
     );
   }
@@ -235,18 +247,18 @@ class _FeaturedCard extends StatelessWidget {
           // Year ribbon
           Positioned(bottom: 0, left: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               decoration: BoxDecoration(
                 color: kPrimary,
-                borderRadius: BorderRadius.only(
-                  topRight:     Radius.circular(kRadius),
-                  bottomRight:  Radius.circular(0),
+                borderRadius: const BorderRadius.only(
+                  topRight:    Radius.circular(kRadiusLg),
                 ),
+                boxShadow: [BoxShadow(color: kPrimary.withOpacity(0.5), blurRadius: 8, offset: const Offset(2, -2))],
               ),
               child: Text(event.tahun,
-                style: TextStyle(
-                  color: Colors.white, fontSize: 13,
-                  fontWeight: FontWeight.w900, letterSpacing: 1)),
+                style: const TextStyle(
+                  color: Colors.white, fontSize: 14,
+                  fontWeight: FontWeight.w900, letterSpacing: 1.5)),
             )),
         ]),
 
@@ -350,12 +362,14 @@ class _TimelineTile extends StatelessWidget {
         // Info
         Expanded(
           child: Container(
-            margin: const EdgeInsets.only(bottom: 0),
-            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color:        kBgCard,
-              borderRadius: BorderRadius.circular(kRadius),
-              border:       Border.all(color: kBorder2),
+              borderRadius: BorderRadius.circular(kRadiusLg),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(gIsDarkMode ? 0.2 : 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+              ],
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [

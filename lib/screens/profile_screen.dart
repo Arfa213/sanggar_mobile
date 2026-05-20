@@ -1,6 +1,9 @@
 // lib/screens/profile_screen.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http; // HTTP untuk kirim foto langsung ke Laravel
 import '../services/auth_provider.dart';
 import '../services/theme_service.dart';
 import '../utils/app_theme.dart';
@@ -96,6 +99,8 @@ class _LoggedInView extends StatelessWidget {
     }
   }
 
+  // Method _prosesUploadFoto dihapus karena tidak lagi digunakan.
+
   @override
   Widget build(BuildContext context) {
     final user = auth.user!;
@@ -120,26 +125,82 @@ class _LoggedInView extends StatelessWidget {
                     decoration: BoxDecoration(shape: BoxShape.circle,
                       border: Border.all(color: Colors.white.withOpacity(0.06), width: 30)))),
                 SafeArea(child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Stack(children: [
-                    Container(
-                      decoration: BoxDecoration(shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
-                      child: CircleAvatar(
-                        radius: 44,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        backgroundImage: (user.foto != null && user.foto!.isNotEmpty)
-                            ? NetworkImage(getImageUrl(user.foto!)) as ImageProvider : null,
-                        child: (user.foto == null || user.foto!.isEmpty)
-                            ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
-                            : null,
+                  GestureDetector(
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? image = await picker.pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 80,
+                      );
+
+                      if (image != null) {
+                        final file = File(image.path);
+                        final fileSize = await file.length();
+                        
+                        if (fileSize > 5 * 1024 * 1024) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Gagal: Ukuran foto tidak boleh melebihi 5MB.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                          return;
+                        }
+
+                        // Tampilkan loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(child: CircularProgressIndicator()),
+                        );
+
+                        try {
+                          await auth.uploadFoto(file);
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Foto profil berhasil diperbarui!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Gagal: ${e.toString().replaceAll('Exception: Exception: ', '').replaceAll('Exception: ', '')}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    },
+                    child: Stack(children: [
+                      Container(
+                        decoration: BoxDecoration(shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
+                        child: CircleAvatar(
+                          radius: 44,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundImage: (user.foto != null && user.foto!.isNotEmpty)
+                              ? NetworkImage('${getImageUrl(user.foto!)}?v=${DateTime.now().millisecondsSinceEpoch}') as ImageProvider : null,
+                          child: (user.foto == null || user.foto!.isEmpty)
+                              ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
+                              : null,
+                        ),
                       ),
-                    ),
-                    Positioned(bottom: 0, right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(color: kGold, shape: BoxShape.circle),
-                        child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
-                  ]),
+                      Positioned(bottom: 0, right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(color: kGold, shape: BoxShape.circle),
+                          child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13))),
+                    ]),
+                  ),
                   SizedBox(height: 10),
                   Text(user.name, style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
                   SizedBox(height: 2),
@@ -184,7 +245,7 @@ class _LoggedInView extends StatelessWidget {
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
           _MenuItem(Icons.lock_outline_rounded, 'Ubah Password',
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()))),
-          _MenuItem(Icons.history_rounded, 'Riwayat Aktivitas',
+          _MenuItem(Icons.history_rounded, 'Riwayat Kehadiran',
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen()))),
 
           SizedBox(height: kSpace),

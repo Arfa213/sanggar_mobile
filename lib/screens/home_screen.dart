@@ -437,7 +437,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             AppBadge('KELAS SAYA'),
             GestureDetector(
-              onTap: () => MainNav.of(context)?.setIndex = 1,
+              //  UBAH JUGA TOMBOL KELOLA AGAR KE PENJADWALAN
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PenjadwalanScreen()),
+                );
+              },
               child: Text('Kelola', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
             ),
           ]),
@@ -453,7 +459,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Text('Belum ada kelas aktif', style: AppText.label.copyWith(color: kMuted)),
                 SizedBox(height: 4),
                 GestureDetector(
-                  onTap: () => MainNav.of(context)?.setIndex = 1,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PenjadwalanScreen()),
+                    );
+                  },
                   child: Text('Daftar kelas →', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
                 ),
               ]),
@@ -476,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(p.tarianNama, style: AppText.label),
                   SizedBox(height: 3),
-                  Text('📍 ${p.jadwal.tempat}  ⏰ ${p.jadwal.jamMulai}–${p.jadwal.jamSelesai}',
+                  Text('📍 ${p.jadwal.tempat}   ⏰ ${p.jadwal.jamMulai}–${p.jadwal.jamSelesai}',
                       style: AppText.bodyXs),
                 ])),
                 Container(

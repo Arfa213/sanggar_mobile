@@ -4,6 +4,8 @@ import '../services/api_service.dart';
 import '../models/models.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ArchiveScreen extends StatefulWidget {
   const ArchiveScreen({super.key});
@@ -59,106 +61,122 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
             pinned:     true,
             backgroundColor: kBgCard,
             titleSpacing: 0,
+            toolbarHeight: 70,
+            centerTitle: false,
             title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kSpace),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppBadge('WARISAN BUDAYA'),
-                Text('Arsip Digital', style: AppText.displaySm),
-              ]),
+              padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center, 
+                children: [
+                  AppBadge('WARISAN BUDAYA'),
+                  const SizedBox(height: 5),
+                  Text('Arsip Digital', style: AppText.displaySm),
+                ]
+              ),
             ),
-            toolbarHeight: 72,
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(108),
+              preferredSize: const Size.fromHeight(116),
               child: Container(
                 color: kBgCard,
                 child: Column(children: [
                   const AppDivider(),
-                  // Search
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(kSpace, 10, kSpace, 8),
-                    child: TextField(
-                      controller: _searchCtrl,
-                      style:      TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        hintText: 'Cari nama tarian...',
-                        prefixIcon: Icon(Icons.search_rounded,
-                            color: kMuted, size: 20),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        filled:    true,
-                        fillColor: kBgSoft,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(kRadiusFull),
-                          borderSide:   BorderSide.none,
-                        ),
-                      ),
-                      onChanged: (v) { _search = v; _apply(); },
-                    ),
-                  ),
-                  // Filter
-                  SizedBox(
-                    height: 46,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding:         const EdgeInsets.symmetric(horizontal: kSpace),
-                      itemCount:       _filters.length,
-                      separatorBuilder: (_, __) => SizedBox(width: 8),
-                      itemBuilder: (_, i) {
-                        final f      = _filters[i];
-                        final active = f == _filter;
-                        return GestureDetector(
-                          onTap: () { _filter = f; _apply(); },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: active ? kPrimary : kBgCard,
-                              borderRadius: BorderRadius.circular(kRadiusFull),
-                              border: Border.all(
-                                color: active ? kPrimary : kBorder,
-                              ),
-                            ),
-                            child: Text(_labels[f]!,
-                              style: TextStyle(
-                                color:      active ? Colors.white : kMuted,
-                                fontSize:   12,
-                                fontWeight: FontWeight.w700,
-                              )),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSearchBar(),
+                  const SizedBox(height: 4),
+                  _buildFilterBar(),
+                  const SizedBox(height: 12),
                 ]),
               ),
             ),
           ),
         ],
-        body: _loading ? const AppLoading()
-            : _error != null ? AppError(message: _error!, onRetry: _load)
-            : _filtered.isEmpty
-                ? Center(child: Text('Tarian tidak ditemukan.',
-                    style: TextStyle(color: kMuted)))
-                : RefreshIndicator(
-                    color:     kPrimary,
-                    onRefresh: _load,
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(kSpace),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:   2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing:  12,
-                        childAspectRatio: 0.68,
-                      ),
-                      itemCount: _filtered.length,
-                      itemBuilder: (_, i) => _TarianGridCard(
-                        tarian: _filtered[i],
-                        onTap:  () => _detail(_filtered[i]),
-                      ),
-                    ),
-                  ),
+        body: _buildBody(),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 4),
+      child: TextField(
+        controller: _searchCtrl,
+        style:      const TextStyle(fontSize: 14),
+        decoration: InputDecoration(
+          hintText: 'Cari nama tarian...',
+          prefixIcon: Icon(Icons.search_rounded, color: kMuted, size: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          filled:    true,
+          fillColor: kBgSoft,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(kRadiusFull),
+            borderSide:   BorderSide.none,
+          ),
+        ),
+        onChanged: (v) { _search = v; _apply(); },
+      ),
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding:         const EdgeInsets.symmetric(horizontal: kSpace),
+        itemCount:       _filters.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (_, i) {
+          final f      = _filters[i];
+          final active = f == _filter;
+          return GestureDetector(
+            onTap: () { _filter = f; _apply(); },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active ? kPrimary : Colors.transparent,
+                borderRadius: BorderRadius.circular(kRadiusFull),
+                border: Border.all(color: active ? kPrimary : kBorder),
+              ),
+              child: Text(_labels[f]!,
+                style: TextStyle(
+                  color:      active ? Colors.white : kMuted,
+                  fontSize:   13,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                )),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_loading) return const AppLoading();
+    if (_error != null) return AppError(message: _error!, onRetry: _load);
+    if (_filtered.isEmpty) {
+      return Center(
+        child: Text('Tarian tidak ditemukan.', style: TextStyle(color: kMuted)),
+      );
+    }
+    
+    return RefreshIndicator(
+      color:     kPrimary,
+      onRefresh: _load,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(kSpace),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount:   2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing:  16,
+          childAspectRatio: 0.65,
+        ),
+        itemCount: _filtered.length,
+        itemBuilder: (_, i) => _TarianGridCard(
+          tarian: _filtered[i],
+          onTap:  () => _detail(_filtered[i]),
+        ),
       ),
     );
   }
@@ -289,8 +307,29 @@ class _TarianDetailSheet extends StatelessWidget {
   final Tarian tarian;
   const _TarianDetailSheet({required this.tarian});
 
+  String? _getYtThumb(String? url) {
+    if (url == null || url.isEmpty) return null;
+    final id = YoutubePlayer.convertUrlToId(url);
+    if (id != null) return YoutubePlayer.getThumbnail(videoId: id);
+    return null;
+  }
+
+  Future<void> _launchYt(BuildContext context, String urlString) async {
+    final url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tidak dapat membuka video.'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final imageUrl = _getYtThumb(tarian.videoUrl) ?? tarian.foto;
+    final hasVideo = tarian.videoUrl != null && tarian.videoUrl!.isNotEmpty;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.88,
       maxChildSize:     0.95,
@@ -298,7 +337,7 @@ class _TarianDetailSheet extends StatelessWidget {
       builder: (_, ctrl) => Container(
         decoration: BoxDecoration(
           color:        kBgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(kRadiusXl)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(kRadiusXl)),
         ),
         child: Column(children: [
           // Handle
@@ -311,32 +350,51 @@ class _TarianDetailSheet extends StatelessWidget {
           Expanded(child: SingleChildScrollView(
             controller: ctrl,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Hero image
-              Stack(children: [
-                AppImage(
-                  url:    tarian.foto,
-                  height: 240,
-                  width:  double.infinity,
-                  placeholder: Container(
-                    height: 200, color: kPrimaryPale,
-                    child: Center(child: Icon(Icons.music_note_rounded,
-                        color: kPrimary, size: 48))),
-                ),
-                // Gradient overlay on image
-                Positioned(
-                  bottom: 0, left: 0, right: 0,
-                  child: Container(
-                    height: 80,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin:  Alignment.bottomCenter,
-                        end:    Alignment.topCenter,
-                        colors: [kBgCard, Colors.transparent],
+              // Hero image atau Youtube Thumbnail
+              GestureDetector(
+                onTap: () {
+                  if (hasVideo) _launchYt(context, tarian.videoUrl!);
+                },
+                child: Stack(children: [
+                  AppImage(
+                    url:    imageUrl,
+                    height: 240,
+                    width:  double.infinity,
+                    placeholder: Container(
+                      height: 240, color: kPrimaryPale,
+                      child: Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 48)),
+                    ),
+                  ),
+                  if (hasVideo)
+                    Positioned.fill(
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
+                          ),
+                          child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 40),
+                        ),
+                      ),
+                    ),
+                  // Gradient overlay on image
+                  Positioned(
+                    bottom: 0, left: 0, right: 0,
+                    child: Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin:  Alignment.bottomCenter,
+                          end:    Alignment.topCenter,
+                          colors: [kBgCard, Colors.transparent],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ]),
+                ]),
+              ),
 
               Padding(
                 padding: const EdgeInsets.fromLTRB(kSpace, 4, kSpace, 0),
@@ -344,7 +402,7 @@ class _TarianDetailSheet extends StatelessWidget {
                   Row(children: [
                     CategoryChip(tarian.kategori),
                     if (tarian.unggulan) ...[
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
@@ -357,29 +415,29 @@ class _TarianDetailSheet extends StatelessWidget {
                       ),
                     ],
                   ]),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(tarian.nama, style: AppText.displayLg),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Row(children: [
                     Icon(Icons.location_on_rounded, size: 14, color: kMuted),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(tarian.asal, style: AppText.bodySm),
                   ]),
-                  SizedBox(height: kSpace),
+                  const SizedBox(height: kSpace),
 
                   // Divider ornamental
                   Row(children: [
                     Container(width: 32, height: 2, color: kPrimary),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Container(width: 8, height: 2, color: kPrimaryLight),
                   ]),
-                  SizedBox(height: kSpace),
+                  const SizedBox(height: kSpace),
 
                   Text(tarian.deskripsi,
                     style: AppText.bodyMd.copyWith(height: 1.75)),
 
                   // Info cards
-                  SizedBox(height: kSpaceMd),
+                  const SizedBox(height: kSpaceMd),
                   if (tarian.fungsi != null || tarian.kostum != null || tarian.durasi != null)
                     Container(
                       padding: const EdgeInsets.all(kSpace),
@@ -402,18 +460,18 @@ class _TarianDetailSheet extends StatelessWidget {
                       ]),
                     ),
 
-                  if (tarian.videoUrl != null) ...[
-                    SizedBox(height: kSpace),
+                  if (hasVideo) ...[
+                    const SizedBox(height: kSpace),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon:  Icon(Icons.play_circle_rounded, size: 20),
-                        label: Text('Tonton Video Tarian'),
+                        onPressed: () => _launchYt(context, tarian.videoUrl!),
+                        icon:  const Icon(Icons.play_circle_rounded, size: 20),
+                        label: const Text('Tonton Video Tarian'),
                       ),
                     ),
                   ],
-                  SizedBox(height: kSpaceXl),
+                  const SizedBox(height: kSpaceXl),
                 ]),
               ),
             ]),
