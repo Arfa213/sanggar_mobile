@@ -1,6 +1,9 @@
 // lib/screens/profile_screen.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http; // HTTP untuk kirim foto langsung ke Laravel
 import '../services/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/theme_service.dart';
@@ -98,6 +101,7 @@ class _LoggedInView extends StatelessWidget {
     }
   }
 
+<<<<<<< HEAD
   Future<void> _pickAndUploadPhoto(BuildContext context, AuthProvider auth) async {
     try {
       final picker = ImagePicker();
@@ -119,6 +123,9 @@ class _LoggedInView extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: ${e.toString()}'), backgroundColor: Colors.red));
     }
   }
+=======
+  // Method _prosesUploadFoto dihapus karena tidak lagi digunakan.
+>>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
 
   @override
   Widget build(BuildContext context) {
@@ -145,11 +152,69 @@ class _LoggedInView extends StatelessWidget {
                       border: Border.all(color: Colors.white.withOpacity(0.06), width: 30)))),
                 SafeArea(child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   GestureDetector(
+<<<<<<< HEAD
                     onTap: () => _pickAndUploadPhoto(context, auth),
+=======
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? image = await picker.pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 80,
+                      );
+
+                      if (image != null) {
+                        final file = File(image.path);
+                        final fileSize = await file.length();
+                        
+                        if (fileSize > 5 * 1024 * 1024) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Gagal: Ukuran foto tidak boleh melebihi 5MB.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                          return;
+                        }
+
+                        // Tampilkan loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(child: CircularProgressIndicator()),
+                        );
+
+                        try {
+                          await auth.uploadFoto(file);
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Foto profil berhasil diperbarui!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Gagal: ${e.toString().replaceAll('Exception: Exception: ', '').replaceAll('Exception: ', '')}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    },
+>>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
                     child: Stack(children: [
                       Container(
                         decoration: BoxDecoration(shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
+<<<<<<< HEAD
                         child: ClipOval(
                           child: (user.foto != null && user.foto!.isNotEmpty)
                               ? AppImage(
@@ -166,6 +231,16 @@ class _LoggedInView extends StatelessWidget {
                                   width: 88, height: 88, color: Colors.white.withOpacity(0.2),
                                   child: Center(child: Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)))
                                 ),
+=======
+                        child: CircleAvatar(
+                          radius: 44,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundImage: (user.foto != null && user.foto!.isNotEmpty)
+                              ? NetworkImage('${getImageUrl(user.foto!)}?v=${DateTime.now().millisecondsSinceEpoch}') as ImageProvider : null,
+                          child: (user.foto == null || user.foto!.isEmpty)
+                              ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
+                              : null,
+>>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
                         ),
                       ),
                       Positioned(bottom: 0, right: 0,
@@ -242,7 +317,7 @@ class _LoggedInView extends StatelessWidget {
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
           _MenuItem(Icons.lock_outline_rounded, 'Ubah Password',
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()))),
-          _MenuItem(Icons.history_rounded, 'Riwayat Aktivitas',
+          _MenuItem(Icons.history_rounded, 'Riwayat Kehadiran',
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen()))),
 
           SizedBox(height: kSpace),

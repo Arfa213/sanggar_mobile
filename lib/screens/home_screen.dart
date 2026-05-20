@@ -680,6 +680,82 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
 
+<<<<<<< HEAD
+=======
+  Widget _buildJadwalSection() {
+    return FadeTransition(
+      opacity: _stagger(4),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            AppBadge('KELAS SAYA'),
+            GestureDetector(
+              //  UBAH JUGA TOMBOL KELOLA AGAR KE PENJADWALAN
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PenjadwalanScreen()),
+                );
+              },
+              child: Text('Kelola', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
+            ),
+          ]),
+          SizedBox(height: 10),
+          if (_jadwalAktif.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
+              child: Column(children: [
+                Icon(Icons.school_outlined, color: kMuted2, size: 32),
+                SizedBox(height: 8),
+                Text('Belum ada kelas aktif', style: AppText.label.copyWith(color: kMuted)),
+                SizedBox(height: 4),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PenjadwalanScreen()),
+                    );
+                  },
+                  child: Text('Daftar kelas →', style: AppText.bodySm.copyWith(color: kPrimary, fontWeight: FontWeight.w700)),
+                ),
+              ]),
+            )
+          else
+            ..._jadwalAktif.map((p) => Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
+              child: Row(children: [
+                Container(
+                  width: 52, height: 52,
+                  decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(12)),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text(p.hariSingkat, style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                    Text(p.jadwal.jamMulai, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w700)),
+                  ]),
+                ),
+                SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(p.tarianNama, style: AppText.label),
+                  SizedBox(height: 3),
+                  Text('📍 ${p.jadwal.tempat}   ⏰ ${p.jadwal.jamMulai}–${p.jadwal.jamSelesai}',
+                      style: AppText.bodyXs),
+                ])),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(kRadiusFull)),
+                  child: Text('Aktif', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.w800)),
+                ),
+              ]),
+            )),
+        ]),
+      ),
+    );
+  }
+>>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
 
   Widget _buildKehadiranSection() {
     if (_kehadiran.isEmpty) return const SizedBox.shrink();

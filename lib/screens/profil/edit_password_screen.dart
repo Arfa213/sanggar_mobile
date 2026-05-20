@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_theme.dart';
+import '../../services/api_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -85,16 +86,46 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // TODO: Integrasi proses update password ke API
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Password berhasil diperbarui!')),
+                        // Tampilkan loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(child: CircularProgressIndicator()),
                         );
-                        Navigator.pop(context);
+                        
+                        try {
+                          await ApiService.updatePassword(
+                            currentPassword: _oldPassCtrl.text,
+                            password: _newPassCtrl.text,
+                            passwordConfirmation: _confirmPassCtrl.text,
+                          );
+                          
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Password berhasil diperbarui!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Navigator.pop(context); // Kembali ke halaman sebelumnya
+                          }
+                        } catch (e) {
+                          if (context.mounted) Navigator.pop(context); // Tutup loading
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString().replaceAll('Exception: ', '')),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
-                    child: Text('Update Password'),
+                    child: const Text('Update Password'),
                   ),
                 ),
               ],

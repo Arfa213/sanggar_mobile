@@ -163,13 +163,20 @@ class ApiService {
   }
 
   static Future<void> updatePassword({
+    String? currentPassword,
     required String password,
     required String passwordConfirmation,
   }) async {
-    final d = await _put('/auth/password', {
+    final body = {
       'password': password,
       'password_confirmation': passwordConfirmation,
-    }, auth: true);
+    };
+    if (currentPassword != null) {
+      body['current_password'] = currentPassword;
+      body['old_password'] = currentPassword;
+    }
+    
+    final d = await _put('/auth/password', body, auth: true);
     if (d['success'] != true) throw Exception(d['message'] ?? 'Gagal ganti password');
   }
 

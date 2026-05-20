@@ -91,12 +91,19 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
         headerSliverBuilder: (_, __) => [
           SliverAppBar(
             pinned: true, backgroundColor: kBgCard,
-            titleSpacing: 0, toolbarHeight: 64,
+            titleSpacing: 0, 
+            toolbarHeight: 75,
             title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kSpace),
+              padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+<<<<<<< HEAD
                 AppBadge(isPengunjung ? 'BOOKING SESI' : 'KELAS TARI'),
                 Text(isPengunjung ? 'Sesi Latihan' : 'Penjadwalan', style: AppText.displaySm),
+=======
+                AppBadge('KELAS TARI'),
+                const SizedBox(height: 5),
+                Text('Penjadwalan', style: AppText.displaySm),
+>>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
               ]),
             ),
             bottom: PreferredSize(
