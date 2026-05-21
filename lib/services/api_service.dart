@@ -6,6 +6,14 @@ import '../models/models.dart';
 import '../utils/app_theme.dart';
 import '../models/jadwal_pendaftaran.dart';
 
+class OtpRequiredException implements Exception {
+  final int userId;
+  final String message;
+  OtpRequiredException(this.userId, this.message);
+  @override
+  String toString() => message;
+}
+
 class ApiService {
   static const _tokenKey = 'auth_token';
 
@@ -93,6 +101,9 @@ class ApiService {
   // ── AUTH ──────────────────────────────────────────────────────
   static Future<UserModel> login(String email, String password) async {
     final d = await _post('/auth/login', {'email': email, 'password': password});
+    if (d['needs_verification'] == true) {
+      throw OtpRequiredException(d['user_id'] as int, d['message'] ?? 'Perlu verifikasi OTP');
+    }
     if (d['success'] == true) {
       final token = d['token'] as String;
       await saveToken(token);
@@ -119,6 +130,9 @@ class ApiService {
 
   static Future<UserModel> register(Map<String, String> body) async {
     final d = await _post('/auth/register', body);
+    if (d['needs_verification'] == true) {
+      throw OtpRequiredException(d['user_id'] as int, d['message'] ?? 'Perlu verifikasi OTP');
+    }
     if (d['success'] == true) {
       final token = d['token'] as String;
       await saveToken(token);
@@ -127,6 +141,25 @@ class ApiService {
       return u;
     }
     throw Exception(d['message'] ?? 'Registrasi gagal');
+  }
+
+  static Future<UserModel> verifyOtp(int userId, String otp) async {
+    final d = await _post('/auth/verify-otp', {'user_id': userId, 'otp': otp});
+    if (d['success'] == true) {
+      final token = d['token'] as String;
+      await saveToken(token);
+      final u = UserModel.fromJson(d['user'] as Map<String, dynamic>);
+      u.token = token;
+      return u;
+    }
+    throw Exception(d['message'] ?? 'Verifikasi gagal');
+  }
+
+  static Future<void> resendOtp(int userId) async {
+    final d = await _post('/auth/resend-otp', {'user_id': userId});
+    if (d['success'] != true) {
+      throw Exception(d['message'] ?? 'Gagal mengirim ulang OTP');
+    }
   }
 
   static Future<void> logout() async {

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_provider.dart';
+import '../../services/api_service.dart';
 import '../../utils/app_theme.dart';
+import 'otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool showRegister;
@@ -78,6 +80,15 @@ class _LoginScreenState extends State<LoginScreen>
         await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
       }
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
+    } on OtpRequiredException catch (e) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => OtpScreen(
+          userId: e.userId,
+          email: _emailCtrl.text.trim(),
+        )),
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString().replaceAll('Exception: ', ''));

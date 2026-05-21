@@ -23,11 +23,17 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(String email, String pass) async {
-    _user = await ApiService.login(email, pass); notifyListeners();
+    // OtpRequiredException akan diteruskan ke pemanggil (login_screen)
+    final user = await ApiService.login(email, pass);
+    _user = user;
+    notifyListeners();
   }
 
   Future<void> register(Map<String, String> data) async {
-    _user = await ApiService.register(data); notifyListeners();
+    // OtpRequiredException akan diteruskan ke pemanggil (login_screen)
+    final user = await ApiService.register(data);
+    _user = user;
+    notifyListeners();
   }
 
   Future<void> logout() async {
