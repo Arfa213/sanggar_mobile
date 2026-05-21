@@ -102,10 +102,14 @@ class ApiService {
   static Future<UserModel> login(String email, String password) async {
     final d = await _post('/auth/login', {'email': email, 'password': password});
     if (d['needs_verification'] == true) {
-      throw OtpRequiredException(d['user_id'] as int, d['message'] ?? 'Perlu verifikasi OTP');
+      final userId = (d['user_id'] is int)
+          ? d['user_id'] as int
+          : int.tryParse(d['user_id']?.toString() ?? '') ?? 0;
+      throw OtpRequiredException(userId, d['message'] ?? 'Perlu verifikasi OTP');
     }
     if (d['success'] == true) {
-      final token = d['token'] as String;
+      final token = d['token']?.toString() ?? '';
+      if (token.isEmpty) throw Exception('Token tidak ditemukan');
       await saveToken(token);
       final u = UserModel.fromJson(d['user'] as Map<String, dynamic>);
       u.token = token;
@@ -131,10 +135,14 @@ class ApiService {
   static Future<UserModel> register(Map<String, String> body) async {
     final d = await _post('/auth/register', body);
     if (d['needs_verification'] == true) {
-      throw OtpRequiredException(d['user_id'] as int, d['message'] ?? 'Perlu verifikasi OTP');
+      final userId = (d['user_id'] is int)
+          ? d['user_id'] as int
+          : int.tryParse(d['user_id']?.toString() ?? '') ?? 0;
+      throw OtpRequiredException(userId, d['message'] ?? 'Perlu verifikasi OTP');
     }
     if (d['success'] == true) {
-      final token = d['token'] as String;
+      final token = d['token']?.toString() ?? '';
+      if (token.isEmpty) throw Exception('Token tidak ditemukan');
       await saveToken(token);
       final u = UserModel.fromJson(d['user'] as Map<String, dynamic>);
       u.token = token;
@@ -146,7 +154,8 @@ class ApiService {
   static Future<UserModel> verifyOtp(int userId, String otp) async {
     final d = await _post('/auth/verify-otp', {'user_id': userId, 'otp': otp});
     if (d['success'] == true) {
-      final token = d['token'] as String;
+      final token = d['token']?.toString() ?? '';
+      if (token.isEmpty) throw Exception('Token verifikasi tidak ditemukan');
       await saveToken(token);
       final u = UserModel.fromJson(d['user'] as Map<String, dynamic>);
       u.token = token;
