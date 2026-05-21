@@ -26,23 +26,13 @@ Color get kMuted2       => gIsDarkMode ? const Color(0xFF777777) : const Color(0
 Color get kBorder       => gIsDarkMode ? const Color(0xFF333333) : const Color(0xFFE8E0D8);
 Color get kBorder2      => gIsDarkMode ? const Color(0xFF2A2A2A) : const Color(0xFFF0EBE5);
 
-// ── BASE URL ─────────────────────────────────────────────────
-<<<<<<< HEAD
-// Konfigurasi menggunakan URL server Laravel yang sudah di-deploy.
-String get kBaseUrl => 'http://senindrai.my.id';
-String get kApiUrl  => 'http://senindrai.my.id/api/v1';
-=======
 // Menggunakan Server Production
 String get kBaseUrl => 'https://senindrai.my.id';
 String get kApiUrl  => 'https://senindrai.my.id/api/v1';
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
 
 String getImageUrl(String? path) {
   if (path == null || path.isEmpty) return '';
   if (path.startsWith('http')) return path;
-<<<<<<< HEAD
-  return '$kApiUrl/file/$path';
-=======
   
   // Hapus garis miring di awal jika ada
   var cleanPath = path.startsWith('/') ? path.substring(1) : path;
@@ -53,7 +43,6 @@ String getImageUrl(String? path) {
   }
   
   return '$kBaseUrl/storage/$cleanPath';
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
 }
 
 // ── RADIUS ───────────────────────────────────────────────────

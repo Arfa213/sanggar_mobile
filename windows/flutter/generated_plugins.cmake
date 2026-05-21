@@ -4,12 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
-<<<<<<< HEAD
   firebase_auth
   firebase_core
-=======
-  flutter_inappwebview_windows
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
   permission_handler_windows
   url_launcher_windows
 )

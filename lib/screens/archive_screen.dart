@@ -56,7 +56,6 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBgSoft,
-<<<<<<< HEAD
       body: RefreshIndicator(
         color: kPrimary,
         onRefresh: _load,
@@ -228,129 +227,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                 ),
               ),
           ],
-=======
-      body: NestedScrollView(
-        headerSliverBuilder: (_, __) => [
-          SliverAppBar(
-            pinned:     true,
-            backgroundColor: kBgCard,
-            titleSpacing: 0,
-            toolbarHeight: 70,
-            centerTitle: false,
-            title: Padding(
-              padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center, 
-                children: [
-                  AppBadge('WARISAN BUDAYA'),
-                  const SizedBox(height: 5),
-                  Text('Arsip Digital', style: AppText.displaySm),
-                ]
-              ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(116),
-              child: Container(
-                color: kBgCard,
-                child: Column(children: [
-                  const AppDivider(),
-                  _buildSearchBar(),
-                  const SizedBox(height: 4),
-                  _buildFilterBar(),
-                  const SizedBox(height: 12),
-                ]),
-              ),
-            ),
-          ),
-        ],
-        body: _buildBody(),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 4),
-      child: TextField(
-        controller: _searchCtrl,
-        style:      const TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          hintText: 'Cari nama tarian...',
-          prefixIcon: Icon(Icons.search_rounded, color: kMuted, size: 20),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          filled:    true,
-          fillColor: kBgSoft,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(kRadiusFull),
-            borderSide:   BorderSide.none,
-          ),
         ),
-        onChanged: (v) { _search = v; _apply(); },
-      ),
-    );
-  }
-
-  Widget _buildFilterBar() {
-    return SizedBox(
-      height: 38,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding:         const EdgeInsets.symmetric(horizontal: kSpace),
-        itemCount:       _filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (_, i) {
-          final f      = _filters[i];
-          final active = f == _filter;
-          return GestureDetector(
-            onTap: () { _filter = f; _apply(); },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: active ? kPrimary : Colors.transparent,
-                borderRadius: BorderRadius.circular(kRadiusFull),
-                border: Border.all(color: active ? kPrimary : kBorder),
-              ),
-              child: Text(_labels[f]!,
-                style: TextStyle(
-                  color:      active ? Colors.white : kMuted,
-                  fontSize:   13,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                )),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_loading) return const AppLoading();
-    if (_error != null) return AppError(message: _error!, onRetry: _load);
-    if (_filtered.isEmpty) {
-      return Center(
-        child: Text('Tarian tidak ditemukan.', style: TextStyle(color: kMuted)),
-      );
-    }
-    
-    return RefreshIndicator(
-      color:     kPrimary,
-      onRefresh: _load,
-      child: GridView.builder(
-        padding: const EdgeInsets.all(kSpace),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount:   2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing:  16,
-          childAspectRatio: 0.65,
-        ),
-        itemCount: _filtered.length,
-        itemBuilder: (_, i) => _TarianGridCard(
-          tarian: _filtered[i],
-          onTap:  () => _detail(_filtered[i]),
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
         ),
       ),
     );
@@ -635,27 +512,6 @@ class _TarianDetailSheet extends StatelessWidget {
                       ]),
                     ),
 
-<<<<<<< HEAD
-                  if (tarian.videoUrl != null && tarian.videoUrl!.isNotEmpty) ...[
-                    SizedBox(height: kSpace),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          final uri = Uri.parse(tarian.videoUrl!);
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri, mode: LaunchMode.externalApplication);
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Tidak dapat membuka video.')),
-                              );
-                            }
-                          }
-                        },
-                        icon:  Icon(Icons.play_circle_rounded, size: 20),
-                        label: Text('Tonton Video Tarian'),
-=======
                   if (hasVideo) ...[
                     const SizedBox(height: kSpace),
                     SizedBox(
@@ -664,7 +520,6 @@ class _TarianDetailSheet extends StatelessWidget {
                         onPressed: () => _launchYt(context, tarian.videoUrl!),
                         icon:  const Icon(Icons.play_circle_rounded, size: 20),
                         label: const Text('Tonton Video Tarian'),
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
                       ),
                     ),
                   ],

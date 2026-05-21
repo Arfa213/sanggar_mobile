@@ -101,31 +101,7 @@ class _LoggedInView extends StatelessWidget {
     }
   }
 
-<<<<<<< HEAD
-  Future<void> _pickAndUploadPhoto(BuildContext context, AuthProvider auth) async {
-    try {
-      final picker = ImagePicker();
-      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-      if (picked == null) return;
-      
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengunggah foto...')));
-      
-      await ApiService.updateProfilePhoto(picked.path);
-      
-      final fresh = await ApiService.getMe();
-      if (fresh != null) auth.updateUser(fresh);
-      
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto profil berhasil diperbarui!')));
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: ${e.toString()}'), backgroundColor: Colors.red));
-    }
-  }
-=======
-  // Method _prosesUploadFoto dihapus karena tidak lagi digunakan.
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
+
 
   @override
   Widget build(BuildContext context) {
@@ -152,9 +128,6 @@ class _LoggedInView extends StatelessWidget {
                       border: Border.all(color: Colors.white.withOpacity(0.06), width: 30)))),
                 SafeArea(child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   GestureDetector(
-<<<<<<< HEAD
-                    onTap: () => _pickAndUploadPhoto(context, auth),
-=======
                     onTap: () async {
                       final ImagePicker picker = ImagePicker();
                       final XFile? image = await picker.pickImage(
@@ -209,29 +182,10 @@ class _LoggedInView extends StatelessWidget {
                         }
                       }
                     },
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
                     child: Stack(children: [
                       Container(
                         decoration: BoxDecoration(shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withOpacity(0.4), width: 3)),
-<<<<<<< HEAD
-                        child: ClipOval(
-                          child: (user.foto != null && user.foto!.isNotEmpty)
-                              ? AppImage(
-                                  url: user.foto!,
-                                  width: 88,
-                                  height: 88,
-                                  fit: BoxFit.cover,
-                                  placeholder: Container(
-                                    width: 88, height: 88, color: Colors.white.withOpacity(0.2),
-                                    child: Center(child: Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)))
-                                  ),
-                                )
-                              : Container(
-                                  width: 88, height: 88, color: Colors.white.withOpacity(0.2),
-                                  child: Center(child: Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)))
-                                ),
-=======
                         child: CircleAvatar(
                           radius: 44,
                           backgroundColor: Colors.white.withOpacity(0.2),
@@ -240,7 +194,6 @@ class _LoggedInView extends StatelessWidget {
                           child: (user.foto == null || user.foto!.isEmpty)
                               ? Text(user.initial, style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900))
                               : null,
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
                         ),
                       ),
                       Positioned(bottom: 0, right: 0,

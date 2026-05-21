@@ -23,7 +23,6 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(String email, String pass) async {
-<<<<<<< HEAD
     _user = await ApiService.login(email, pass); notifyListeners();
   }
 
@@ -38,22 +37,10 @@ class AuthProvider extends ChangeNotifier {
     await ApiService.logout();
     _user = null;
     notifyListeners();
-=======
-    _user = await ApiService.login(email, pass); notifyListeners(); 
-  }
-
-  Future<void> register(Map<String, String> data) async {
-    _user = await ApiService.register(data); notifyListeners(); 
-  }
-
-  Future<void> logout() async {
-    await ApiService.logout(); _user = null; notifyListeners(); 
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
   }
 
   void updateUser(UserModel u) { _user = u; notifyListeners(); }
 
-<<<<<<< HEAD
   /// Login menggunakan akun Google via Firebase
   Future<void> loginWithGoogle() async {
     // 1. Tampilkan popup pilih akun Google
@@ -82,8 +69,7 @@ class AuthProvider extends ChangeNotifier {
     _user = await ApiService.loginWithGoogleToken(idToken);
     notifyListeners();
   }
-}
-=======
+
   // 📸 FUNGSI UPLOAD FOTO PROFIL
   Future<void> uploadFoto(File imageFile) async {
     try {
@@ -129,5 +115,4 @@ class AuthProvider extends ChangeNotifier {
       throw Exception('$e');
     }
   }
-} // 👈 Kurung kurawal penutup class dipastikan di paling bawah
->>>>>>> f9f305abd06cb236eb7f6cfac66afea76717c62a
+}
