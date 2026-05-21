@@ -8,6 +8,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+}
+
 android {
     namespace = "com.example.sanggar_mobile"
     compileSdk = flutter.compileSdkVersion
@@ -49,6 +56,15 @@ android {
         }
         create("prod") {
             dimension = "env"
+        }
+    }
+
+    // Rename generated APK
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output.outputFileName = "sanggar-mulya-bhakti.apk"
         }
     }
 }

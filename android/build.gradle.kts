@@ -27,10 +27,3 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
-
-android.applicationVariants.all { variant ->
-    variant.outputs.all { output ->
-        // Memaksa semua hasil build (baik dev maupun prod) bernama sanggar-mulya-bhakti.apk
-        outputFileName = "sanggar-mulya-bhakti.apk"
-    }
-}
