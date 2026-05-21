@@ -225,9 +225,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                     childCount: _filtered.length,
                   ),
                 ),
-              ),
           ],
-        ),
         ),
       ),
     );
