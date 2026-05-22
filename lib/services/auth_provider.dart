@@ -12,9 +12,13 @@ class AuthProvider extends ChangeNotifier {
   UserModel? _user;
   bool _loading = true;
 
-  UserModel? get user     => _user;
-  bool get isLoggedIn    => _user != null;
+  UserModel? get user    => _user;
+  bool get isLoggedIn   => _user != null;
   bool get isLoading      => _loading;
+
+  //  Web Client ID agar mudah jika sewaktu-waktu ingin diubah
+  // PASTIKAN ganti dengan Web Client ID asli yang kamu salin dari Firebase Console!
+  static const String _webClientId = '611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com';
 
   Future<void> init() async {
     _loading = true; notifyListeners();
@@ -23,23 +27,25 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(String email, String pass) async {
-    // OtpRequiredException akan diteruskan ke pemanggil (login_screen)
     final user = await ApiService.login(email, pass);
     _user = user;
     notifyListeners();
   }
 
   Future<void> register(Map<String, String> data) async {
-    // OtpRequiredException akan diteruskan ke pemanggil (login_screen)
     final user = await ApiService.register(data);
     _user = user;
     notifyListeners();
   }
 
   Future<void> logout() async {
-    // Sign out dari Google juga kalau sedang login via Google
-    try { await GoogleSignIn().signOut(); } catch (_) {}
-    try { await FirebaseAuth.instance.signOut(); } catch (_) {}
+    // Sign out dari Google menggunakan serverClientId agar sesi bersih global
+    try { 
+      await GoogleSignIn(serverClientId: _webClientId).signOut(); 
+    } catch (_) {}
+    try { 
+      await FirebaseAuth.instance.signOut(); 
+    } catch (_) {}
     await ApiService.logout();
     _user = null;
     notifyListeners();
@@ -47,10 +53,13 @@ class AuthProvider extends ChangeNotifier {
 
   void updateUser(UserModel u) { _user = u; notifyListeners(); }
 
-  /// Login menggunakan akun Google via Firebase
+  /// Login menggunakan akun Google via Firebase (FIXED TOKEN)
   Future<void> loginWithGoogle() async {
-    // 1. Tampilkan popup pilih akun Google
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // 1. Tampilkan popup pilih akun Google dengan mengoper serverClientId resmi
+    final GoogleSignInAccount? googleUser = await GoogleSignIn(
+      serverClientId: _webClientId,
+    ).signIn();
+    
     if (googleUser == null) throw Exception('Login dibatalkan');
 
     // 2. Ambil token autentikasi dari Google
@@ -67,23 +76,20 @@ class AuthProvider extends ChangeNotifier {
     final userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
 
-    // 5. Ambil idToken Firebase untuk dikirim ke backend Laravel
-    final idToken = await userCredential.user!.getIdToken();
-    if (idToken == null) throw Exception('Gagal mendapatkan token Firebase');
+    // 5. Ambil idToken langsung dari GOOGLE (bukan dari userCredential Firebase)
+    final googleIdToken = googleAuth.idToken; 
+    if (googleIdToken == null) throw Exception('Token Google tidak valid');
 
-    // 6. Kirim idToken ke backend Laravel untuk verifikasi & buat session
-    _user = await ApiService.loginWithGoogleToken(idToken);
+    // 6. Kirim token asli GOOGLE ke backend Laravel
+    _user = await ApiService.loginWithGoogleToken(googleIdToken);
     notifyListeners();
   }
 
   // 📸 FUNGSI UPLOAD FOTO PROFIL
   Future<void> uploadFoto(File imageFile) async {
     try {
-      // Menambahkan /auth karena berdasarkan struktur API lainnya, profil diakses via /auth/profile
       final url = Uri.parse('https://senindrai.my.id/api/v1/auth/foto');
       final request = http.MultipartRequest('POST', url);
-
-      // Mengambil token Sanctum langsung dari ApiService bawaan proyekmu
       final savedToken = await ApiService.getToken();
 
       request.headers.addAll({
@@ -105,12 +111,10 @@ class AuthProvider extends ChangeNotifier {
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
-        // Mengambil data user terupdate dari response backend jika ada
         final responseData = json.decode(response.body);
         if (responseData['user'] != null) {
           _user = UserModel.fromJson(responseData['user']);
         } else {
-          // Jika backend tidak me-return data user baru, kita ambil ulang datanya
           _user = await ApiService.getMe();
         }
         notifyListeners();

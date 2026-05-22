@@ -65,25 +65,26 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
             // 1. Sleek Pinned AppBar
             SliverAppBar(
               pinned: true,
-              expandedHeight: 130,
               backgroundColor: kBgCard,
               elevation: 0,
               surfaceTintColor: Colors.transparent,
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: false,
-                titlePadding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 12),
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              titleSpacing: 0,
+              toolbarHeight: 80,
+              centerTitle: false,
+              title: Padding(
+                padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, 
                   children: [
-                    AppBadge('WARISAN BUDAYA'),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Arsip Digital',
-                      style: AppText.displaySm.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: kDark,
+                    IntrinsicWidth(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppBadge('WARISAN BUDAYA'),
+                          const SizedBox(height: 4),
+                          Text('Arsip Digital',style: AppText.displaySm),
+                        ],
                       ),
                     ),
                   ],

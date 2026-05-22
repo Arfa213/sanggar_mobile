@@ -150,18 +150,15 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
       final top    = (h - boxSize) / 2 - 40;
 
       return Stack(children: [
-        // Dark overlay dengan lubang di tengah
-        ColorFiltered(
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.72), BlendMode.srcOut),
-          child: Stack(children: [
-            Container(decoration: BoxDecoration(
-                color: Colors.transparent, backgroundBlendMode: BlendMode.dstOut)),
-            Positioned(
-              left: left, top: top, width: boxSize, height: boxSize,
-              child: Container(decoration: BoxDecoration(
-                  color: Colors.red, borderRadius: BorderRadius.circular(20))),
-            ),
-          ]),
+        // ── FIX: Background Luar Berwarna Oranye Transparan dengan Lubang Bening di Tengah ──
+        CustomPaint(
+          size: Size(w, h),
+          painter: _ScannerOverlayShapePainter(
+            left: left,
+            top: top,
+            boxSize: boxSize,
+            overlayColor: kPrimary.withOpacity(0.35), // <-- Menggunakan warna Oranye (kPrimary) transparan untuk luar kotak
+          ),
         ),
 
         // Corner brackets
@@ -196,7 +193,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-        ),
+        ),  
 
         // Label bawah viewfinder
         Positioned(
@@ -205,11 +202,15 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
           child: Column(children: [
             Text('Arahkan kamera ke QR Code kelas',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, shadows: [
+                Shadow(color: Colors.black87, blurRadius: 4),
+              ])),
             SizedBox(height: 6),
             Text('QR Code tersedia di papan informasi sanggar',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white38, fontSize: 12)),
+              style: TextStyle(color: Colors.white60, fontSize: 12, shadows: [
+                Shadow(color: Colors.black87, blurRadius: 4),
+              ])),
           ]),
         ),
       ]);
@@ -329,4 +330,45 @@ class _CornerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_) => false;
+}
+
+// Class Painter baru untuk membolongi layar secara sempurna
+class _ScannerOverlayShapePainter extends CustomPainter {
+  final double left;
+  final double top;
+  final double boxSize;
+  final Color overlayColor;
+
+  const _ScannerOverlayShapePainter({
+    required this.left,
+    required this.top,
+    required this.boxSize,
+    required this.overlayColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = overlayColor;
+
+    // Menggunakan EvenOdd fill type: area yang bertumpuk dua kali (kotak tengah) akan otomatis berlubang bening
+    final path = Path()
+      ..fillType = PathFillType.evenOdd
+      // 1. Gambar seluruh layar
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      // 2. Gambar kotak target scan di tengah dengan sudut melengkung (rounded)
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(left, top, boxSize, boxSize),
+        const Radius.circular(20),
+      ));
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScannerOverlayShapePainter oldDelegate) {
+    return oldDelegate.left != left ||
+        oldDelegate.top != top ||
+        oldDelegate.boxSize != boxSize ||
+        oldDelegate.overlayColor != overlayColor;
+  }
 }

@@ -20,8 +20,9 @@ class DefaultFirebaseOptions {
       return web;
     }
     switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return android;
+        case TargetPlatform.android:
+        const isDev = bool.fromEnvironment('dart.vm.product') == false; 
+        return isDev ? androidDev : androidProd;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
@@ -50,12 +51,24 @@ class DefaultFirebaseOptions {
     measurementId: 'G-NGT4B1VQTX',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
+  // FLAVOR DEV (com.example.sanggar_mobile.dev)
+  static const FirebaseOptions androidDev = FirebaseOptions(
     apiKey: 'AIzaSyDhwOBl3BgZunSPkOMXcImkVFKt4ltom8c',
-    appId: '1:611713677810:android:53d7ebb23cda7dcf85936b',
+    appId: '1:611713677810:android:504cc6e7c13a22bf85936b',
     messagingSenderId: '611713677810',
     projectId: 'sanggar-mulya-bhakti',
     storageBucket: 'sanggar-mulya-bhakti.firebasestorage.app',
+    androidClientId: '611713677810-tpr00g3b4j1v9v0745b2n3i8t5302vma.apps.googleusercontent.com',
+  );
+
+  // PROD (com.example.sanggar_mobile)
+  static const FirebaseOptions androidProd = FirebaseOptions(
+    apiKey: 'AIzaSyDhwOBl3BgZunSPkOMXcImkVFKt4ltom8c',
+    appId: '1:611713677810:android:53d7ebb23cda7dcf85936b', 
+    messagingSenderId: '611713677810',
+    projectId: 'sanggar-mulya-bhakti',
+    storageBucket: 'sanggar-mulya-bhakti.firebasestorage.app',
+    androidClientId: '611713677810-tpr00g3b4j1v9v0745b2n3i8t5302vma.apps.googleusercontent.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

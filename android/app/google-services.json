@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "611713677810-5ctruf4fnhe775qp5i9jjltsc1giphhb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sanggar_mobile",
+            "certificate_hash": "e06649b31e68ae180a24af926b5d5b9a93944590"
+          }
+        },
+        {
+          "client_id": "611713677810-5mg87g2e8q93d3obpko2vf83dasfdi7m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sanggar_mobile",
+            "certificate_hash": "87b79536292923b1b5ab8ae597c4a7df95dfcdbc"
+          }
+        },
+        {
           "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -27,8 +43,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+              "client_id": "611713677810-47v0mj13rpshrfcivf3s4eru2dukel49.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "611713677810-mkrku08s0ohvmoghsehcm76f2j19t2ti.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sanggarMobile"
+              }
             }
           ]
         }
@@ -36,12 +59,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:611713677810:android:53d7ebb23cda7dcf85936b",
+        "mobilesdk_app_id": "1:611713677810:android:504cc6e7c13a22bf85936b",
         "android_client_info": {
           "package_name": "com.example.sanggar_mobile.dev"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "611713677810-j7v3sn99lj1t0nt60ukrromh1fimk3bt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sanggar_mobile.dev",
+            "certificate_hash": "e06649b31e68ae180a24af926b5d5b9a93944590"
+          }
+        },
+        {
+          "client_id": "611713677810-pliukubago5jrrrc0v3b2su6pmias2fs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sanggar_mobile.dev",
+            "certificate_hash": "87b79536292923b1b5ab8ae597c4a7df95dfcdbc"
+          }
+        },
         {
           "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
           "client_type": 3
@@ -56,8 +95,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "611713677810-86g03v381kvd8lua78c650t8elicjtce.apps.googleusercontent.com",
+              "client_id": "611713677810-47v0mj13rpshrfcivf3s4eru2dukel49.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "611713677810-mkrku08s0ohvmoghsehcm76f2j19t2ti.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sanggarMobile"
+              }
             }
           ]
         }

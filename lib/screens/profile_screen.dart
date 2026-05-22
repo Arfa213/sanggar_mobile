@@ -5,9 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http; // HTTP untuk kirim foto langsung ke Laravel
 import '../services/auth_provider.dart';
-import '../services/api_service.dart';
 import '../services/theme_service.dart';
-import 'package:image_picker/image_picker.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import 'auth/login_screen.dart';
@@ -100,8 +98,6 @@ class _LoggedInView extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const LoginScreen()), (_) => false);
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -240,29 +236,6 @@ class _LoggedInView extends StatelessWidget {
                 ),
               ]),
             )),
-          SizedBox(height: kSpaceMd),
-
-          _sectionTitle('PENGATURAN TEMA'),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 3),
-            child: Container(
-              decoration: BoxDecoration(border: Border.all(color: kBorder2), borderRadius: BorderRadius.circular(kRadius), color: kBgCard),
-              child: SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                title: Text('Mode Gelap', style: AppText.label.copyWith(fontWeight: FontWeight.w600)),
-                subtitle: Text('Ubah tampilan menjadi gelap.', style: AppText.bodyXs.copyWith(color: kMuted2)),
-                secondary: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(color: themeProvider.isDarkMode ? kDark2 : kPrimaryPale, borderRadius: BorderRadius.circular(kRadiusSm)),
-                  child: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                      color: themeProvider.isDarkMode ? Colors.white : kPrimary, size: 18),
-                ),
-                value: themeProvider.isDarkMode,
-                activeColor: kPrimary,
-                onChanged: (val) => themeProvider.toggleTheme(),
-              ),
-            ),
-          ),
           SizedBox(height: kSpaceMd),
 
           _sectionTitle('PENGATURAN AKUN'),

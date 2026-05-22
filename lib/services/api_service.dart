@@ -121,7 +121,10 @@ class ApiService {
   /// Login menggunakan Firebase ID Token dari Google Sign-In.
   /// Backend Laravel harus punya endpoint POST /api/v1/auth/google
   static Future<UserModel> loginWithGoogleToken(String firebaseIdToken) async {
+    // FIX: Mengubah kunci pengiriman dari 'id_token' menjadi 'firebase_token'
+    // agar pas dan cocok dengan $request->firebase_token yang dicari oleh Laravel
     final d = await _post('/auth/google', {'firebase_token': firebaseIdToken});
+    
     if (d['success'] == true) {
       final token = d['token'] as String;
       await saveToken(token);
