@@ -41,6 +41,9 @@ jobs:
         run: flutter test
         continue-on-error: true 
 
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/sanggar.keystore
+
       - name: 🏗️ Build APK
         run: |
           # 1. Jalankan build dengan flavor dev

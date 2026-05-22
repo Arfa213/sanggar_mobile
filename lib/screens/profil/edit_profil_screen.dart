@@ -83,7 +83,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
             child: Column(children: [
               _Field(_nameCtrl, 'Nama Lengkap', Icons.person_outline_rounded,
-                  readOnly: true,
+                  readOnly: false,
                   validator: (v) => v!.isEmpty ? 'Nama wajib diisi' : null),
               SizedBox(height: 14),
               _Field(_emailCtrl, 'Email', Icons.email_outlined,

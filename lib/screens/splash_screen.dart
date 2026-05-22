@@ -1,7 +1,6 @@
 // lib/screens/splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/auth_provider.dart';
+import '../../services/api_service.dart'; // 🚀 FIX 1: Import ApiService untuk membaca token secara langsung
 import '../utils/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,23 +24,30 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _ctrl, curve: const Interval(0.3, 1, curve: Curves.easeOut)));
     _ctrl.forward();
     
-    // Menjalankan pengecekan rute setelah delay 3 detik
+    // Menjalankan pengecekan rute setelah durasi delay 3 detik terpenuhi
     Future.delayed(const Duration(seconds: 3), _navigate);
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() { 
+    _ctrl.dispose(); 
+    super.dispose(); 
+  }
 
-void _navigate() {
+  // 🚀 FIX 2: Mengubah fungsi menjadi 'async' agar akurat membaca memori lokal HP
+  Future<void> _navigate() async {
     if (!mounted) return;
     
-    // Cek status login
-    final auth = Provider.of<AuthProvider>(context, listen: false);
+    // Ambil token login yang tersimpan di HP secara langsung dan pasti
+    final String? token = await ApiService.getToken();
 
-    // Tentukan rute tujuan
-    final String targetRoute = auth.isLoggedIn ? '/home' : '/register';
+    if (!mounted) return;
 
-    // Pindah halaman menggunakan nama rute secara aman
+    // Tentukan rute tujuan berdasarkan keberadaan token lokal
+    // Jika token ada -> Masuk ke Dashboard (/home), jika kosong -> Masuk ke halaman login/register
+    final String targetRoute = (token != null && token.isNotEmpty) ? '/home' : '/login';
+
+    // Pindah halaman menggunakan nama rute secara aman dan membuang riwayat splash screen
     Navigator.pushReplacementNamed(context, targetRoute);
   }
   
@@ -51,7 +57,7 @@ void _navigate() {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [kPrimaryDark, kPrimary, Color(0xFFD4754A)],
+            colors: [kPrimaryDark, kPrimary, const Color(0xFFD4754A)],
             begin:  Alignment.topLeft,
             end:    Alignment.bottomRight,
           ),
@@ -101,7 +107,7 @@ void _navigate() {
                     ),
                   ),
                 )),
-              SizedBox(height: 28),
+              const SizedBox(height: 28),
 
               // Title
               AnimatedBuilder(
@@ -111,36 +117,38 @@ void _navigate() {
                   child: child,
                 ),
                 child: Column(children: [
-                  Text('Sanggar Mulya Bhakti',
+                  const Text('Sanggar Mulya Bhakti',
                     style: TextStyle(
                       color: Colors.white, fontSize: 26,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'PlayfairDisplay',
                       letterSpacing: 0.5,
                     )),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     Container(width: 20, height: 1, color: Colors.white.withOpacity(0.4)),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text('Melestarikan Budaya Melalui Seni',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8), fontSize: 12,
                         letterSpacing: 0.5)),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Container(width: 20, height: 1, color: Colors.white.withOpacity(0.4)),
                   ]),
                 ]),
               ),
-              SizedBox(height: 52),
+              const SizedBox(height: 52),
 
               // Loader
-              SizedBox(
-                width: 28, height: 28,
-                child: CircularProgressIndicator(
-                  color:       Colors.white.withOpacity(0.6),
-                  strokeWidth: 2,
-                ),
-              ),
+              Navigator.canPop(context) // Diganti logika aman agar progress bar tetap estetik saat rendering
+                  ? const SizedBox()
+                  : SizedBox(
+                      width: 28, height: 28,
+                      child: CircularProgressIndicator(
+                        color:        Colors.white.withOpacity(0.6),
+                        strokeWidth: 2,
+                      ),
+                    ),
             ]),
           )),
         ]),

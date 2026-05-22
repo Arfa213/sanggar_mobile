@@ -28,6 +28,25 @@ android {
             keyAlias = "sanggarseni"
             keyPassword = "senindrai"
         }
+        
+        create("release") {
+            storeFile = file("sanggar.keystore")
+            storePassword = "senindrai"
+            keyAlias = "sanggarseni"
+            keyPassword = "senindrai"
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
     }
 
     compileOptions {

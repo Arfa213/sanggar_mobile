@@ -5,7 +5,6 @@ import '../models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ArchiveScreen extends StatefulWidget {
@@ -265,9 +264,17 @@ class _TarianGridCard extends StatelessWidget {
               AppImage(
                 url:   tarian.foto,
                 fit:   BoxFit.cover,
+                // 🛠️ FIX FIX: Menggunakan color & modblend untuk transparansi yang aman dan konstan
                 placeholder: Container(
                   color: kPrimaryPale,
-                  child: Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 32)),
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/logosanggar.png',
+                      color: Colors.white.withOpacity(0.4),
+                      colorBlendMode: BlendMode.modulate,
+                    ),
+                  ),
                 ),
               ),
 
@@ -304,7 +311,7 @@ class _TarianGridCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(kRadiusFull),
                       boxShadow: [BoxShadow(color: kGold.withOpacity(0.4), blurRadius: 4)],
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.star_rounded, color: Colors.white, size: 10),
@@ -331,12 +338,12 @@ class _TarianGridCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.location_on_rounded, size: 10, color: Colors.white70),
+                        const Icon(Icons.location_on_rounded, size: 10, color: Colors.white70),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             tarian.asal,
-                            style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w500),
+                            style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w500),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -412,9 +419,18 @@ class _TarianDetailSheet extends StatelessWidget {
                     url:    imageUrl,
                     height: 240,
                     width:  double.infinity,
+                    // 🛠 ...
                     placeholder: Container(
-                      height: 240, color: kPrimaryPale,
-                      child: Center(child: Icon(Icons.music_note_rounded, color: kPrimary, size: 48)),
+                      height: 240, 
+                      color: kPrimaryPale,
+                      padding: const EdgeInsets.all(40),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/logosanggar.png',
+                          color: Colors.white.withOpacity(0.5),
+                          colorBlendMode: BlendMode.modulate,
+                        ),
+                      ),
                     ),
                   ),
                   if (hasVideo)
@@ -542,11 +558,11 @@ class _InfoTile extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Row(children: [
-      Text(emoji, style: TextStyle(fontSize: 18)),
-      SizedBox(width: 12),
+      Text(emoji, style: const TextStyle(fontSize: 18)),
+      const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: AppText.caption.copyWith(letterSpacing: 0.8)),
-        SizedBox(height: 2),
+        const SizedBox(height: 2),
         Text(value, style: AppText.label),
       ])),
     ]),
