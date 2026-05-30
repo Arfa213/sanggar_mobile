@@ -27,7 +27,11 @@ class ApiService {
       (await SharedPreferences.getInstance()).remove(_tokenKey);
 
   static Future<Map<String, String>> _headers({bool auth = false}) async {
-    final h = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+    final h = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    };
     if (auth) {
       final t = await getToken();
       if (t != null) h['Authorization'] = 'Bearer $t';
@@ -196,6 +200,7 @@ class ApiService {
     final req = http.MultipartRequest('POST', Uri.parse('$kApiUrl/auth/foto'));
     req.headers['Authorization'] = 'Bearer $token';
     req.headers['Accept'] = 'application/json';
+    req.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
     req.files.add(await http.MultipartFile.fromPath('foto', imagePath));
     
     final res = await req.send();
@@ -233,6 +238,15 @@ class ApiService {
         .toList();
   }
 
+  static Future<List<dynamic>> getEventsMendatang() async {
+    try {
+      final d = await _get('/events');
+      return (d['mendatang'] as List) ?? [];
+    } catch (_) {
+      return [];
+    }
+  }
+
   static Future<List<PendaftaranMember>> getPendaftaranSaya() async {
     try {
       final d = await _get('/pendaftaran', auth: true);
@@ -257,16 +271,14 @@ class ApiService {
 
   static Future<void> daftarKelas({
     required int tarianId,
-    int? jadwalId,
-    String? tanggalLatihan,
-    String? jamLatihan,
+    required String tanggalLatihan,
+    required String jamLatihan,
     String? catatan,
   }) async {
     final d = await _post('/pendaftaran', {
-      'tarian_id': tarianId,
-      if (jadwalId != null) 'jadwal_id': jadwalId,
-      if (tanggalLatihan != null) 'tanggal_latihan': tanggalLatihan,
-      if (jamLatihan != null) 'jam_latihan': jamLatihan,
+      'tarian_id'       : tarianId,
+      'tanggal_latihan' : tanggalLatihan,
+      'jam_latihan'     : jamLatihan,
       if (catatan != null) 'catatan': catatan,
     }, auth: true);
     if (d['success'] != true) {
@@ -305,6 +317,35 @@ class ApiService {
   static Future<Map<String, dynamic>> scanAbsensi(String barcodeToken) async {
     final d = await _post('/attendance/scan', {'barcode_token': barcodeToken}, auth: true);
     return d;
+  }
+
+  // ── RAPOR PAGELARAN ───────────────────────────────────────────
+  static Future<List<RaporPagelaran>> getRaporSaya() async {
+    try {
+      final d = await _get('/rapor-saya', auth: true);
+      final list = (d['data'] as List?) ?? [];
+      return list.map((e) => RaporPagelaran.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<RaporSummary?> getRaporSummary() async {
+    try {
+      final d = await _get('/rapor-saya/summary', auth: true);
+      if (d['data'] == null) return null;
+      return RaporSummary.fromJson(d['data']);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<void> updateFcmToken(String token) async {
+    try {
+      await _post('/auth/update-fcm-token', {'fcm_token': token}, auth: true);
+    } catch (e) {
+      // Ignore if fail
+    }
   }
 
   // ── HELPER ────────────────────────────────────────────────────

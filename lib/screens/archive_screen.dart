@@ -80,9 +80,9 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppBadge('WARISAN BUDAYA'),
+                          AppBadge('MATERI BELAJAR'),
                           const SizedBox(height: 4),
-                          Text('Arsip Digital',style: AppText.displaySm),
+                          Text('Materi Tari',style: AppText.displaySm),
                         ],
                       ),
                     ),

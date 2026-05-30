@@ -1,5 +1,6 @@
 // lib/screens/detail/event_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../utils/app_theme.dart';
 import '../../models/models.dart';
 import '../../widgets/shared_widgets.dart';
@@ -7,6 +8,13 @@ import '../../widgets/shared_widgets.dart';
 class EventDetailScreen extends StatelessWidget {
   final Event event;
   const EventDetailScreen({super.key, required this.event});
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url)) {
+      debugPrint('Could not launch $urlString');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +134,29 @@ class EventDetailScreen extends StatelessWidget {
             ]),
           ),
 
+          // Kolaborasi
+          if (event.namaPengaju != null)
+          Container(
+            margin: const EdgeInsets.only(left: kSpace, right: kSpace, top: kSpaceSm),
+            padding: const EdgeInsets.all(kSpace),
+            decoration: BoxDecoration(
+              color: kPrimaryPale,
+              borderRadius: BorderRadius.circular(kRadius),
+              border: Border.all(color: kPrimary.withOpacity(0.2))),
+            child: Row(children: [
+              Icon(Icons.handshake_rounded, color: kPrimary, size: 28),
+              SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Kolaborasi Spesial',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
+                      color: kPrimary, letterSpacing: 0.8)),
+                SizedBox(height: 4),
+                Text(event.namaPengaju!,
+                  style: AppText.displayXs.copyWith(color: kPrimaryDark)),
+              ])),
+            ]),
+          ),
+
           // Deskripsi
           if (event.deskripsi != null)
           Padding(
@@ -134,6 +165,32 @@ class EventDetailScreen extends StatelessWidget {
               Text('Tentang Event', style: AppText.displayXs),
               SizedBox(height: 10),
               Text(event.deskripsi!, style: AppText.bodyMd.copyWith(height: 1.75)),
+            ]),
+          )
+          else if (event.sinopsisLink != null)
+          Padding(
+            padding: const EdgeInsets.all(kSpace),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Tentang Event', style: AppText.displayXs),
+              SizedBox(height: 10),
+              InkWell(
+                onTap: () => _launchUrl(event.sinopsisLink!),
+                borderRadius: BorderRadius.circular(kRadius),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(kRadius),
+                    border: Border.all(color: kBorder),
+                  ),
+                  child: Row(children: [
+                     Icon(Icons.description_outlined, color: kPrimary),
+                     SizedBox(width: 12),
+                     Expanded(child: Text('Buka Dokumen Sinopsis', style: AppText.bodySm.copyWith(fontWeight: FontWeight.w700, color: kPrimary))),
+                     Icon(Icons.open_in_new_rounded, color: kTextLight, size: 16),
+                  ])
+                ),
+              ),
             ]),
           ),
 

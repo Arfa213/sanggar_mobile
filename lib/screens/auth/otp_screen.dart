@@ -1,8 +1,9 @@
-// lib/screens/auth/otp_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../services/auth_provider.dart';
 import '../../services/api_service.dart';
 import '../../utils/app_theme.dart';
 
@@ -75,8 +76,9 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     }
     setState(() { _loading = true; _error = null; });
     try {
-      await ApiService.verifyOtp(widget.userId, _otpCode);
+      final user = await ApiService.verifyOtp(widget.userId, _otpCode);
       if (!mounted) return;
+      context.read<AuthProvider>().updateUser(user);
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       if (!mounted) return;

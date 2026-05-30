@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import 'api_service.dart';
 import '../models/jadwal_pendaftaran.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AppNotification {
   final String id;
@@ -47,12 +48,42 @@ class NotificationService extends ChangeNotifier {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   List<AppNotification> _notifications = [];
   List<AppNotification> get notifications => _notifications;
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
 
   Future<void> init() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+    );
+
     await loadNotifications();
+  }
+
+  Future<void> showLocalNotification({required String title, required String body}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'sanggar_pengumuman',
+      'Pengumuman Sanggar',
+      channelDescription: 'Notifikasi untuk jadwal latihan dan pengumuman',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+    );
   }
 
   // ── SAVE & LOAD FROM LOCAL STORAGE ─────────────────────────
@@ -112,7 +143,7 @@ class NotificationService extends ChangeNotifier {
       _notifications.add(AppNotification(
         id: 'welcome_${user.id}',
         title: 'Selamat bergabung! 🎉',
-        message: 'Selamat datang di aplikasi resmi Sanggar Mulya Bhakti. Di sini kamu bisa memantau jadwal latihan, booking kelas tari, dan melakukan presensi digital secara praktis!',
+        message: 'Selamat datang di aplikasi resmi Sanggar Mulya Bhakti. Di sini kamu bisa memantau jadwal latihan, daftar kelas private tari, dan melakukan presensi digital secara praktis!',
         timestamp: now.subtract(const Duration(minutes: 5)),
         type: 'announcement',
       ));
@@ -121,17 +152,35 @@ class NotificationService extends ChangeNotifier {
 
     // Ambil Broadcast Pengumuman dari Website Laravel API secara dinamis
     try {
-      final apiAnnouncements = await ApiService.getPengumuman();
-      for (var item in apiAnnouncements) {
-        final id = 'broadcast_${item['id']}';
+      // 1. Ambil event mendatang
+      final events = await ApiService.getEventsMendatang();
+      for (var item in events) {
+        final id = 'event_${item['id']}';
         if (!_notifications.any((n) => n.id == id)) {
           final dtStr = item['created_at'] ?? now.toIso8601String();
           _notifications.insert(0, AppNotification(
             id: id,
-            title: item['judul'] ?? 'Pengumuman Baru',
-            message: item['konten'] ?? '',
+            title: '🎉 Event Baru: ${item['nama']}',
+            message: 'Persiapkan dirimu! Kita akan melaksanakan kegiatan ini pada tanggal ${item['tanggal']} di ${item['lokasi']}!',
             timestamp: DateTime.parse(dtStr).toLocal(),
-            type: item['tipe'] ?? 'announcement',
+            type: 'announcement',
+          ));
+          updated = true;
+        }
+      }
+      
+      // Ambil pengumuman dari backend
+      final apiAnnouncements = await ApiService.getPengumuman();
+      for (var item in apiAnnouncements) {
+        final id = 'pengumuman_${item['id']}';
+        if (!_notifications.any((n) => n.id == id)) {
+          final dtStr = item['created_at'] ?? now.toIso8601String();
+          _notifications.insert(0, AppNotification(
+            id: id,
+            title: item['judul'] ?? '📢 Pengumuman',
+            message: item['konten'] ?? '-',
+            timestamp: DateTime.parse(dtStr).toLocal(),
+            type: 'announcement',
           ));
           updated = true;
         }
@@ -150,13 +199,16 @@ class NotificationService extends ChangeNotifier {
         if (diff.inHours <= 24 && diff.inHours > 1) {
           final id = '24h_tetap_${p.id}_${nextPracticeDate.day}';
           if (!_notifications.any((n) => n.id == id)) {
+            final title = 'Besok Latihan Tari! 🎭';
+            final body = 'Pengingat Wajib: Latihan kelas "${p.tarianNama}" dijadwalkan besok ${p.jadwal.hari} jam ${p.jadwal.jamMulai} WIB di ${p.jadwal.tempat}. Harap persiapkan diri!';
             _notifications.insert(0, AppNotification(
               id: id,
-              title: 'Besok Latihan Tari! 🎭',
-              message: 'Pengingat Wajib: Latihan kelas "${p.tarianNama}" dijadwalkan besok ${p.jadwal.hari} jam ${p.jadwal.jamMulai} WIB di ${p.jadwal.tempat}. Harap persiapkan diri!',
+              title: title,
+              message: body,
               timestamp: now,
               type: 'reminder',
             ));
+            showLocalNotification(title: title, body: body);
             updated = true;
           }
         }
@@ -165,23 +217,26 @@ class NotificationService extends ChangeNotifier {
         if (diff.inMinutes <= 60 && diff.inMinutes > 0) {
           final id = '1h_tetap_${p.id}_${nextPracticeDate.day}';
           if (!_notifications.any((n) => n.id == id)) {
+            final title = '1 Jam Lagi Mulai! ⏰';
+            final body = 'Latihan kelas "${p.tarianNama}" akan dimulai 1 jam lagi jam ${p.jadwal.jamMulai} WIB. Sampai jumpa di ruang latihan!';
             _notifications.insert(0, AppNotification(
               id: id,
-              title: '1 Jam Lagi Mulai! ⏰',
-              message: 'Latihan kelas "${p.tarianNama}" akan dimulai 1 jam lagi jam ${p.jadwal.jamMulai} WIB. Sampai jumpa di ruang latihan!',
+              title: title,
+              message: body,
               timestamp: now,
               type: 'reminder',
             ));
+            showLocalNotification(title: title, body: body);
             updated = true;
           }
         }
       }
     }
 
-    // 2. GENERATOR UNTUK ANGGOTA SEMENTARA (Berdasarkan Booking)
+    // 2. GENERATOR UNTUK ANGGOTA SEMENTARA (Berdasarkan Private)
     if (user.isPengunjung && !user.isAdmin) {
       for (var p in pendaftaranList) {
-        // Status booking disetujui (aktif / approved)
+        // Status private disetujui (aktif / approved)
         final isApproved = p.status.toLowerCase() == 'aktif' || p.status.toLowerCase() == 'approved';
         
         // Notifikasi persetujuan admin jika belum pernah masuk
@@ -189,7 +244,7 @@ class NotificationService extends ChangeNotifier {
         if (isApproved && !_notifications.any((n) => n.id == approvalId)) {
           _notifications.insert(0, AppNotification(
             id: approvalId,
-            title: 'Booking Disetujui! ✅',
+            title: 'Sesi Private Disetujui! ✅',
             message: 'Sesi latihan "${p.tarianNama}" untuk hari ${p.jadwal.hari} jam ${p.jadwal.jamMulai} WIB telah DISETUJUI oleh Admin. Silakan datang sesuai jadwal!',
             timestamp: now,
             type: 'approval',
@@ -201,32 +256,38 @@ class NotificationService extends ChangeNotifier {
         final nextPracticeDate = _getNextPracticeDate(p.jadwal.hari.toLowerCase(), p.jadwal.jamMulai);
         final diff = nextPracticeDate.difference(now);
 
-        // 2.a Pengingat 24 Jam Sebelum Booking
+        // 2.a Pengingat 24 Jam Sebelum Private
         if (isApproved && diff.inHours <= 24 && diff.inHours > 1) {
           final id = '24h_sementara_${p.id}_${nextPracticeDate.day}';
           if (!_notifications.any((n) => n.id == id)) {
+            final title = 'Besok Agenda Latihanmu! 🎯';
+            final body = 'Sesi private kelas "${p.tarianNama}" akan dimulai besok ${p.jadwal.hari} jam ${p.jadwal.jamMulai} WIB. Persiapkan fisik dan kelengkapan latihanmu!';
             _notifications.insert(0, AppNotification(
               id: id,
-              title: 'Besok Agenda Latihanmu! 🎯',
-              message: 'Sesi booking kelas "${p.tarianNama}" akan dimulai besok ${p.jadwal.hari} jam ${p.jadwal.jamMulai} WIB. Persiapkan fisik dan kelengkapan latihanmu!',
+              title: title,
+              message: body,
               timestamp: now,
               type: 'reminder',
             ));
+            showLocalNotification(title: title, body: body);
             updated = true;
           }
         }
 
-        // 2.b Pengingat 1 Jam Sebelum Booking
+        // 2.b Pengingat 1 Jam Sebelum Private
         if (isApproved && diff.inMinutes <= 60 && diff.inMinutes > 0) {
           final id = '1h_sementara_${p.id}_${nextPracticeDate.day}';
           if (!_notifications.any((n) => n.id == id)) {
+            final title = '1 Jam Lagi Mulai! ⏰';
+            final body = 'Sesi latihan khusus "${p.tarianNama}" Anda dimulai 1 jam lagi jam ${p.jadwal.jamMulai} WIB. Harap datang 15 menit lebih awal!';
             _notifications.insert(0, AppNotification(
               id: id,
-              title: '1 Jam Lagi Mulai! ⏰',
-              message: 'Sesi latihan khusus "${p.tarianNama}" Anda dimulai 1 jam lagi jam ${p.jadwal.jamMulai} WIB. Harap datang 15 menit lebih awal!',
+              title: title,
+              message: body,
               timestamp: now,
               type: 'reminder',
             ));
+            showLocalNotification(title: title, body: body);
             updated = true;
           }
         }

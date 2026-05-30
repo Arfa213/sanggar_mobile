@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'archive_screen.dart';
-import 'event_screen.dart';
+import 'penjadwalan_screen.dart';
 import 'profile_screen.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_provider.dart';
 import '../utils/app_theme.dart';
 
 class MainNav extends StatefulWidget {
@@ -17,10 +19,22 @@ class _MainNavState extends State<MainNav> {
   int _idx = 0;
   set setIndex(int i) => setState(() => _idx = i);
 
-  final _pages = const [HomeScreen(), ArchiveScreen(), EventScreen(), ProfileScreen()];
+  final _pages = const [HomeScreen(), PenjadwalanScreen(), ArchiveScreen(), ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
+    // Proteksi halaman: Jika user tidak terdeteksi login, langsung lempar kembali ke halaman login
+    if (!auth.isLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: IndexedStack(index: _idx, children: _pages),
       bottomNavigationBar: Container(
@@ -35,8 +49,8 @@ class _MainNavState extends State<MainNav> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(children: [
               _NavItem(icon: Icons.home_rounded,   label: 'Beranda', idx: 0, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-              _NavItem(icon: Icons.library_music_rounded, label: 'Arsip', idx: 1, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-              _NavItem(icon: Icons.event_rounded,  label: 'Event',   idx: 2, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+              _NavItem(icon: Icons.event_note_rounded, label: 'Jadwal', idx: 1, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+              _NavItem(icon: Icons.school_rounded, label: 'Materi',   idx: 2, cur: _idx, onTap: (i) => setState(() => _idx = i)),
               _NavItem(icon: Icons.person_rounded, label: 'Profil',  idx: 3, cur: _idx, onTap: (i) => setState(() => _idx = i)),
             ]),
           ),

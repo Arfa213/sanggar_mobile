@@ -14,6 +14,7 @@ import 'chatbot_screen.dart';
 import 'penjadwalan_screen.dart';
 import '../services/notification_service.dart';
 import 'notification_screen.dart';
+import 'rapor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -125,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           SliverToBoxAdapter(child: _buildStatsRow()),
           SliverToBoxAdapter(child: _buildKehadiranSection()),
           SliverToBoxAdapter(child: _buildEventSection()),
+          if (user.isPengunjung) SliverToBoxAdapter(child: _buildUpgradeBanner()),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ]),
       ),
@@ -135,6 +137,89 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         backgroundColor: kPrimary,
         child: Icon(Icons.forum_rounded, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildUpgradeBanner() {
+    return FadeTransition(
+      opacity: _stagger(7),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('👑', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              const Text(
+                'Suka latihan di sini?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'PlayfairDisplay',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Dapatkan jadwal rutin tetap, bebas antrean private, dan prioritas aula dengan menjadi Anggota Tetap!',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  // In a real app, this would open URL using url_launcher:
+                  // launchUrl(Uri.parse('https://wa.me/6281234567890?text=Halo...'));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Akan membuka WhatsApp Admin...')),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22C55E),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Hubungi Admin',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -419,6 +504,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildModernQuickGrid() {
+    final user = context.read<AuthProvider>().user;
+    final isAnggotaTetap = user != null && user.tipeAnggota == 'anggota_tetap';
+    
     final items = [
       (
         'Scan QR',
@@ -434,16 +522,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           if (ok == true && mounted) { _load(); }
         }
       ),
+      if (isAnggotaTetap)
+        (
+          'Rapor Saya',
+          'Nilai ujian pagelaran',
+          Icons.workspace_premium_rounded,
+          const Color(0xFFB45309), // Amber dark
+          const Color(0xFFFEF3C7), // Amber light
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const RaporScreen()),
+          )
+        ),
       (
-        'Booking Kelas',
-        'Daftar sesi latihan tari',
+        'Kelas Tari',
+        'Daftar sesi & kelas latihan',
         Icons.add_task_rounded,
         const Color(0xFFC65D2E),
         const Color(0xFFFBEBE3),
-        () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PenjadwalanScreen()),
-        )
+        () => MainNav.of(context)?.setIndex = 1 // Pindah ke tab Jadwal
       ),
       (
         'Tanya AI',
@@ -456,14 +553,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           MaterialPageRoute(builder: (_) => const ChatbotScreen()),
         )
       ),
-      (
-        'Arsip Digital',
-        'Kamus tarian & topeng',
-        Icons.auto_stories_rounded,
-        const Color(0xFF6A1B9A),
-        const Color(0xFFF3E5F5),
-        () => MainNav.of(context)?.setIndex = 1 // Pindah ke tab Arsip
-      ),
+      if (!isAnggotaTetap)
+        (
+          'Materi Tari',
+          'Video & materi belajar',
+          Icons.auto_stories_rounded,
+          const Color(0xFF6A1B9A),
+          const Color(0xFFF3E5F5),
+          () => MainNav.of(context)?.setIndex = 2 // Pindah ke tab Materi
+        ),
     ];
 
     return FadeTransition(
@@ -625,15 +723,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ]),
               SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(kRadiusFull),
-                ),
-                child: Text(
-                  user.isAdmin ? '👑 Administrator' : (user.isPengunjung ? '🎭 Anggota Sementara' : '🎭 Anggota Tetap'),
-                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(kRadiusFull),
+                    ),
+                    child: Text(
+                      user.isAdmin ? '👑 Administrator' : (user.isPengunjung ? '🎭 Anggota Sementara' : '🎭 Anggota Tetap'),
+                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(width: 8),
+                  if (user.isPengunjung && user.tglKadaluarsa != null)
+                    Builder(
+                      builder: (ctx) {
+                        final tgl = DateTime.tryParse(user.tglKadaluarsa!);
+                        if (tgl == null) return const SizedBox.shrink();
+                        final sisaHari = tgl.difference(DateTime.now()).inDays;
+                        final isExpired = sisaHari < 0;
+                        final color = isExpired ? Colors.redAccent : (sisaHari <= 2 ? Colors.orangeAccent : Colors.greenAccent);
+                        final text = isExpired ? 'Hangus' : 'Sisa $sisaHari Hari';
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(kRadiusFull),
+                            border: Border.all(color: color.withOpacity(0.5)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.timer_outlined, color: color, size: 12),
+                              const SizedBox(width: 4),
+                              Text(text, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                ],
               ),
             ]),
           ),
@@ -776,8 +905,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           SliverToBoxAdapter(child: _buildPublicHeader()),
           SliverToBoxAdapter(child: AutoSlider(items: slides, height: 300, interval: const Duration(seconds: 5))),
           if (_profil != null) SliverToBoxAdapter(child: _buildPublicStats()),
-          SliverToBoxAdapter(child: SectionTitle(title: 'Tarian Khas Indramayu', subtitle: 'ARSIP DIGITAL',
-              actionLabel: 'Lihat semua', onAction: () => MainNav.of(context)?.setIndex = 1)),
+          SliverToBoxAdapter(child: SectionTitle(title: 'Tarian Khas Indramayu', subtitle: 'MATERI TARI',
+              actionLabel: 'Lihat semua', onAction: () => MainNav.of(context)?.setIndex = 2)),
           SliverToBoxAdapter(child: _buildPublicTarian()),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ]),

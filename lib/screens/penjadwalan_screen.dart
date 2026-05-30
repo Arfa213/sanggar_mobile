@@ -96,7 +96,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppBadge(isPengunjung ? 'BOOKING SESI' : 'KELAS TARI'),
+                AppBadge(isPengunjung ? 'SESI PRIVATE' : 'KELAS TARI'),
                 const SizedBox(height: 5),
                 Text(isPengunjung ? 'Sesi Latihan' : 'Penjadwalan', style: AppText.displaySm),
               ]),
@@ -132,7 +132,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
                   unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                   tabs: [
                     Tab(text: isPengunjung ? 'Pilih Tarian (${_tarian.length})' : 'Pilih Kelas (${_tarian.length})'),
-                    Tab(text: isPengunjung ? 'Booking Saya (${_daftar.length})' : 'Terdaftar (${_daftar.length})'),
+                    Tab(text: isPengunjung ? 'Private Saya (${_daftar.length})' : 'Terdaftar (${_daftar.length})'),
                   ],
                 ),
               ),
@@ -164,30 +164,25 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
 
   Future<void> _daftarKelas({
     required int tarianId,
-    int? jadwalId,
     String? tanggal,
     String? jam,
     String? catatan,
   }) async {
     try {
-      if (jadwalId != null) {
-        await ApiService.daftarKelas(tarianId: tarianId, jadwalId: jadwalId, catatan: catatan);
-      } else {
-        await ApiService.daftarKelas(
-          tarianId: tarianId,
-          tanggalLatihan: tanggal,
-          jamLatihan: jam,
-          catatan: catatan,
-        );
-      }
+      await ApiService.daftarKelas(
+        tarianId: tarianId,
+        tanggalLatihan: tanggal!,
+        jamLatihan: jam!,
+        catatan: catatan,
+      );
       await _load();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white),
-            const SizedBox(width: 10),
-            Text(jadwalId != null ? 'Berhasil mendaftar kelas!' : 'Booking berhasil dikirim!'),
+          content: const Row(children: [
+            Icon(Icons.check_circle_rounded, color: Colors.white),
+            SizedBox(width: 10),
+            Text('Pendaftaran berhasil diajukan!'),
           ]),
           backgroundColor: const Color(0xFF2E7D32),
           behavior: SnackBarBehavior.floating,
@@ -244,7 +239,6 @@ class _PilihKelasTab extends StatelessWidget {
   final List<Pendaftaran>  daftarSaya;
   final Future<void> Function({
     required int tarianId,
-    int? jadwalId,
     String? tanggal,
     String? jam,
     String? catatan,
@@ -291,7 +285,6 @@ class _TarianKelasCard extends StatefulWidget {
   final bool             highlighted;
   final Future<void> Function({
     required int tarianId,
-    int? jadwalId,
     String? tanggal,
     String? jam,
     String? catatan,
@@ -303,7 +296,6 @@ class _TarianKelasCard extends StatefulWidget {
 
 class _TarianKelasCardState extends State<_TarianKelasCard> {
   bool _expanded = false;
-  int? _selectedJadwal;
   DateTime? _selectedDate;
   String? _selectedTimeSlot;
   final _catatanController = TextEditingController();
@@ -459,7 +451,7 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  _expanded ? 'Tutup' : (isPengunjung ? 'Booking' : 'Daftar'),
+                                  _expanded ? 'Tutup' : (isPengunjung ? 'Private' : 'Daftar'),
                                   style: TextStyle(
                                     color: _expanded ? Colors.white : kPrimary,
                                     fontSize: 11,
@@ -484,7 +476,7 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                     const SizedBox(height: 16),
                     const AppDivider(),
                     const SizedBox(height: 16),
-                    
+
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -495,218 +487,158 @@ class _TarianKelasCardState extends State<_TarianKelasCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (isPengunjung) ...[
-                            // ── Visitor Dynamic Booking Form ──
-                            Text('Tanggal Booking', style: AppText.label),
-                            const SizedBox(height: 6),
-                            GestureDetector(
-                              onTap: () async {
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime.now().add(const Duration(days: 30)),
-                                  builder: (context, child) {
-                                    return Theme(
-                                      data: Theme.of(context).copyWith(
-                                        colorScheme: ColorScheme.light(
-                                          primary: kPrimary,
-                                          onPrimary: Colors.white,
-                                          onSurface: kDark,
-                                        ),
-                                      ),
-                                      child: child!,
-                                    );
-                                  },
-                                );
-                                if (picked != null) {
-                                  setState(() => _selectedDate = picked);
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(kRadiusXs),
-                                  border: Border.all(color: kBorder),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today_rounded, color: kPrimary, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _selectedDate == null
-                                          ? 'Ketuk untuk pilih tanggal...'
-                                          : _formatDate(_selectedDate!),
-                                      style: TextStyle(
-                                        color: _selectedDate == null ? kMuted : kDark,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 12,
+                          // ── Form Pilih Tanggal & Jam (untuk semua tipe anggota) ──
+                          Text(
+                            isPengunjung ? 'Tanggal Private' : 'Tanggal Latihan',
+                            style: AppText.label,
+                          ),
+                          const SizedBox(height: 6),
+                          GestureDetector(
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(const Duration(days: 30)),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: ColorScheme.light(
+                                        primary: kPrimary,
+                                        onPrimary: Colors.white,
+                                        onSurface: kDark,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (picked != null) {
+                                setState(() => _selectedDate = picked);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(kRadiusXs),
+                                border: Border.all(color: kBorder),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            
-                            Text('Pilih Jam Booking', style: AppText.label),
-                            const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: [
-                                '08:00', '09:00', '10:00', '11:00', 
-                                '13:00', '14:00', '15:00', '16:00', 
-                                '17:00', '18:00', '19:00', '20:00'
-                              ].map((slot) {
-                                final isSelected = _selectedTimeSlot == slot;
-                                return GestureDetector(
-                                  onTap: () => setState(() => _selectedTimeSlot = slot),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 150),
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? kPrimary : Colors.white,
-                                      borderRadius: BorderRadius.circular(kRadiusXs),
-                                      border: Border.all(
-                                        color: isSelected ? kPrimary : kBorder,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      slot,
-                                      style: TextStyle(
-                                        color: isSelected ? Colors.white : kDark,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 11,
-                                      ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.calendar_today_rounded, color: kPrimary, size: 16),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _selectedDate == null
+                                        ? 'Ketuk untuk pilih tanggal...'
+                                        : _formatDate(_selectedDate!),
+                                    style: TextStyle(
+                                      color: _selectedDate == null ? kMuted : kDark,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
                                     ),
                                   ),
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 12),
-                            
-                            Text('Catatan (Opsional)', style: AppText.label),
-                            const SizedBox(height: 6),
-                            TextField(
-                              controller: _catatanController,
-                              decoration: const InputDecoration(
-                                hintText: 'Masukkan catatan tambahan...',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              ),
-                              maxLines: 2,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _selectedDate == null || _selectedTimeSlot == null || _loading
-                                    ? null
-                                    : () async {
-                                        setState(() => _loading = true);
-                                        final dateStr = '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
-                                        await widget.onDaftar(
-                                          tarianId: widget.tarian.id,
-                                          tanggal: dateStr,
-                                          jam: _selectedTimeSlot,
-                                          catatan: _catatanController.text.trim().isEmpty ? null : _catatanController.text.trim(),
-                                        );
-                                        if (mounted) {
-                                          setState(() {
-                                            _loading = false;
-                                            _expanded = false;
-                                          });
-                                        }
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimary,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusFull)),
-                                ),
-                                child: _loading
-                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                    : const Text('Kirim Booking', style: TextStyle(fontWeight: FontWeight.w800)),
+                                ],
                               ),
                             ),
-                          ] else ...[
-                            // ── Regular Member Class Schedules ──
-                            Text('Pilih Jadwal Latihan Rutin', style: AppText.label),
-                            const SizedBox(height: 6),
-                            ...widget.jadwal.map((j) {
-                              final isSelected = _selectedJadwal == j.id;
+                          ),
+                          const SizedBox(height: 12),
+
+                          Text(
+                            isPengunjung ? 'Pilih Jam Private' : 'Pilih Jam Latihan',
+                            style: AppText.label,
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              '08:00', '09:00', '10:00', '11:00',
+                              '13:00', '14:00', '15:00', '16:00',
+                              '17:00', '18:00', '19:00', '20:00'
+                            ].map((slot) {
+                              final isSelected = _selectedTimeSlot == slot;
                               return GestureDetector(
-                                onTap: () => setState(() => _selectedJadwal = j.id),
+                                onTap: () => setState(() => _selectedTimeSlot = slot),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 150),
-                                  margin: const EdgeInsets.only(bottom: 6),
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: isSelected ? kPrimaryPale : Colors.white,
+                                    color: isSelected ? kPrimary : Colors.white,
                                     borderRadius: BorderRadius.circular(kRadiusXs),
                                     border: Border.all(
                                       color: isSelected ? kPrimary : kBorder,
                                     ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        isSelected ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
-                                        color: isSelected ? kPrimary : kMuted,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              j.hari,
-                                              style: TextStyle(
-                                                color: isSelected ? kPrimary : kDark,
-                                                fontWeight: FontWeight.w800,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              '⏰ ${j.jamMulai} – ${j.jamSelesai}  ·  📍 ${j.tempat}',
-                                              style: AppText.bodyXs,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    slot,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : kDark,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ),
                               );
                             }).toList(),
-                            const SizedBox(height: 12),
-                            
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _selectedJadwal == null || _loading ? null : () async {
-                                  setState(() => _loading = true);
-                                  await widget.onDaftar(
-                                    tarianId: widget.tarian.id,
-                                    jadwalId: _selectedJadwal!,
-                                  );
-                                  if (mounted) setState(() { _loading = false; _expanded = false; });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimary,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadiusFull)),
-                                ),
-                                child: _loading
-                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                    : const Text('Daftar Kelas Ini', style: TextStyle(fontWeight: FontWeight.w800)),
-                              ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          Text('Catatan (Opsional)', style: AppText.label),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _catatanController,
+                            decoration: const InputDecoration(
+                              hintText: 'Masukkan catatan tambahan...',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             ),
-                          ],
+                            maxLines: 2,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          const SizedBox(height: 16),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _selectedDate == null || _selectedTimeSlot == null || _loading
+                                  ? null
+                                  : () async {
+                                      setState(() => _loading = true);
+                                      final dateStr =
+                                          '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+                                      await widget.onDaftar(
+                                        tarianId: widget.tarian.id,
+                                        tanggal: dateStr,
+                                        jam: _selectedTimeSlot,
+                                        catatan: _catatanController.text.trim().isEmpty
+                                            ? null
+                                            : _catatanController.text.trim(),
+                                      );
+                                      if (mounted) {
+                                        setState(() {
+                                          _loading = false;
+                                          _expanded = false;
+                                        });
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimary,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(kRadiusFull)),
+                              ),
+                              child: _loading
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : Text(
+                                      isPengunjung ? 'Ajukan Private' : 'Daftar Kelas Ini',
+                                      style: const TextStyle(fontWeight: FontWeight.w800),
+                                    ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -745,10 +677,10 @@ class _TerdaftarTab extends StatelessWidget {
           ),
           child: Icon(Icons.event_note_rounded, color: kPrimary, size: 32)),
         SizedBox(height: kSpace),
-        Text(isPengunjung ? 'Belum ada booking sesi' : 'Belum ada kelas terdaftar', 
-            style: AppText.displayXs.copyWith(fontSize: 16)),
-        const SizedBox(height: 6),
-        Text(isPengunjung ? 'Pilih tarian dari tab pertama untuk membooking' : 'Pilih kelas tari dari tab "Pilih Kelas"',
+        Text(isPengunjung ? 'Belum ada sesi private' : 'Belum ada kelas terdaftar', 
+             style: AppText.displayXs.copyWith(fontSize: 16)),
+        const SizedBox(height: 10),
+        Text(isPengunjung ? 'Pilih tarian dari tab pertama untuk mengajukan sesi private' : 'Pilih kelas tari dari tab "Pilih Kelas"',
             style: TextStyle(color: kMuted)),
       ]));
     }
@@ -846,7 +778,7 @@ class _TerdaftarTab extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(String status) {
-    final isPending = status == 'nonaktif';
+    final isPending = status == 'pending';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(

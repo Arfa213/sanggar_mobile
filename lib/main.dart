@@ -14,6 +14,7 @@ import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart'; 
 import 'screens/main_nav.dart';   
 import 'services/notification_service.dart';
+import 'services/api_service.dart';
 
 import 'utils/app_theme.dart';
 
@@ -52,6 +53,18 @@ void main() async {
     String? token = await messaging.getToken();
     debugPrint("FCM Registration Token: $token");
     
+    if (token != null) {
+      // Kita kirim tanpa menunggu (fire and forget)
+      // Jika user belum login, ApiService akan handle fail silently
+      importApiService() async {
+        try {
+          // Import tertunda untuk menghindari circular jika ada
+          await ApiService.updateFcmToken(token);
+        } catch (_) {}
+      }
+      importApiService();
+    }
+    
     // Subscribe ke topic global agar semua anggota mendapat notifikasi pengumuman
     await messaging.subscribeToTopic('pengumuman_smb');
   } catch (e) {
@@ -64,10 +77,16 @@ void main() async {
     
     // Tambahkan notifikasi ke dalam NotificationService lokal secara instan
     if (message.notification != null) {
+      final title = message.notification!.title ?? 'Pengumuman Baru';
+      final body = message.notification!.body ?? '';
+
+      // Tampilkan pop-up notifikasi lokal
+      NotificationService().showLocalNotification(title: title, body: body);
+
       NotificationService().notifications.insert(0, AppNotification(
         id: message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        title: message.notification!.title ?? 'Pengumuman Baru',
-        message: message.notification!.body ?? '',
+        title: title,
+        message: body,
         timestamp: DateTime.now(),
         type: 'announcement',
       ));

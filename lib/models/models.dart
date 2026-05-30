@@ -1,5 +1,5 @@
 // lib/models/models.dart
-
+export 'rapor.dart';
 class SanggarProfile {
   final String namaSanggar, tagline, sejarah, visi;
   final List<String> misi;
@@ -50,20 +50,27 @@ class Event {
   final List<String> penghargaan;
   final int? jumlahPenonton;
   final bool unggulan;
+  
+  // Kolaborasi (Midhang Sore)
+  final String? namaPengaju, fotoPengaju, sinopsisLink;
 
   Event({required this.id, required this.nama, required this.lokasi,
     required this.tanggal, required this.kategori, required this.level,
     required this.status, this.hasil, this.deskripsi, this.foto,
-    required this.penghargaan, this.jumlahPenonton, required this.unggulan});
+    required this.penghargaan, this.jumlahPenonton, required this.unggulan,
+    this.namaPengaju, this.fotoPengaju, this.sinopsisLink});
 
   factory Event.fromJson(Map<String, dynamic> j) => Event(
     id: j['id'] as int, nama: j['nama'] ?? '', lokasi: j['lokasi'] ?? '',
-    tanggal: j['tanggal'] ?? '', kategori: j['kategori'] ?? 'pentas',
+    tanggal: j['tanggal'] ?? '', kategori: j['kategori'] ?? 'umum',
     level: j['level'] ?? 'Lokal', status: j['status'] ?? 'selesai',
     hasil: j['hasil'], deskripsi: j['deskripsi'], foto: j['foto'],
     penghargaan: List<String>.from(j['penghargaan'] ?? []),
     jumlahPenonton: j['jumlah_penonton'],
-    unggulan: j['unggulan'] == true || j['unggulan'] == 1);
+    unggulan: j['unggulan'] == true || j['unggulan'] == 1,
+    namaPengaju: j['nama_pengaju'],
+    fotoPengaju: j['foto_pengaju'],
+    sinopsisLink: j['sinopsis_link']);
 
   String get tahun => tanggal.length >= 4 ? tanggal.substring(0, 4) : '';
   String get tgl   => tanggal.length >= 10 ? tanggal.substring(8, 10) : '';
@@ -107,7 +114,7 @@ class Galeri {
 class UserModel {
   final int id;
   final String name, email, role, status;
-  final String? alamat, noHp, foto, tipeAnggota;
+  final String? alamat, noHp, foto, tipeAnggota, tglKadaluarsa;
   String? token;
 
   UserModel({
@@ -120,26 +127,28 @@ class UserModel {
     this.noHp,
     this.foto,
     this.tipeAnggota,
+    this.tglKadaluarsa,
     this.token,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> j) => UserModel(
-    id:          j['id'] as int,
-    name:        j['name'] ?? '',
-    email:       j['email'] ?? '',
-    role:        j['role'] ?? 'anggota',
-    status:      j['status'] ?? 'aktif',
-    alamat:      j['alamat'],
-    noHp:        j['no_hp'],
-    foto:        j['foto_profil'] ?? j['foto'],
-    tipeAnggota: j['tipe_anggota'] ?? 'anggota_tetap',
-    token:       j['token'],
+    id:            j['id'] as int,
+    name:          j['name'] ?? '',
+    email:         j['email'] ?? '',
+    role:          j['role'] ?? 'anggota',
+    status:        j['status'] ?? 'aktif',
+    alamat:        j['alamat'],
+    noHp:          j['no_hp'],
+    foto:          j['foto_profil'] ?? j['foto'],
+    tipeAnggota:   j['tipe_anggota'] ?? 'anggota_tetap',
+    tglKadaluarsa: j['tgl_kadaluarsa'],
+    token:         j['token'],
   );
 
-  bool get isAdmin     => role == 'admin' || role == 'administrator';
+  bool get isAdmin      => role == 'admin' || role == 'administrator';
   bool get isPengunjung => tipeAnggota == 'pengunjung';
-  String get firstName => name.split(' ').first;
-  String get initial   => name.isNotEmpty ? name[0].toUpperCase() : 'U';
+  String get firstName  => name.split(' ').first;
+  String get initial    => name.isNotEmpty ? name[0].toUpperCase() : 'U';
 }
 
 // ── KEHADIRAN ─────────────────────────────────────────────────

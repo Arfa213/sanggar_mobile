@@ -1,6 +1,8 @@
 // lib/screens/splash_screen.dart
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart'; // 🚀 FIX 1: Import ApiService untuk membaca token secara langsung
+import 'package:provider/provider.dart';
+import '../services/auth_provider.dart';
+import '../../services/api_service.dart';
 import '../utils/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -34,20 +36,25 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose(); 
   }
 
-  // 🚀 FIX 2: Mengubah fungsi menjadi 'async' agar akurat membaca memori lokal HP
   Future<void> _navigate() async {
     if (!mounted) return;
     
-    // Ambil token login yang tersimpan di HP secara langsung dan pasti
-    final String? token = await ApiService.getToken();
+    final auth = context.read<AuthProvider>();
+    
+    // Tunggu sampai AuthProvider selesai mengambil data user dari server jika masih loading
+    if (auth.isLoading) {
+      await Future.doWhile(() async {
+        await Future.delayed(const Duration(milliseconds: 100));
+        return auth.isLoading;
+      });
+    }
 
     if (!mounted) return;
 
-    // Tentukan rute tujuan berdasarkan keberadaan token lokal
-    // Jika token ada -> Masuk ke Dashboard (/home), jika kosong -> Masuk ke halaman login/register
-    final String targetRoute = (token != null && token.isNotEmpty) ? '/home' : '/login';
+    // Jika user sudah login (isLoggedIn = true), arahkan ke dashboard /home.
+    // Jika belum login, todongkan langsung ke halaman login /login
+    final String targetRoute = auth.isLoggedIn ? '/home' : '/login';
 
-    // Pindah halaman menggunakan nama rute secara aman dan membuang riwayat splash screen
     Navigator.pushReplacementNamed(context, targetRoute);
   }
   

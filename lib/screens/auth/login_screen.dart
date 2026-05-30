@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _passCtrl     = TextEditingController();
   final _nameCtrl     = TextEditingController();
   final _alamatCtrl   = TextEditingController();
+  final _noHpCtrl     = TextEditingController();
   final _passConfCtrl = TextEditingController();
 
   bool    _loading = false, _googleLoading = false;
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void dispose() {
     _ctrl.dispose();
-    for (final c in [_emailCtrl, _passCtrl, _nameCtrl, _alamatCtrl, _passConfCtrl]) {
+    for (final c in [_emailCtrl, _passCtrl, _nameCtrl, _alamatCtrl, _noHpCtrl, _passConfCtrl]) {
       c.dispose();
     }
     super.dispose();
@@ -72,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen>
           'name':                  _nameCtrl.text.trim(),
           'email':                 _emailCtrl.text.trim(),
           'alamat':                _alamatCtrl.text.trim(),
+          'no_hp':                 _noHpCtrl.text.trim(),
           'tipe_anggota':          _tipeAnggota,
           'password':              _passCtrl.text,
           'password_confirmation': _passConfCtrl.text,
@@ -272,6 +274,17 @@ class _LoginScreenState extends State<LoginScreen>
               icon: Icons.location_on_outlined, maxLines: 2),
           const SizedBox(height: 12),
           _buildTipeAnggota(),
+          if (_tipeAnggota == 'sementara') ...[
+            const SizedBox(height: 12),
+            _LightField(
+              ctrl: _noHpCtrl,
+              label: 'Nomor WhatsApp',
+              hint: '0812...',
+              icon: Icons.phone_android_rounded,
+              type: TextInputType.phone,
+              validator: (v) => (v?.isEmpty ?? true) ? 'Nomor WA wajib diisi' : null,
+            ),
+          ],
         ],
         const SizedBox(height: 12),
         _LightPasswordField(
@@ -325,7 +338,7 @@ class _LoginScreenState extends State<LoginScreen>
         )),
         const SizedBox(width: 10),
         Expanded(child: _TipeCard(
-          label: 'Sementara', sub: 'Booking / Tamu',
+          label: 'Sementara', sub: 'Private / Tamu',
           active: _tipeAnggota == 'sementara',
           onTap: () => setState(() => _tipeAnggota = 'sementara'),
         )),

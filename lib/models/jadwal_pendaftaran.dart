@@ -43,7 +43,7 @@ class Pendaftaran {
     final tarian = j['tarian'] as Map<String, dynamic>? ?? {};
     final jadwal = j['jadwal'] as Map<String, dynamic>? ?? {};
     
-    // Fallback jika jadwal kosong (untuk booking khusus / anggota sementara)
+    // Fallback jika jadwal kosong (untuk private khusus / anggota sementara)
     String hari = jadwal['hari'] as String? ?? '';
     String jamMulai = jadwal['jam_mulai'] as String? ?? '';
     String jamSelesai = jadwal['jam_selesai'] as String? ?? '';
