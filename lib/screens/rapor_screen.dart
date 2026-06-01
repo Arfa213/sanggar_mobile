@@ -49,7 +49,7 @@ class _RaporScreenState extends State<RaporScreen> {
       appBar: AppBar(
         title: const Text('Rapor Pagelaran', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
-        foregroundColor: kTextMain,
+        foregroundColor: kDark,
         elevation: 0,
         centerTitle: true,
       ),
