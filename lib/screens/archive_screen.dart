@@ -68,24 +68,16 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
               elevation: 0,
               surfaceTintColor: Colors.transparent,
               titleSpacing: 0,
-              toolbarHeight: 80,
+              toolbarHeight: 75,
               centerTitle: false,
               title: Padding(
-                padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start, 
+                padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IntrinsicWidth(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppBadge('MATERI BELAJAR'),
-                          const SizedBox(height: 4),
-                          Text('Materi Tari',style: AppText.displaySm),
-                        ],
-                      ),
-                    ),
+                    AppBadge('MATERI BELAJAR'),
+                    const SizedBox(height: 5),
+                    Text('Materi Tari', style: AppText.displaySm),
                   ],
                 ),
               ),
