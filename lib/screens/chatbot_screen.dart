@@ -56,7 +56,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
     try {
       final res = await http.post(
-        Uri.parse('$kApiUrl/../chatbot'), // /chatbot bukan /api/v1/chatbot
+        Uri.parse('$kApiUrl/ai/chat'), // Mengarah ke endpoint API yang benar tanpa CSRF
         headers: {
           'Content-Type': 'application/json',
           'Accept':        'application/json',

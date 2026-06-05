@@ -17,6 +17,8 @@
     <!-- Permission untuk upload foto -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <!-- WAJIB: untuk Android 13+ agar bisa menerima push notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="Sanggar Mulya Bhakti"

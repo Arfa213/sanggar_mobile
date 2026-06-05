@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'api_service.dart';
 import '../models/models.dart';
 import 'dart:io';
@@ -26,16 +27,27 @@ class AuthProvider extends ChangeNotifier {
     _loading = false; notifyListeners();
   }
 
+  Future<void> _syncFcmToken() async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        await ApiService.updateFcmToken(token);
+      }
+    } catch (_) {}
+  }
+
   Future<void> login(String email, String pass) async {
     final user = await ApiService.login(email, pass);
     _user = user;
     notifyListeners();
+    _syncFcmToken();
   }
 
   Future<void> register(Map<String, String> data) async {
     final user = await ApiService.register(data);
     _user = user;
     notifyListeners();
+    _syncFcmToken();
   }
 
   Future<void> logout() async {
@@ -83,6 +95,7 @@ class AuthProvider extends ChangeNotifier {
     // 6. Kirim token asli GOOGLE ke backend Laravel
     _user = await ApiService.loginWithGoogleToken(googleIdToken);
     notifyListeners();
+    _syncFcmToken();
   }
 
   // 📸 FUNGSI UPLOAD FOTO PROFIL
