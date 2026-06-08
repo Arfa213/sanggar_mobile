@@ -241,7 +241,7 @@ class ApiService {
   static Future<List<dynamic>> getEventsMendatang() async {
     try {
       final d = await _get('/events');
-      return (d['mendatang'] as List) ?? [];
+      return (d['mendatang'] as List? ) ?? [];
     } catch (_) {
       return [];
     }
@@ -317,6 +317,41 @@ class ApiService {
   static Future<Map<String, dynamic>> scanAbsensi(String barcodeToken) async {
     final d = await _post('/attendance/scan', {'barcode_token': barcodeToken}, auth: true);
     return d;
+  }
+
+  /// Kirim data "tidak hadir / alpa" otomatis ke backend.
+  /// Dipanggil mobile saat jadwal sudah terlewat dan user tidak scan.
+  /// Backend cukup terima pendaftaran_id + tanggal dan insert record alpa.
+  static Future<bool> markAbsent({
+    required int pendaftaranId,
+    required String tanggal, // format: 'YYYY-MM-DD'
+  }) async {
+    try {
+      final d = await _post(
+        '/attendance/mark-absent',
+        {'pendaftaran_id': pendaftaranId, 'tanggal': tanggal},
+        auth: true,
+      );
+      return d['success'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Cek apakah user sudah punya record kehadiran (hadir/izin/alpa) hari ini
+  /// untuk suatu pendaftaran tertentu — mencegah double submit alpa.
+  static Future<bool> sudahAbsenHariIni(int pendaftaranId) async {
+    try {
+      final today = DateTime.now().toString().substring(0, 10);
+      final d = await _get(
+        '/attendance/check-today?pendaftaran_id=$pendaftaranId&tanggal=$today',
+        auth: true,
+      );
+      return d['exists'] == true;
+    } catch (_) {
+      // Jika endpoint belum ada / error, anggap sudah absen (aman, tidak double-submit)
+      return true;
+    }
   }
 
   // ── RAPOR PAGELARAN ───────────────────────────────────────────

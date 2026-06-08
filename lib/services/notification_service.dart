@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import 'api_service.dart';
-import '../models/jadwal_pendaftaran.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AppNotification {
@@ -69,12 +68,16 @@ class NotificationService extends ChangeNotifier {
   Future<void> showLocalNotification({required String title, required String body}) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'sanggar_pengumuman',
+      'smb_pengumuman_high',          // ← sama dengan channel di main.dart
       'Pengumuman Sanggar',
-      channelDescription: 'Notifikasi untuk jadwal latihan dan pengumuman',
-      importance: Importance.max,
+      channelDescription: 'Notifikasi pengumuman & jadwal latihan dari admin Sanggar Mulya Bhakti',
+      importance: Importance.high,    // ← WAJIB untuk heads-up popup
       priority: Priority.high,
       showWhen: true,
+      playSound: true,
+      enableVibration: true,
+      styleInformation: BigTextStyleInformation(''), // teks panjang terbaca
+      icon: '@mipmap/launcher_icon',
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -291,6 +294,105 @@ class NotificationService extends ChangeNotifier {
             updated = true;
           }
         }
+      }
+    }
+
+    if (updated) {
+      await saveNotifications();
+    }
+  }
+
+  // ── DETEKSI ALPA OTOMATIS ──────────────────────────────────
+  // Dipanggil dari HomeScreen setelah load data.
+  // Jika hari ini adalah hari latihan & waktu sudah melewati jam selesai,
+  // dan user belum scan absen → kirim data alpa ke backend secara otomatis.
+  Future<void> checkAndMarkAbsent({
+    required List<PendaftaranMember> pendaftaranList,
+  }) async {
+    final now = DateTime.now();
+    final today = now.toString().substring(0, 10); // 'YYYY-MM-DD'
+    final prefs = await SharedPreferences.getInstance();
+    bool updated = false;
+
+    for (var p in pendaftaranList) {
+      // Hanya proses jika status pendaftaran aktif
+      if (p.status.toLowerCase() != 'aktif' &&
+          p.status.toLowerCase() != 'approved') continue;
+
+      // Guard lokal: cek apakah kita sudah proses jadwal ini hari ini
+      // Key: 'absent_checked_{pendaftaranId}_{tanggal}'
+      final guardKey = 'absent_checked_${p.id}_$today';
+      if (prefs.getBool(guardKey) == true) continue;
+
+      // Cek apakah hari ini adalah hari latihan ini
+      final days = {
+        'senin': 1, 'selasa': 2, 'rabu': 3, 'kamis': 4,
+        'jumat': 5, 'sabtu': 6, 'minggu': 7
+      };
+      final hariStr = p.jadwal.hari.trim().toLowerCase();
+      final targetDay = days[hariStr];
+      if (targetDay == null || targetDay != now.weekday) continue;
+
+      // Parse jam selesai latihan
+      int hourSelesai = 17; // default jam 17:00
+      int minuteSelesai = 0;
+      try {
+        final selesaiStr = p.jadwal.jamSelesai.isNotEmpty
+            ? p.jadwal.jamSelesai
+            : p.jadwal.jamMulai; // fallback ke jamMulai + 2 jam
+        final parts = selesaiStr.split(':');
+        if (parts.isNotEmpty) hourSelesai = int.parse(parts[0]);
+        if (parts.length > 1) minuteSelesai = int.parse(parts[1]);
+        // Jika pakai jamMulai sebagai fallback, tambah 2 jam
+        if (p.jadwal.jamSelesai.isEmpty) hourSelesai += 2;
+      } catch (_) {}
+
+      final jamSelesai = DateTime(now.year, now.month, now.day, hourSelesai, minuteSelesai);
+
+      // Hanya proses jika waktu latihan sudah selesai (lewat dari jam selesai)
+      if (now.isBefore(jamSelesai)) continue;
+
+      // Tandai sudah diproses hari ini (guard lokal) sebelum API call
+      await prefs.setBool(guardKey, true);
+
+      // Cek ke backend apakah user sudah punya record absen hari ini
+      final sudahAbsen = await ApiService.sudahAbsenHariIni(p.id);
+      if (sudahAbsen) continue; // sudah hadir/izin/alpa — skip
+
+      // Kirim data alpa ke backend
+      final berhasil = await ApiService.markAbsent(
+        pendaftaranId: p.id,
+        tanggal: today,
+      );
+
+      // Simpan notifikasi peringatan ke inbox app
+      final notifId = 'alpa_${p.id}_$today';
+      if (!_notifications.any((n) => n.id == notifId)) {
+        _notifications.insert(
+          0,
+          AppNotification(
+            id: notifId,
+            title: berhasil
+                ? '⚠️ Kamu Tidak Hadir Hari Ini'
+                : '⚠️ Latihan Terlewat',
+            message: berhasil
+                ? 'Kamu tidak tercatat hadir pada latihan "${p.tarianNama}" '
+                    '${p.jadwal.hari} pukul ${p.jadwal.jamMulai} WIB. '
+                    'Status kehadiranmu dicatat sebagai ALPA dan akan '
+                    'mempengaruhi nilai kehadiran di rapor.'
+                : 'Latihan "${p.tarianNama}" hari ini telah selesai. '
+                    'Pastikan kamu scan absen di pertemuan berikutnya.',
+            timestamp: now,
+            type: 'reminder',
+          ),
+        );
+        // Tampilkan push notification lokal
+        showLocalNotification(
+          title: '⚠️ Kamu Tidak Hadir Hari Ini',
+          body: 'Latihan "${p.tarianNama}" telah selesai tanpa absensimu. '
+              'Status: ALPA — berpengaruh ke nilai rapor.',
+        );
+        updated = true;
       }
     }
 

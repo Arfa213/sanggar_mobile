@@ -71,10 +71,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         // Trigger pengingat latihan real-time otomatis (24 jam & 1 jam)
         if (mounted) {
-          context.read<NotificationService>().generateRealtimeReminders(
+          final ns = context.read<NotificationService>();
+          ns.generateRealtimeReminders(
             user: auth.user!,
             pendaftaranList: _jadwalAktif,
           );
+          // Deteksi alpa otomatis: jika jadwal sudah lewat & belum scan → kirim alpa
+          ns.checkAndMarkAbsent(pendaftaranList: _jadwalAktif);
         }
       } else {
         final results = await Future.wait([
