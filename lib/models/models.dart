@@ -114,7 +114,7 @@ class Galeri {
 class UserModel {
   final int id;
   final String name, email, role, status;
-  final String? alamat, noHp, foto, tipeAnggota, tglKadaluarsa;
+  final String? alamat, noHp, foto, tipeAnggota, tglKadaluarsa, nomorInduk;
   String? token;
 
   UserModel({
@@ -128,6 +128,7 @@ class UserModel {
     this.foto,
     this.tipeAnggota,
     this.tglKadaluarsa,
+    this.nomorInduk,
     this.token,
   });
 
@@ -142,6 +143,7 @@ class UserModel {
     foto:          j['foto_profil'] ?? j['foto'],
     tipeAnggota:   j['tipe_anggota'] ?? 'anggota_tetap',
     tglKadaluarsa: j['tgl_kadaluarsa'],
+    nomorInduk:    j['nomor_induk'],
     token:         j['token'],
   );
 

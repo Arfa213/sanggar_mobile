@@ -236,6 +236,21 @@ class _LoggedInView extends StatelessWidget {
                 ),
               ]),
             )),
+          
+          if (user.nomorInduk != null && user.nomorInduk!.isNotEmpty)
+            Padding(padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(color: const Color(0xFFFDF0EA), borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
+                child: Row(children: [
+                  Icon(Icons.badge_rounded, color: kPrimary, size: 20),
+                  SizedBox(width: 12),
+                  Text('Nomor Induk Siswa', style: AppText.label.copyWith(color: kPrimary)),
+                  const Spacer(),
+                  Text(user.nomorInduk!, style: AppText.label.copyWith(fontWeight: FontWeight.w900, color: kPrimary, letterSpacing: 1.5)),
+                ]),
+              )),
+
           SizedBox(height: kSpaceMd),
 
           _sectionTitle('PENGATURAN AKUN'),
