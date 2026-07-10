@@ -32,25 +32,24 @@ final FlutterLocalNotificationsPlugin _localNotif =
     FlutterLocalNotificationsPlugin();
 
 // ── Background / Terminated handler ──────────────────────────────────────────
-// Harus top-level function (bukan di dalam kelas)
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Di background isolate, buat instance FlutterLocalNotificationsPlugin baru
   final localNotifBg = FlutterLocalNotificationsPlugin();
+  
+  // ✅ FIX: Menggunakan Named parameter 'initializationSettings:'
   await localNotifBg.initialize(
-    const InitializationSettings(
+    initializationSettings: const InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/launcher_icon'),
     ),
   );
-  // Buat channel di isolate background juga
+
   await localNotifBg
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(_fcmChannel);
 
-  // Tampilkan heads-up popup
   final title = message.notification?.title ??
       (message.data['title'] as String?) ??
       '📢 Pengumuman Baru';
@@ -59,10 +58,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       'Ada pengumuman baru dari Sanggar Mulya Bhakti.';
 
   await localNotifBg.show(
-    message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch ~/ 1000,
-    title,
-    body,
-    NotificationDetails(
+    id: message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch ~/ 1000,
+    title: title,
+    body: body,
+    notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         _fcmChannel.id,
         _fcmChannel.name,
@@ -85,10 +84,10 @@ void _showHeadsUpNotification({
   int id = 0,
 }) {
   _localNotif.show(
-    id,
-    title,
-    body,
-    NotificationDetails(
+    id: id,
+    title: title,
+    body: body,
+    notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         _fcmChannel.id,
         _fcmChannel.name,
@@ -108,31 +107,26 @@ void _showHeadsUpNotification({
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inisialisasi Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // 2. Set background/terminated message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // 3. Inisialisasi flutter_local_notifications
   const AndroidInitializationSettings initAndroid =
       AndroidInitializationSettings('@mipmap/launcher_icon');
+  
+  // ✅ FIX: Menggunakan Named parameter 'initializationSettings:'
   await _localNotif.initialize(
-    const InitializationSettings(android: initAndroid),
-    // Aksi saat user tap notifikasi (bisa navigasi ke halaman tertentu)
+    initializationSettings: const InitializationSettings(android: initAndroid),
     onDidReceiveNotificationResponse: (details) {
       debugPrint('Notifikasi di-tap: ${details.payload}');
     },
   );
 
-  // 4. WAJIB: Buat notification channel IMPORTANCE_HIGH di Android
-  //    Tanpa ini, popup heads-up tidak akan muncul di Android 8+
   await _localNotif
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(_fcmChannel);
 
-  // 5. Minta izin notifikasi dari user (Android 13+)
   final messaging = FirebaseMessaging.instance;
   await messaging.requestPermission(
     alert: true,
@@ -141,29 +135,24 @@ void main() async {
     provisional: false,
   );
 
-  // 6. Paksa FCM menggunakan channel kita (bukan default)
   await messaging.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  // 7. Ambil & kirim FCM token ke backend
   try {
     final token = await messaging.getToken();
     if (token != null) {
       debugPrint('FCM Token: $token');
-      ApiService.updateFcmToken(token); // fire & forget
+      ApiService.updateFcmToken(token);
     }
-
-    // 8. Subscribe topic global → semua user dapat broadcast pengumuman admin
     await messaging.subscribeToTopic('pengumuman_smb');
     debugPrint('Subscribed to topic: pengumuman_smb');
   } catch (e) {
     debugPrint('FCM setup error: $e');
   }
 
-  // 9. Handle notifikasi saat app FOREGROUND (app terbuka)
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     debugPrint('FCM Foreground: ${message.notification?.title}');
 
@@ -174,14 +163,12 @@ void main() async {
         message.data['body'] ??
         'Ada pengumuman baru dari Sanggar Mulya Bhakti.';
 
-    // Tampilkan heads-up popup
     _showHeadsUpNotification(
       title: title,
       body: body,
       id: message.messageId.hashCode,
     );
 
-    // Simpan ke inbox notifikasi in-app
     final ns = NotificationService();
     final notif = AppNotification(
       id: message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -194,13 +181,10 @@ void main() async {
     ns.saveNotifications();
   });
 
-  // 10. Handle klik notifikasi saat app BACKGROUND (bukan terminated)
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     debugPrint('Notifikasi di-tap dari background: ${message.notification?.title}');
-    // Bisa tambahkan navigasi ke NotificationScreen di sini jika perlu
   });
 
-  // 11. Handle notifikasi yang membuka app dari terminated state
   final initialMessage = await messaging.getInitialMessage();
   if (initialMessage != null) {
     debugPrint('App dibuka dari notif terminated: ${initialMessage.notification?.title}');
