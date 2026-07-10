@@ -38,9 +38,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   final localNotifBg = FlutterLocalNotificationsPlugin();
   
-  // ✅ FIX 1: Menggunakan Named parameter 'initializationSettings:'
+  // ✅ FIX 1: Menggunakan Named parameter 'settings:' yang sesuai dengan versi 21.0.0
   await localNotifBg.initialize(
-    initializationSettings: const InitializationSettings(
+    settings: const InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/launcher_icon'),
     ),
   );
@@ -114,8 +114,9 @@ void main() async {
   const AndroidInitializationSettings initAndroid =
       AndroidInitializationSettings('@mipmap/launcher_icon');
   
+  // ✅ FIX 2: Menggunakan Named parameter 'settings:' yang sesuai dengan versi 21.0.0
   await _localNotif.initialize(
-    initializationSettings: const InitializationSettings(android: initAndroid),
+    settings: const InitializationSettings(android: initAndroid),
     onDidReceiveNotificationResponse: (details) {
       debugPrint('Notifikasi di-tap: ${details.payload}');
     },
