@@ -1,11 +1,14 @@
 // lib/screens/archive_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/api_service.dart';
+import '../services/auth_provider.dart';
 import '../models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/app_theme.dart';
 import '../widgets/shared_widgets.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'main_nav.dart';
 
 class ArchiveScreen extends StatefulWidget {
   const ArchiveScreen({super.key});
@@ -51,113 +54,159 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     });
   }
 
+  String _kategoriLabel(String k) =>
+      _labels[k] ?? (k.isEmpty ? '-' : '${k[0].toUpperCase()}${k.substring(1)}');
+
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().user;
+    final width = MediaQuery.sizeOf(context).width;
+    final cols = width >= 900 ? 3 : (width >= 600 ? 2 : 1);
+
     return Scaffold(
       backgroundColor: kBgSoft,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(MediaQuery.of(context).padding.top + 64),
+        child: Container(
+          decoration: BoxDecoration(
+            color: kBgSoft,
+            border: Border(bottom: BorderSide(color: kBorder)),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Sanggar Tari',
+                      style: TextStyle(
+                        color: kPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        height: 1.33,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => MainNav.of(context)?.setIndex = 3,
+                    child: Builder(
+                      builder: (_) {
+                        final foto = user?.foto;
+                        final hasFoto = foto != null && foto.isNotEmpty;
+                        return Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: kPrimaryPale,
+                            border: Border.all(color: kBorder, width: 2),
+                            image: hasFoto
+                                ? DecorationImage(image: NetworkImage(getImageUrl(foto)), fit: BoxFit.cover)
+                                : null,
+                          ),
+                          child: hasFoto
+                              ? null
+                              : Center(
+                                  child: Text(
+                                    user?.initial ?? 'U',
+                                    style: TextStyle(color: kPrimary, fontSize: 14, fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         color: kPrimary,
         onRefresh: _load,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            // 1. Sleek Pinned AppBar
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: kBgCard,
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
-              titleSpacing: 0,
-              toolbarHeight: 75,
-              centerTitle: false,
-              title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 16),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppBadge('MATERI BELAJAR'),
-                    const SizedBox(height: 5),
-                    Text('Materi Tari', style: AppText.displaySm),
-                  ],
-                ),
-              ),
-            ),
-
-            // 2. Search & Filter Section
-            SliverToBoxAdapter(
-              child: Container(
-                color: kBgCard,
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Column(
-                  children: [
-                    const AppDivider(),
-                    // Search Bar
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(kSpace, 14, kSpace, 12),
-                      child: TextField(
-                        controller: _searchCtrl,
-                        style: TextStyle(fontSize: 14, color: kDark),
-                        decoration: InputDecoration(
-                          hintText: 'Cari nama tarian...',
-                          hintStyle: TextStyle(color: kMuted),
-                          prefixIcon: Icon(Icons.search_rounded, color: kMuted, size: 20),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                          filled: true,
-                          fillColor: kBgSoft,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(kRadius),
-                            borderSide: BorderSide(color: kBorder2),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(kRadius),
-                            borderSide: BorderSide(color: kBorder2),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(kRadius),
-                            borderSide: BorderSide(color: kPrimary, width: 1.5),
-                          ),
-                        ),
-                        onChanged: (v) { _search = v; _apply(); },
+                    Text(
+                      'Materi Tari',
+                      style: TextStyle(
+                        color: kDark,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
                       ),
                     ),
-                    // Categories ListView
+                    const SizedBox(height: 8),
+                    Text(
+                      'Koleksi materi tari tradisional Nusantara untuk pelestarian budaya.',
+                      style: TextStyle(color: kMuted, fontSize: 16, height: 1.5),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _searchCtrl,
+                      style: TextStyle(fontSize: 14, color: kDark),
+                      decoration: InputDecoration(
+                        hintText: 'Cari nama tarian...',
+                        hintStyle: TextStyle(color: kMuted),
+                        prefixIcon: Icon(Icons.search_rounded, color: kMuted, size: 20),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        filled: true,
+                        fillColor: kBgCard,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: kBorder2),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: kBorder2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: kPrimary, width: 1.5),
+                        ),
+                      ),
+                      onChanged: (v) { _search = v; _apply(); },
+                    ),
+                    const SizedBox(height: 12),
                     SizedBox(
-                      height: 38,
+                      height: 40,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: kSpace),
                         itemCount: _filters.length,
                         separatorBuilder: (_, __) => const SizedBox(width: 8),
                         itemBuilder: (_, i) {
                           final f = _filters[i];
                           final active = f == _filter;
-                          return GestureDetector(
-                            onTap: () { _filter = f; _apply(); },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: active ? kPrimary : kBgSoft,
-                                borderRadius: BorderRadius.circular(kRadius),
-                                border: Border.all(
-                                  color: active ? kPrimary : kBorder2,
-                                  width: 1.2,
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () { _filter = f; _apply(); },
+                              borderRadius: BorderRadius.circular(kRadiusFull),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                                decoration: BoxDecoration(
+                                  color: active ? kPrimary : kBgCard,
+                                  borderRadius: BorderRadius.circular(kRadiusFull),
+                                  border: Border.all(color: active ? kPrimary : kBorder2),
                                 ),
-                                boxShadow: active ? [
-                                  BoxShadow(
-                                    color: kPrimary.withOpacity(0.25),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
-                                  )
-                                ] : null,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  _labels[f]!,
-                                  style: TextStyle(
-                                    color: active ? Colors.white : kMuted,
-                                    fontSize: 12,
-                                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                                child: Center(
+                                  child: Text(
+                                    _labels[f]!,
+                                    style: TextStyle(
+                                      color: active ? Colors.white : kMuted,
+                                      fontSize: 12.5,
+                                      fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -171,7 +220,6 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
               ),
             ),
 
-            // 3. Grid / Loading / Error Body
             if (_loading)
               const SliverFillRemaining(
                 hasScrollBody: false,
@@ -201,17 +249,18 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(kSpace, 16, kSpace, 32),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 36),
                 sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.68,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    mainAxisExtent: 400,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (_, i) => _TarianGridCard(
                       tarian: _filtered[i],
+                      kategoriLabel: _kategoriLabel(_filtered[i].kategori),
                       onTap: () => _detail(_filtered[i]),
                     ),
                     childCount: _filtered.length,
@@ -234,115 +283,140 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
 
 // ── GRID CARD ────────────────────────────────────────────────
 class _TarianGridCard extends StatelessWidget {
-  final Tarian     tarian;
+  final Tarian tarian;
+  final String kategoriLabel;
   final VoidCallback onTap;
-  const _TarianGridCard({required this.tarian, required this.onTap});
+  const _TarianGridCard({
+    required this.tarian,
+    required this.kategoriLabel,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(kRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(gIsDarkMode ? 0.3 : 0.08), blurRadius: 12, offset: const Offset(0, 4))],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(kRadius),
-          child: Stack(
-            fit: StackFit.expand,
+    return Material(
+      color: kBgCard,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: kBgCard,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Gambar Full
-              AppImage(
-                url:   tarian.foto,
-                fit:   BoxFit.cover,
-                // 🛠️ FIX FIX: Menggunakan color & modblend untuk transparansi yang aman dan konstan
-                placeholder: Container(
-                  color: kPrimaryPale,
-                  padding: const EdgeInsets.all(24),
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/logosanggar.png',
-                      color: Colors.white.withOpacity(0.4),
-                      colorBlendMode: BlendMode.modulate,
-                    ),
-                  ),
-                ),
-              ),
-
-              // 2. Gradient Gelap dari Bawah
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.1),
-                      Colors.black.withOpacity(0.85),
-                    ],
-                    stops: const [0.4, 0.7, 1.0],
-                  ),
-                ),
-              ),
-
-              // 3. Kategori (Kanan Atas)
-              Positioned(
-                top: 8, right: 8,
-                child: CategoryChip(tarian.kategori, small: true),
-              ),
-
-              // 4. Bintang Unggulan (Kiri Atas)
-              if (tarian.unggulan)
-                Positioned(
-                  top: 8, left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: kGold,
-                      borderRadius: BorderRadius.circular(kRadiusFull),
-                      boxShadow: [BoxShadow(color: kGold.withOpacity(0.4), blurRadius: 4)],
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.star_rounded, color: Colors.white, size: 10),
-                        SizedBox(width: 2),
-                        Text('Unggulan', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                ),
-
-              // 5. Teks Judul & Asal di Bawah
-              Positioned(
-                bottom: 12, left: 12, right: 12,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              SizedBox(
+                height: 300,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Text(
-                      tarian.nama,
-                      style: AppText.displayXs.copyWith(color: Colors.white, fontSize: 15, height: 1.1),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on_rounded, size: 10, color: Colors.white70),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            tarian.asal,
-                            style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w500),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    AppImage(
+                      url: tarian.foto,
+                      fit: BoxFit.cover,
+                      placeholder: Container(
+                        color: kPrimaryPale,
+                        padding: const EdgeInsets.all(32),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/logosanggar.png',
+                            color: Colors.white.withOpacity(0.4),
+                            colorBlendMode: BlendMode.modulate,
                           ),
                         ),
-                      ],
+                      ),
                     ),
+                    Positioned(
+                      top: 16,
+                      left: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: kPrimary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(kRadiusFull),
+                        ),
+                        child: Text(
+                          kategoriLabel,
+                          style: TextStyle(
+                            color: kPrimary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.02,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (tarian.unggulan)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: kGold.withOpacity(0.92),
+                            borderRadius: BorderRadius.circular(kRadiusFull),
+                          ),
+                          child: const Text(
+                            'Unggulan',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tarian.nama,
+                        style: TextStyle(
+                          color: kDark,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on_outlined, size: 16, color: kMuted),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              tarian.asal,
+                              style: TextStyle(
+                                color: kMuted,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

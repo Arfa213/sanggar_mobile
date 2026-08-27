@@ -40,19 +40,27 @@ class _MainNavState extends State<MainNav> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: kBgCard,
-          border: Border(top: BorderSide(color: kBorder2, width: 1)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(gIsDarkMode ? 0.3 : 0.06), blurRadius: 16, offset: const Offset(0, -4))],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(children: [
-              _NavItem(icon: Icons.home_rounded,   label: 'Beranda', idx: 0, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-              _NavItem(icon: Icons.event_note_rounded, label: 'Jadwal', idx: 1, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-              _NavItem(icon: Icons.school_rounded, label: 'Materi',   idx: 2, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-              _NavItem(icon: Icons.person_rounded, label: 'Profil',  idx: 3, cur: _idx, onTap: (i) => setState(() => _idx = i)),
-            ]),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+            child: Row(
+              children: [
+                _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: 'Beranda', idx: 0, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+                _NavItem(icon: Icons.calendar_month_outlined, activeIcon: Icons.calendar_month_rounded, label: 'Jadwal', idx: 1, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+                _NavItem(icon: Icons.menu_book_outlined, activeIcon: Icons.menu_book_rounded, label: 'Materi', idx: 2, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+                _NavItem(icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded, label: 'Profil', idx: 3, cur: _idx, onTap: (i) => setState(() => _idx = i)),
+              ],
+            ),
           ),
         ),
       ),
@@ -62,10 +70,18 @@ class _MainNavState extends State<MainNav> {
 
 class _NavItem extends StatelessWidget {
   final IconData icon;
+  final IconData activeIcon;
   final String label;
   final int idx, cur;
   final void Function(int) onTap;
-  const _NavItem({required this.icon, required this.label, required this.idx, required this.cur, required this.onTap});
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.idx,
+    required this.cur,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,28 +91,31 @@ class _NavItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => onTap(idx),
-          borderRadius: BorderRadius.circular(12),
-          hoverColor: kPrimary.withOpacity(0.08),
-          splashColor: kPrimary.withOpacity(0.15),
-          highlightColor: kPrimary.withOpacity(0.05),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+          borderRadius: BorderRadius.circular(8),
+          splashColor: kPrimary.withOpacity(0.08),
+          highlightColor: kPrimary.withOpacity(0.04),
+          child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: active ? kPrimaryPale : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  active ? activeIcon : icon,
+                  color: active ? kPrimary : kMuted,
+                  size: 24,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: active ? kPrimary : kMuted,
+                    fontSize: 12,
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                    height: 1.3,
+                  ),
+                ),
+              ],
             ),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(icon, color: active ? kPrimary : kMuted2, size: active ? 24 : 22),
-              ),
-              const SizedBox(height: 3),
-              Text(label, style: TextStyle(
-                color: active ? kPrimary : kMuted2,
-                fontSize: 10, fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-              )),
-            ]),
           ),
         ),
       ),

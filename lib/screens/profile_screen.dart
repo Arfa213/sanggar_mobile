@@ -213,7 +213,7 @@ class _LoggedInView extends StatelessWidget {
           SizedBox(height: kSpace),
 
           // Role badge
-          Padding(padding: const EdgeInsets.symmetric(horizontal: kSpace),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: kSpaceMd),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(color: kBgCard, borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
@@ -238,7 +238,7 @@ class _LoggedInView extends StatelessWidget {
             )),
           
           if (user.nomorInduk != null && user.nomorInduk!.isNotEmpty)
-            Padding(padding: const EdgeInsets.only(left: kSpace, right: kSpace, top: 12),
+            Padding(padding: const EdgeInsets.only(left: kSpaceMd, right: kSpaceMd, top: 12),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(color: const Color(0xFFFDF0EA), borderRadius: BorderRadius.circular(kRadius), border: Border.all(color: kBorder2)),
@@ -254,28 +254,37 @@ class _LoggedInView extends StatelessWidget {
           SizedBox(height: kSpaceMd),
 
           _sectionTitle('PENGATURAN AKUN'),
-          _MenuItem(Icons.person_outline_rounded, 'Edit Profil',
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
-          _MenuItem(Icons.lock_outline_rounded, 'Ubah Password',
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()))),
-          _MenuItem(Icons.history_rounded, 'Riwayat Kehadiran',
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen()))),
+          _MenuGroup(children: [
+            _MenuItem(Icons.person_outline_rounded, 'Edit Profil',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+                showDivider: true),
+            _MenuItem(Icons.lock_outline_rounded, 'Ubah Password',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen())),
+                showDivider: true),
+            _MenuItem(Icons.history_rounded, 'Riwayat Kehadiran',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen())),
+                showDivider: false),
+          ]),
 
-          SizedBox(height: kSpace),
+          SizedBox(height: kSpaceMd),
           _sectionTitle('INFORMASI'),
-          _MenuItem(Icons.info_outline_rounded, 'Tentang Aplikasi', () => _showAbout(context)),
-          _MenuItem(Icons.help_outline_rounded, 'Pusat Bantuan',
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen()))),
+          _MenuGroup(children: [
+            _MenuItem(Icons.info_outline_rounded, 'Tentang Aplikasi', () => _showAbout(context),
+                showDivider: true),
+            _MenuItem(Icons.help_outline_rounded, 'Pusat Bantuan',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen())),
+                showDivider: false),
+          ]),
 
           // Logout
           Padding(
-            padding: const EdgeInsets.fromLTRB(kSpace, kSpaceLg, kSpace, 0),
+            padding: const EdgeInsets.fromLTRB(kSpaceMd, kSpaceLg, kSpaceMd, 0),
             child: OutlinedButton.icon(
               onPressed: () => _logout(context),
               icon: Icon(Icons.logout_rounded, color: Colors.red, size: 18),
               label: Text('Keluar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700)),
               style: OutlinedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
+                minimumSize: const Size.fromHeight(52),
                 side: BorderSide(color: Color(0xFFFFCDD2), width: 1.5),
                 backgroundColor: const Color(0xFFFFEBEE),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kRadius)),
@@ -289,8 +298,17 @@ class _LoggedInView extends StatelessWidget {
   }
 
   Widget _sectionTitle(String t) => Padding(
-    padding: const EdgeInsets.fromLTRB(kSpace + 4, 4, kSpace, 8),
-    child: Text(t, style: AppText.caption.copyWith(letterSpacing: 1.2, fontWeight: FontWeight.w800)));
+    padding: const EdgeInsets.fromLTRB(kSpaceMd + 4, 4, kSpaceMd, 10),
+    child: Text(
+      t,
+      style: AppText.caption.copyWith(
+        letterSpacing: 1.4,
+        fontWeight: FontWeight.w800,
+        fontSize: 11,
+        color: kMuted,
+      ),
+    ),
+  );
 
   void _showAbout(BuildContext ctx) => showModalBottomSheet(
     context: ctx,
@@ -315,28 +333,81 @@ class _LoggedInView extends StatelessWidget {
       ])));
 }
 
-class _MenuItem extends StatelessWidget {
-  final IconData icon; final String label; final VoidCallback onTap;
-  const _MenuItem(this.icon, this.label, this.onTap);
+class _MenuGroup extends StatelessWidget {
+  final List<Widget> children;
+  const _MenuGroup({required this.children});
+
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 3),
-    child: Material(color: kBgCard, borderRadius: BorderRadius.circular(kRadius),
-      child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(kRadius),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(border: Border.all(color: kBorder2), borderRadius: BorderRadius.circular(kRadius)),
-          child: Row(children: [
-            Container(width: 36, height: 36,
-              decoration: BoxDecoration(color: kPrimaryPale, borderRadius: BorderRadius.circular(kRadiusSm)),
-              child: Icon(icon, color: kPrimary, size: 18)),
-            SizedBox(width: 14),
-            Text(label, style: AppText.label.copyWith(fontWeight: FontWeight.w600)),
-            const Spacer(),
-            Icon(Icons.chevron_right_rounded, color: kMuted2, size: 20),
-          ]),
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: kSpaceMd),
+      child: Container(
+        decoration: BoxDecoration(
+          color: kBgCard,
+          borderRadius: BorderRadius.circular(kRadius),
+          border: Border.all(color: kBorder2),
         ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(children: children),
       ),
-    ),
-  );
+    );
+  }
+}
+
+class _MenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool showDivider;
+  const _MenuItem(this.icon, this.label, this.onTap, {this.showDivider = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            splashColor: kPrimary.withOpacity(0.08),
+            highlightColor: kPrimary.withOpacity(0.04),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: kPrimaryPale,
+                      borderRadius: BorderRadius.circular(kRadiusSm),
+                    ),
+                    child: Icon(icon, color: kPrimary, size: 20),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: AppText.label.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.5,
+                        letterSpacing: -0.1,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: kMuted2, size: 22),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (showDivider)
+          Padding(
+            padding: const EdgeInsets.only(left: 70),
+            child: Divider(height: 1, thickness: 1, color: kBorder2),
+          ),
+      ],
+    );
+  }
 }

@@ -94,7 +94,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
             titleSpacing: 0, 
             toolbarHeight: 75,
             title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: kSpaceMd, vertical: 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 AppBadge(isPengunjung ? 'SESI PRIVATE' : 'KELAS TARI'),
                 const SizedBox(height: 5),
@@ -104,7 +104,7 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: kSpace, vertical: 8),
+                margin: const EdgeInsets.fromLTRB(kSpaceMd, 4, kSpaceMd, 10),
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: kBgSoft,
@@ -118,18 +118,11 @@ class _PenjadwalanScreenState extends State<PenjadwalanScreen>
                   indicator: BoxDecoration(
                     color: kPrimary,
                     borderRadius: BorderRadius.circular(kRadiusFull),
-                    boxShadow: [
-                      BoxShadow(
-                        color: kPrimary.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   labelColor: Colors.white,
                   unselectedLabelColor: kMuted,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
-                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, letterSpacing: -0.1),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5),
                   tabs: [
                     Tab(text: isPengunjung ? 'Pilih Tarian (${_tarian.length})' : 'Pilih Kelas (${_tarian.length})'),
                     Tab(text: isPengunjung ? 'Private Saya (${_daftar.length})' : 'Terdaftar (${_daftar.length})'),
@@ -258,7 +251,7 @@ class _PilihKelasTab extends StatelessWidget {
     final sudahDaftarIds = isPengunjung ? <int>{} : daftarSaya.map((d) => d.tarianId).toSet();
 
     return ListView.separated(
-      padding: const EdgeInsets.all(kSpace),
+      padding: const EdgeInsets.fromLTRB(kSpaceMd, kSpace, kSpaceMd, kSpace),
       itemCount: tarian.length,
       separatorBuilder: (_, __) => SizedBox(height: kSpaceSm),
       itemBuilder: (_, i) {
@@ -686,7 +679,7 @@ class _TerdaftarTab extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(kSpace),
+      padding: const EdgeInsets.fromLTRB(kSpaceMd, kSpace, kSpaceMd, kSpace),
       itemCount: daftar.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, i) {
@@ -706,7 +699,7 @@ class _TerdaftarTab extends StatelessWidget {
         }
 
         return Container(
-          padding: const EdgeInsets.all(kSpace),
+          padding: const EdgeInsets.fromLTRB(kSpaceMd, kSpace, kSpaceMd, kSpace),
           decoration: BoxDecoration(
             color: kBgCard,
             borderRadius: BorderRadius.circular(kRadiusLg),
