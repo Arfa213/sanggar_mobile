@@ -14,26 +14,95 @@ class NotificationScreen extends StatelessWidget {
     final notifService = context.watch<NotificationService>();
     final list = notifService.notifications;
 
+    // Kelompokkan notifikasi
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final hariIni = <AppNotification>[];
+    final groupedByMonth = <String, List<AppNotification>>{};
+
+    const monthNames = [
+      '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    for (var n in list) {
+      final d = DateTime(n.timestamp.year, n.timestamp.month, n.timestamp.day);
+      if (d == today) {
+        hariIni.add(n);
+      } else {
+        final monthStr = '${monthNames[n.timestamp.month]} ${n.timestamp.year}';
+        if (!groupedByMonth.containsKey(monthStr)) {
+          groupedByMonth[monthStr] = [];
+        }
+        groupedByMonth[monthStr]!.add(n);
+      }
+    }
+
     return Scaffold(
-      backgroundColor: kBgSoft,
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        backgroundColor: kBgCard,
+        backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        iconTheme: IconThemeData(color: kText),
-        title: Text(
-          'Notifikasi & Pengingat',
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFFC84B31)), // kPrimary
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Notifikasi',
           style: TextStyle(
-            color: kText,
-            fontSize: 17,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'PlayfairDisplay',
+            color: Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          if (list.isNotEmpty) ...[
-            TextButton.icon(
-              onPressed: () {
-                notifService.markAllAsRead();
+      ),
+      body: list.isEmpty
+          ? _buildEmptyState()
+          : ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              children: [
+                if (hariIni.isNotEmpty) ...[
+                  _buildSectionHeader(context, 'Hari ini', notifService, showMarkAll: true),
+                  ...hariIni.map((n) => _NotificationCard(notif: n, service: notifService)),
+                  const SizedBox(height: 10),
+                ],
+                ...groupedByMonth.entries.map((entry) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildSectionHeader(context, entry.key, notifService),
+                      ...entry.value.map((n) => _NotificationCard(notif: n, service: notifService)),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                }),
+                const SizedBox(height: 30),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title, NotificationService service, {bool showMarkAll = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF1E1E1E), // kDark
+            ),
+          ),
+          if (showMarkAll)
+            GestureDetector(
+              onTap: () {
+                service.markAllAsRead();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Semua notifikasi ditandai telah dibaca'),
@@ -41,38 +110,17 @@ class NotificationScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: Icon(Icons.done_all_rounded, color: kPrimary, size: 16),
-              label: Text(
-                'Baca Semua',
+              child: const Text(
+                'Tandai semua dibaca',
                 style: TextStyle(
-                  color: kPrimary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFC84B31), // kPrimary
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-            IconButton(
-              onPressed: () => _confirmClear(context, notifService),
-              icon: Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
-              tooltip: 'Hapus Semua',
-            ),
-          ],
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: kBorder2),
-        ),
       ),
-      body: list.isEmpty
-          ? _buildEmptyState()
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: list.length,
-              itemBuilder: (context, idx) {
-                final notif = list[idx];
-                return _NotificationCard(notif: notif, service: notifService);
-              },
-            ),
     );
   }
 
@@ -86,61 +134,37 @@ class NotificationScreen extends StatelessWidget {
             Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                color: kPrimaryPale,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFBECE9),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.notifications_none_rounded,
-                color: kPrimary,
+                color: Color(0xFFC84B31),
                 size: 48,
               ),
             ),
-            SizedBox(height: 24),
-            Text(
+            const SizedBox(height: 24),
+            const Text(
               'Belum Ada Notifikasi',
               style: TextStyle(
-                color: kText,
+                color: Colors.black87,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'Pengingat latihan otomatis 24 jam & 1 jam sebelum sesi dimulai akan muncul di sini!',
+            const SizedBox(height: 8),
+            const Text(
+              'Pemberitahuan jadwal latihan dan pengingat akan muncul di sini!',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: kMuted,
+                color: Colors.black54,
                 fontSize: 13,
                 height: 1.5,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _confirmClear(BuildContext context, NotificationService service) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Hapus Notifikasi', style: TextStyle(fontWeight: FontWeight.w800)),
-        content: Text('Apakah Anda yakin ingin menghapus semua riwayat notifikasi?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('Batal', style: TextStyle(color: kMuted)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              service.clearNotifications();
-              Navigator.pop(ctx);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
-            child: Text('Hapus Semua'),
-          ),
-        ],
       ),
     );
   }
@@ -154,123 +178,153 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Styling berdasarkan tipe
-    final styles = {
-      'reminder': [
-        const Color(0xFFFFF3E0),
-        kPrimary,
-        Icons.alarm_rounded,
-      ],
-      'approval': [
-        const Color(0xFFE8F5E9),
-        const Color(0xFF2E7D32),
-        Icons.check_circle_outline_rounded,
-      ],
-      'announcement': [
-        const Color(0xFFE3F2FD),
-        const Color(0xFF1565C0),
-        Icons.campaign_rounded,
-      ],
-    };
+    // Styling berdasarkan tipe dan status isRead
+    final isUnread = !notif.isRead;
+    
+    // Warna untuk state unread vs read
+    final iconBgColor = isUnread ? const Color(0xFFFDECE5) : const Color(0xFFEEEEEE);
+    final iconColor = isUnread ? const Color(0xFFC84B31) : const Color(0xFF757575);
 
-    final style = styles[notif.type] ?? [kBorder2, kMuted, Icons.notifications_rounded];
+    // Tentukan icon berdasarkan tipe
+    IconData getIcon() {
+      if (notif.title.toLowerCase().contains('jadwal')) return Icons.calendar_month_rounded;
+      if (notif.title.toLowerCase().contains('materi')) return Icons.menu_book_rounded;
+      if (notif.title.toLowerCase().contains('bayar')) return Icons.credit_card_rounded;
+      if (notif.title.toLowerCase().contains('pentas')) return Icons.event_available_rounded;
+      
+      switch (notif.type) {
+        case 'reminder': return Icons.event_note_rounded;
+        case 'approval': return Icons.check_circle_outline_rounded;
+        case 'announcement': return Icons.campaign_rounded;
+        default: return Icons.notifications_none_rounded;
+      }
+    }
+
     final timeStr = _formatTimestamp(notif.timestamp);
+
+    // Cek apakah judul mengandung 'Materi' untuk menampilkan tombol khusus (seperti di gambar)
+    final hasMateriButton = notif.title.toLowerCase().contains('materi');
 
     return GestureDetector(
       onTap: () {
         if (!notif.isRead) {
           service.markAsRead(notif.id);
         }
-        // Tampilkan modal detail notifikasi
         _showDetailBottomSheet(context);
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: notif.isRead ? kBgCard : const Color(0xFFFFF8F5),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: notif.isRead ? kBorder2 : kPrimary.withOpacity(0.2),
-            width: notif.isRead ? 1 : 1.5,
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(notif.isRead ? 0.02 : 0.05),
+              color: Colors.black.withOpacity(0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon Badge
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: style[0] as Color,
-                borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: isUnread ? const Color(0xFFC84B31) : Colors.transparent,
+                width: isUnread ? 4 : 0,
               ),
-              child: Icon(style[2] as IconData, color: style[1] as Color, size: 22),
             ),
-            SizedBox(width: 14),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon Circle
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(getIcon(), color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 14),
 
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          notif.title,
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            notif.title,
+                            style: const TextStyle(
+                              color: Color(0xFF222222),
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          timeStr,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      notif.message,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                    
+                    // Tombol khusus "Lihat Materi" seperti di gambar
+                    if (hasMateriButton) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton(
+                        onPressed: () {
+                          if (!notif.isRead) service.markAsRead(notif.id);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFC84B31),
+                          side: const BorderSide(color: Color(0xFFC84B31), width: 1),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          minimumSize: const Size(0, 0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          'Lihat\nMateri',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: kText,
-                            fontSize: 14.5,
-                            fontWeight: notif.isRead ? FontWeight.w700 : FontWeight.w900,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
                           ),
                         ),
                       ),
-                      if (!notif.isRead)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: kPrimary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
                     ],
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    notif.message,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: notif.isRead ? kMuted : kText.withOpacity(0.85),
-                      fontSize: 12.5,
-                      height: 1.5,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    timeStr,
-                    style: TextStyle(
-                      color: kMuted2,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -278,14 +332,20 @@ class _NotificationCard extends StatelessWidget {
 
   String _formatTimestamp(DateTime dt) {
     final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inMinutes < 60) {
-      if (diff.inMinutes <= 0) return 'Baru saja';
-      return '${diff.inMinutes} menit yang lalu';
-    } else if (diff.inHours < 24) {
-      return '${diff.inHours} jam yang lalu';
+    final today = DateTime(now.year, now.month, now.day);
+    final date = DateTime(dt.year, dt.month, dt.day);
+    
+    if (date == today) {
+      final diff = now.difference(dt);
+      if (diff.inHours < 1) {
+        if (diff.inMinutes <= 0) return 'Baru saja';
+        return '${diff.inMinutes} menit lalu';
+      }
+      return '${diff.inHours} jam lalu';
+    } else if (date == today.subtract(const Duration(days: 1))) {
+      return 'Kemarin';
     } else {
-      return DateFormat('dd MMM yyyy, HH:mm').format(dt);
+      return DateFormat('dd MMM').format(dt);
     }
   }
 
@@ -307,64 +367,63 @@ class _NotificationCard extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: kMuted2,
+                  color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Row(
               children: [
-                Icon(Icons.info_outline_rounded, color: kPrimary, size: 24),
-                SizedBox(width: 10),
+                const Icon(Icons.info_outline_rounded, color: Color(0xFFC84B31), size: 24),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     notif.title,
-                    style: TextStyle(
-                      color: kText,
+                    style: const TextStyle(
+                      color: Colors.black87,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'PlayfairDisplay',
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            Divider(color: kBorder2),
-            SizedBox(height: 12),
+            const SizedBox(height: 16),
+            const Divider(color: Color(0xFFEEEEEE)),
+            const SizedBox(height: 12),
             Text(
               notif.message,
-              style: TextStyle(
-                color: kText,
+              style: const TextStyle(
+                color: Colors.black87,
                 fontSize: 14,
                 height: 1.6,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Diterima: ${DateFormat('dd MMMM yyyy, HH:mm').format(notif.timestamp)} WIB',
-              style: TextStyle(
-                color: kMuted,
+              style: const TextStyle(
+                color: Colors.black54,
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
+                  backgroundColor: const Color(0xFFC84B31),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.w800)),
+                child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
           ],
         ),
       ),

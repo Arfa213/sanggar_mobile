@@ -15,6 +15,7 @@ import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_nav.dart';
 import 'services/notification_service.dart';
+import 'screens/notification_screen.dart';
 import 'services/api_service.dart';
 import 'utils/app_theme.dart';
 
@@ -241,6 +242,9 @@ class SanggarApp extends StatelessWidget {
             break;
           case '/archive':
             page = const ArchiveScreen();
+            break;
+          case '/notifications':
+            page = const NotificationScreen();
             break;
           default:
             page = const SplashScreen();
